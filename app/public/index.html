@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Küme HQ</title>
+<link rel="icon" href="avatars/cabure.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--verde:#1B3A2D;--verde2:#2D5A42;--verde3:#24493A;--dorado:#C4973A;--crema:#F5EFE0;--crema2:#EDE5D2;--negro:#111;--rojo:#9B3B2E}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;font-weight:300;background:var(--crema);color:var(--negro);height:100vh;display:grid;grid-template-columns:240px 1fr;overflow:hidden}
+  h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:600;color:var(--verde)}
+  button{font-family:inherit;cursor:pointer}
+  /* Sidebar */
+  aside{background:var(--verde);color:var(--crema);display:flex;flex-direction:column;padding:22px 16px}
+  .logo{font-family:'Cormorant Garamond',serif;font-size:28px;letter-spacing:.06em;padding:0 8px}
+  .logo small{display:block;font-family:'DM Sans';font-size:10px;letter-spacing:.3em;color:var(--dorado);margin-top:2px}
+  nav{margin-top:28px;display:flex;flex-direction:column;gap:2px}
+  nav button{background:none;border:0;color:var(--crema);text-align:left;padding:10px 12px;font-size:14px;border-radius:6px;opacity:.75;display:flex;justify-content:space-between;align-items:center}
+  nav button.on,nav button:hover{background:var(--verde3);opacity:1}
+  nav .count{background:var(--dorado);color:var(--verde);font-size:11px;font-weight:500;border-radius:10px;padding:1px 8px}
+  .side-title{font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--dorado);margin:28px 12px 8px}
+  .side-agent{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:6px;background:none;border:0;color:var(--crema);font-size:14px;text-align:left;width:100%}
+  .side-agent:hover{background:var(--verde3)}
+  .side-agent img{width:30px;height:30px;border-radius:50%}
+  .side-agent small{display:block;font-size:11px;opacity:.6}
+  .side-foot{margin-top:auto;font-size:11px;opacity:.55;padding:0 12px;line-height:1.6}
+  .side-foot a{color:var(--dorado)}
+  /* Main */
+  main{overflow:auto;padding:36px 44px}
+  .head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:26px}
+  .head h1{font-size:40px;line-height:1}
+  .head p{font-size:14px;color:var(--verde2);margin-top:6px}
+  .kicker{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--dorado);font-weight:500;margin-bottom:8px}
+  .view{display:none}.view.on{display:block}
+  /* Oficina */
+  .office{background:linear-gradient(180deg,var(--crema2),var(--crema));border:1px solid rgba(27,58,45,.1);border-radius:14px;padding:34px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:26px;position:relative}
+  .office::before{content:"";position:absolute;inset:0;border-radius:14px;background-image:linear-gradient(rgba(27,58,45,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(27,58,45,.04) 1px,transparent 1px);background-size:28px 28px;pointer-events:none}
+  .desk{background:#fff;border-radius:12px;padding:22px;position:relative;box-shadow:0 10px 0 var(--verde2),0 18px 30px rgba(27,58,45,.15);transition:transform .2s}
+  .desk:hover{transform:translateY(-3px)}
+  .desk .top{display:flex;gap:16px;align-items:center}
+  .desk img{width:72px;height:72px;border-radius:50%;box-shadow:0 0 0 3px var(--crema),0 0 0 4px var(--dorado)}
+  .desk h3{font-size:26px;line-height:1}
+  .desk .rol{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dorado);font-weight:500}
+  .desk p{font-size:13px;line-height:1.55;color:#333;margin:14px 0}
+  .status{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--verde2)}
+  .status i{width:8px;height:8px;border-radius:50%;background:#5d9b6f;display:block}
+  .status.busy i{background:var(--dorado);animation:pulse 1s infinite}
+  @keyframes pulse{50%{opacity:.3}}
+  .desk .actions{display:flex;gap:8px;margin-top:16px}
+  .btn{background:var(--verde);color:var(--crema);border:0;border-radius:6px;padding:9px 14px;font-size:13px}
+  .btn.ghost{background:none;color:var(--verde);border:1px solid rgba(27,58,45,.25)}
+  .btn.gold{background:var(--dorado);color:var(--verde);font-weight:500}
+  .btn.red{background:none;color:var(--rojo);border:1px solid rgba(155,59,46,.35)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:26px}
+  .stat{background:#fff;border-top:2px solid var(--dorado);padding:16px 18px}
+  .stat b{font-family:'Cormorant Garamond',serif;font-size:36px;color:var(--verde);display:block;line-height:1}
+  .stat span{font-size:12px;color:var(--verde2)}
+  /* Aprobar */
+  .notice{background:#fff;border-left:3px solid var(--dorado);padding:16px 20px;font-size:13px;line-height:1.6;margin-bottom:18px}
+  .notice code{background:var(--crema);padding:1px 6px;border-radius:3px}
+  .card{background:#fff;border-radius:10px;padding:20px 22px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1.3fr;gap:24px}
+  .card h3{font-size:22px}
+  .meta{font-size:12px;color:var(--verde2);margin:4px 0 10px}
+  .pill{display:inline-block;font-size:11px;padding:2px 9px;border-radius:10px;background:var(--crema);color:var(--verde);margin:0 4px 4px 0}
+  .pill.gold{background:var(--dorado);color:var(--verde);font-weight:500}
+  .op{font-size:13px;line-height:1.55;color:#333}
+  .msg{background:#dcf8c6;border-radius:10px;padding:14px 16px;font-size:13.5px;line-height:1.55;white-space:pre-wrap}
+  .card .actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .empty{color:var(--verde2);font-size:14px;padding:30px 0}
+  .tabs{display:flex;gap:6px;margin-bottom:16px}
+  .tabs button{background:none;border:1px solid rgba(27,58,45,.2);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--verde)}
+  .tabs button.on{background:var(--verde);color:var(--crema)}
+  .thumbs{display:flex;gap:6px;overflow-x:auto;margin-top:12px;padding-bottom:4px}
+  .thumbs img{height:120px;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+  /* Propuestas */
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{text-align:left;padding:14px 18px;font-size:13px;border-bottom:1px solid var(--crema2)}
+  th{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--verde2);font-weight:500}
+  td a{color:var(--verde);margin-right:10px}
+  /* Chat */
+  .chat-wrap{position:fixed;top:0;right:0;width:min(560px,100vw);height:100vh;background:#fff;box-shadow:-20px 0 40px rgba(0,0,0,.15);transform:translateX(105%);transition:transform .25s;display:flex;flex-direction:column;z-index:10}
+  .chat-wrap.on{transform:none}
+  .chat-head{background:var(--verde);color:var(--crema);padding:18px 20px;display:flex;align-items:center;gap:12px}
+  .chat-head img{width:44px;height:44px;border-radius:50%}
+  .chat-head h3{color:var(--crema);font-size:22px;line-height:1}
+  .chat-head small{font-size:11px;opacity:.7}
+  .chat-head .x{margin-left:auto;background:none;border:0;color:var(--crema);font-size:22px}
+  .chat-head .reset{background:none;border:1px solid rgba(245,239,224,.3);color:var(--crema);font-size:11px;border-radius:4px;padding:4px 8px}
+  .msgs{flex:1;overflow:auto;padding:20px;background:var(--crema);display:flex;flex-direction:column;gap:10px}
+  .bubble{max-width:88%;padding:11px 14px;border-radius:10px;font-size:13.5px;line-height:1.55;white-space:pre-wrap;word-wrap:break-word}
+  .bubble.vos{align-self:flex-end;background:var(--verde);color:var(--crema)}
+  .bubble.agente{align-self:flex-start;background:#fff}
+  .bubble.error{border-left:3px solid var(--rojo)}
+  .bubble code{background:var(--crema2);padding:0 4px;border-radius:3px;font-size:12px}
+  .typing{align-self:flex-start;font-size:12px;color:var(--verde2);font-style:italic}
+  .shortcuts{display:flex;gap:6px;flex-wrap:wrap;padding:10px 16px 0}
+  .shortcuts button{background:var(--crema);border:0;border-radius:14px;padding:5px 11px;font-size:11.5px;color:var(--verde)}
+  form.send{display:flex;gap:8px;padding:12px 16px 16px}
+  form.send textarea{flex:1;border:1px solid rgba(27,58,45,.2);border-radius:8px;padding:10px 12px;font-family:inherit;font-size:13.5px;resize:none;height:64px}
+  .tip{font-size:11px;color:var(--verde2);padding:0 16px 12px;opacity:.8}
+  @media (max-width:820px){body{grid-template-columns:1fr}aside{display:none}main{padding:22px 16px}.card{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<aside>
+  <div class="logo">küme<small>HQ · EQUIPO DE AGENTES</small></div>
+  <nav>
+    <button data-view="oficina" class="on">Oficina</button>
+    <button data-view="aprobar">Para aprobar <span class="count" id="c-aprobar" hidden>0</span></button>
+    <button data-view="diagnosticos">Diagnósticos</button>
+    <button data-view="propuestas">Propuestas <span class="count" id="c-prop" hidden>0</span></button>
+    <button data-view="contenido">Contenido <span class="count" id="c-cont" hidden>0</span></button>
+    <button data-view="reportes">Reportes</button>
+  </nav>
+  <div class="side-title">El equipo</div>
+  <div id="side-agents"></div>
+  <div class="side-foot">
+    Regla de oro: ningún agente envía nada sin tu OK.<br>
+    <a href="https://app.notion.com/p/3f8191cf13b8810eafa6c24aa30cecdf" target="_blank">Abrir Notion ↗</a>
+  </div>
+</aside>
+
+<main>
+  <!-- OFICINA -->
+  <section class="view on" id="v-oficina">
+    <div class="head"><div><div class="kicker" id="saludo">Buen día</div><h1>La oficina de Küme</h1><p>Tu equipo, en un solo lugar. Hacé clic en un escritorio para hablar con ese agente.</p></div></div>
+    <div class="office" id="office"></div>
+    <div class="stats">
+      <div class="stat"><b id="s-listos">–</b><span>mensajes para aprobar</span></div>
+      <div class="stat"><b id="s-aprobados">–</b><span>aprobados para enviar</span></div>
+      <div class="stat"><b id="s-prop">–</b><span>propuestas en curso</span></div>
+      <div class="stat"><b id="s-agentes">–</b><span>agentes en el equipo</span></div>
+    </div>
+  </section>
+
+  <!-- APROBAR -->
+  <section class="view" id="v-aprobar">
+    <div class="head"><div><div class="kicker">Caburé · Prospectos</div><h1>Para aprobar</h1><p>Leé el mensaje, aprobalo y envialo vos. Después marcá "Contactado".</p></div>
+      <button class="btn ghost" onclick="loadProspectos()">Actualizar</button></div>
+    <div id="notion-msg"></div>
+    <div class="tabs" id="tabs-estado"></div>
+    <div id="prospectos"></div>
+  </section>
+
+  <!-- DIAGNÓSTICOS -->
+  <section class="view" id="v-diagnosticos">
+    <div class="head"><div><div class="kicker">Zorzal · Diagnóstico gratis</div><h1>Diagnósticos</h1><p>El regalo antes de la consulta. Revisalo y mandalo vos.</p></div>
+      <button class="btn" onclick="openChat('diagnostico')">Pedir un diagnóstico</button></div>
+    <table><thead><tr><th>Negocio</th><th>Estado</th><th>Archivos</th></tr></thead><tbody id="diagnosticos"></tbody></table>
+  </section>
+
+  <!-- PROPUESTAS -->
+  <section class="view" id="v-propuestas">
+    <div class="head"><div><div class="kicker">Calandria · Propuestas</div><h1>Propuestas</h1><p>Cada cliente tiene su carpeta. Revisá antes de enviar.</p></div>
+      <button class="btn" onclick="openChat('propuestas')">Pedir una propuesta</button></div>
+    <table><thead><tr><th>Cliente</th><th>Fase</th><th>Archivos</th></tr></thead><tbody id="propuestas"></tbody></table>
+  </section>
+
+  <!-- CONTENIDO -->
+  <section class="view" id="v-contenido">
+    <div class="head"><div><div class="kicker">Benteveo · Instagram de Küme</div><h1>Contenido</h1><p>Revisá cada pieza. Aprobada, la programás vos.</p></div>
+      <div style="display:flex;gap:8px"><button class="btn ghost" onclick="loadContenido()">Actualizar</button><button class="btn" onclick="openChat('contenido')">Pedir contenido</button></div></div>
+    <div id="cont-msg"></div>
+    <div class="tabs" id="tabs-cont"></div>
+    <div id="contenido"></div>
+  </section>
+
+  <!-- REPORTES -->
+  <section class="view" id="v-reportes">
+    <div class="head"><div><div class="kicker">Tero · Reportes mensuales</div><h1>Reportes</h1><p>Uno por cliente y por mes. Revisalo antes de enviarlo.</p></div>
+      <button class="btn" onclick="openChat('reportes')">Pedir un reporte</button></div>
+    <table><thead><tr><th>Cliente</th><th>Mes</th><th>Estado</th><th>Archivos</th></tr></thead><tbody id="reportes"></tbody></table>
+  </section>
+</main>
+
+<div class="chat-wrap" id="chat">
+  <div class="chat-head">
+    <img id="ch-img" alt="">
+    <div><h3 id="ch-nombre"></h3><small id="ch-rol"></small></div>
+    <button class="reset" onclick="resetChat()" title="Empezar una conversación nueva (ahorra uso)">Chat nuevo</button>
+    <button class="x" onclick="closeChat()">×</button>
+  </div>
+  <div class="msgs" id="msgs"></div>
+  <div class="shortcuts" id="shortcuts"></div>
+  <form class="send" id="send"><textarea id="txt" placeholder="Pedile algo…"></textarea><button class="btn gold" id="btn-send">Enviar</button></form>
+  <div class="tip">Un chat por agente. Si se hace muy largo, tocá "Chat nuevo": el agente no olvida lo importante porque vive en su archivo.</div>
+</div>
+
+<script>
+let AGENTS = [], current = null, PROS = [], filtro = "Mensaje listo";
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const md = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`]+)`/g, "<code>$1</code>");
+
+const h = new Date().getHours();
+$("#saludo").textContent = h < 13 ? "Buen día" : h < 20 ? "Buenas tardes" : "Buenas noches";
+
+document.querySelectorAll("nav button").forEach((b) => b.onclick = () => show(b.dataset.view));
+function show(v) {
+  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("on", b.dataset.view === v));
+  document.querySelectorAll(".view").forEach((s) => s.classList.toggle("on", s.id === "v-" + v));
+  if (v === "aprobar") loadProspectos();
+  if (v === "propuestas") loadPropuestas();
+  if (v === "contenido") loadContenido();
+  if (v === "reportes") loadReportes();
+  if (v === "diagnosticos") loadDiagnosticos();
+}
+
+async function loadAgents() {
+  AGENTS = await (await fetch("/api/agents")).json();
+  $("#s-agentes").textContent = AGENTS.length;
+  $("#side-agents").innerHTML = AGENTS.map((a) => `<button class="side-agent" onclick="openChat('${a.id}')"><img src="${a.avatar}" alt=""><span>${esc(a.nombre)}<small>${esc(a.rol)}</small></span></button>`).join("");
+  $("#office").innerHTML = AGENTS.map((a) => `
+    <div class="desk">
+      <div class="top"><img src="${a.avatar}" alt=""><div><div class="rol">${esc(a.rol)}</div><h3>${esc(a.nombre)}</h3></div></div>
+      <p>${esc(a.descripcion)}</p>
+      <span class="status ${a.ocupado ? "busy" : ""}"><i></i>${a.ocupado ? "Trabajando…" : "Disponible"} · ${a.mensajes} mensajes en su chat</span>
+      <div class="actions"><button class="btn" onclick="openChat('${a.id}')">Hablar con ${esc(a.nombre)}</button>
+      ${{ prospectos: `<button class="btn ghost" onclick="show('aprobar')">Ver para aprobar</button>`,
+          propuestas: `<button class="btn ghost" onclick="show('propuestas')">Ver propuestas</button>`,
+          contenido: `<button class="btn ghost" onclick="show('contenido')">Ver contenido</button>`,
+          reportes: `<button class="btn ghost" onclick="show('reportes')">Ver reportes</button>`,
+          diagnostico: `<button class="btn ghost" onclick="show('diagnosticos')">Ver diagnósticos</button>` }[a.id] || ""}</div>
+    </div>`).join("");
+}
+
+// ---------- Chat ----------
+async function openChat(id) {
+  current = AGENTS.find((a) => a.id === id);
+  $("#ch-img").src = current.avatar; $("#ch-nombre").textContent = current.nombre; $("#ch-rol").textContent = current.rol + " · " + current.descripcion;
+  $("#shortcuts").innerHTML = current.atajos.map((t) => `<button type="button">${esc(t)}</button>`).join("");
+  $("#shortcuts").querySelectorAll("button").forEach((b) => b.onclick = () => { $("#txt").value = b.textContent; $("#txt").focus(); });
+  $("#chat").classList.add("on");
+  renderChat(await (await fetch("/api/chat/" + id)).json(), current.ocupado);
+}
+function closeChat() { $("#chat").classList.remove("on"); current = null; }
+function renderChat(chat, busy) {
+  const list = chat.messages.map((m) => `<div class="bubble ${m.de} ${m.error ? "error" : ""}">${md(m.texto)}</div>`);
+  if (!chat.messages.length) list.push(`<div class="typing">Todavía no hablaron. Probá con uno de los atajos de abajo.</div>`);
+  if (busy) list.push(`<div class="typing">${esc(current.nombre)} está trabajando… (puede tardar unos minutos)</div>`);
+  $("#msgs").innerHTML = list.join("");
+  $("#msgs").scrollTop = 1e9;
+  $("#btn-send").disabled = !!busy;
+}
+$("#send").onsubmit = async (e) => {
+  e.preventDefault();
+  const message = $("#txt").value.trim();
+  if (!message || !current) return;
+  const agent = current;
+  $("#txt").value = "";
+  const chat = await (await fetch("/api/chat/" + agent.id)).json();
+  chat.messages.push({ de: "vos", texto: message });
+  renderChat(chat, true);
+  const r = await fetch("/api/chat/" + agent.id, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message }) });
+  const data = await r.json();
+  if (current?.id === agent.id) renderChat(data.messages ? data : { messages: [...chat.messages, { de: "agente", texto: data.error, error: true }] }, false);
+  loadAgents(); loadPropuestas();
+};
+$("#txt").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#send").requestSubmit(); } });
+async function resetChat() {
+  if (!current || !confirm(`¿Empezar un chat nuevo con ${current.nombre}? Lo que aprendió sigue en su archivo.`)) return;
+  await fetch("/api/chat/" + current.id, { method: "DELETE" });
+  renderChat({ messages: [] }, false); loadAgents();
+}
+
+// ---------- Prospectos (Notion) ----------
+const ESTADOS = ["Mensaje listo", "Aprobado", "Contactado", "Respondió", "Consulta agendada", "Descartado"];
+async function loadProspectos() {
+  const r = await (await fetch("/api/prospectos")).json();
+  if (r.error) {
+    $("#notion-msg").innerHTML = r.error === "sin_token"
+      ? `<div class="notice"><b>Falta conectar Notion.</b> Creá una integración interna en <a href="https://www.notion.so/profile/integrations" target="_blank">notion.so/profile/integrations</a>, copiá su clave y pegala en <code>Kume/app/.env</code> como <code>NOTION_TOKEN=...</code>. Después, en Notion, abrí la página "Küme — Equipo de agentes" → ··· → Conexiones → agregá la integración. Reiniciá la app.</div>`
+      : `<div class="notice"><b>Notion respondió:</b> ${esc(r.error)}. Revisá que la integración tenga acceso a la página "Küme — Equipo de agentes".</div>`;
+  } else $("#notion-msg").innerHTML = "";
+  PROS = r.items || [];
+  const listos = PROS.filter((p) => p.estado === "Mensaje listo").length;
+  $("#s-listos").textContent = r.error ? "–" : listos;
+  $("#s-aprobados").textContent = r.error ? "–" : PROS.filter((p) => p.estado === "Aprobado").length;
+  $("#c-aprobar").hidden = !listos; $("#c-aprobar").textContent = listos;
+  $("#tabs-estado").innerHTML = ESTADOS.map((e) => `<button class="${e === filtro ? "on" : ""}" onclick="filtro='${e}';renderProspectos();renderTabs()">${e} (${PROS.filter((p) => p.estado === e).length})</button>`).join("");
+  renderProspectos();
+}
+function renderTabs() { document.querySelectorAll("#tabs-estado button").forEach((b) => b.classList.toggle("on", b.textContent.startsWith(filtro))); }
+function renderProspectos() {
+  const items = PROS.filter((p) => p.estado === filtro);
+  $("#prospectos").innerHTML = items.length ? items.map((p) => `
+    <div class="card">
+      <div>
+        <h3>${esc(p.negocio)}</h3>
+        <div class="meta">${esc(p.rubro)} · ${esc(p.zona)}</div>
+        <span class="pill gold">${esc(p.puntaje)}</span>${p.servicios.map((s) => `<span class="pill">${esc(s)}</span>`).join("")}
+        <p class="op" style="margin-top:8px">${esc(p.oportunidad)}</p>
+        <div class="meta" style="margin-top:8px">${p.instagram ? `<a href="${esc(p.instagram)}" target="_blank">Instagram ↗</a> ` : ""}${p.web ? `<a href="${esc(p.web)}" target="_blank">Web ↗</a> ` : ""}<a href="${esc(p.url)}" target="_blank">Ficha en Notion ↗</a></div>
+      </div>
+      <div>
+        ${p.mensaje ? `<div class="msg">${esc(p.mensaje)}</div>` : `<div class="empty">Sin mensaje.</div>`}
+        <div class="actions">${acciones(p)}</div>
+      </div>
+    </div>`).join("") : `<div class="empty">No hay prospectos en "${filtro}".</div>`;
+}
+function acciones(p) {
+  const b = (estado, label, cls = "btn") => `<button class="${cls}" onclick="setEstado('${p.id}','${estado}')">${label}</button>`;
+  const copiar = p.mensaje ? `<button class="btn ghost" onclick="navigator.clipboard.writeText(PROS.find(x=>x.id==='${p.id}').mensaje);this.textContent='Copiado ✓'">Copiar mensaje</button>` : "";
+  const diag = `<button class="btn ghost" onclick="pedirDiagnostico('${p.id}')">Diagnóstico (Zorzal)</button>`;
+  switch (p.estado) {
+    case "Mensaje listo": return b("Aprobado", "Aprobar", "btn gold") + copiar + b("Descartado", "Descartar", "btn red");
+    case "Aprobado": return copiar + b("Contactado", "Ya lo envié") + diag;
+    case "Contactado": return b("Respondió", "Respondió") + diag + b("Descartado", "No respondió", "btn red");
+    case "Respondió": return b("Consulta agendada", "Agendamos consulta", "btn gold") + diag;
+    case "Consulta agendada": return `<button class="btn" onclick="pedirPropuesta('${p.id}')">Pasarle a Calandria</button>`;
+    default: return b("Mensaje listo", "Recuperar", "btn ghost");
+  }
+}
+async function setEstado(id, estado) {
+  const r = await fetch("/api/prospectos/" + id, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ estado }) });
+  if (!r.ok) return alert((await r.json()).error);
+  PROS.find((p) => p.id === id).estado = estado;
+  loadProspectos();
+}
+function pedirPropuesta(id) {
+  const p = PROS.find((x) => x.id === id);
+  openChat("propuestas").then(() => { $("#txt").value = `Arrancá el análisis de ${p.negocio} (${p.rubro}, ${p.zona}). ${p.instagram || p.web || ""}\nLo que ya sabemos por Caburé: ${p.oportunidad}`; });
+}
+
+function pedirDiagnostico(id) {
+  const p = PROS.find((x) => x.id === id);
+  openChat("diagnostico").then(() => { $("#txt").value = `Diagnóstico de ${p.negocio} (${p.rubro}, ${p.zona}) — ${p.instagram || p.web || "sin link"}\nLo que ya vio Caburé: ${p.oportunidad}`; });
+}
+
+// ---------- Diagnósticos ----------
+async function loadDiagnosticos() {
+  const list = await (await fetch("/api/diagnosticos")).json();
+  $("#diagnosticos").innerHTML = list.length ? list.map((d) => `<tr>
+    <td><b>${esc(d.negocio)}</b></td>
+    <td><span class="pill ${d.listo ? "gold" : ""}">${d.listo ? "Listo para revisar" : "Revisando"}</span></td>
+    <td>${d.files.filter((f) => /\.(md|html|pdf)$/.test(f)).map((f) => `<a href="/files/diagnostico/${encodeURIComponent(d.negocio)}/${encodeURIComponent(f)}" target="_blank">${esc(f)}</a>`).join("")}</td>
+  </tr>`).join("") : `<tr><td colspan="3" class="empty">Todavía no hay diagnósticos.</td></tr>`;
+}
+
+// ---------- Propuestas ----------
+async function loadPropuestas() {
+  const list = await (await fetch("/api/propuestas")).json();
+  $("#s-prop").textContent = list.length;
+  const listas = list.filter((p) => p.fase === "Lista para revisar").length;
+  $("#c-prop").hidden = !listas; $("#c-prop").textContent = listas;
+  $("#propuestas").innerHTML = list.length ? list.map((p) => `<tr>
+    <td><b>${esc(p.cliente)}</b></td>
+    <td><span class="pill ${p.fase === "Lista para revisar" ? "gold" : ""}">${esc(p.fase)}</span></td>
+    <td>${p.files.filter((f) => /\.(md|html|pdf)$/.test(f)).map((f) => `<a href="/salidas/${encodeURIComponent(p.cliente)}/${encodeURIComponent(f)}" target="_blank">${esc(f)}</a>`).join("")}</td>
+  </tr>`).join("") : `<tr><td colspan="3" class="empty">Todavía no hay propuestas.</td></tr>`;
+}
+
+// ---------- Contenido (Notion) ----------
+const EST_CONT = ["Para aprobar", "Borrador", "Grabar (humano)", "Aprobado", "Programado", "Publicado"];
+let CONT = [], filtroCont = "Para aprobar";
+async function loadContenido() {
+  const r = await (await fetch("/api/contenido")).json();
+  $("#cont-msg").innerHTML = r.error ? `<div class="notice"><b>Notion respondió:</b> ${esc(r.error)}</div>` : "";
+  CONT = r.items || [];
+  const pend = CONT.filter((c) => c.estado === "Para aprobar").length;
+  $("#c-cont").hidden = !pend; $("#c-cont").textContent = pend;
+  $("#tabs-cont").innerHTML = EST_CONT.map((e) => `<button class="${e === filtroCont ? "on" : ""}" onclick="filtroCont='${e}';loadContenido()">${e} (${CONT.filter((c) => c.estado === e).length})</button>`).join("");
+  const items = CONT.filter((c) => c.estado === filtroCont);
+  $("#contenido").innerHTML = items.length ? items.map((c) => `
+    <div class="card">
+      <div>
+        <div class="meta">${esc(fechaLinda(c.fecha))} · ${esc(c.formato)}</div>
+        <h3>${esc(c.pieza)}</h3>
+        <span class="pill gold">${esc(c.pilar)}</span>
+        ${c.imagenes.length ? `<div class="thumbs">${c.imagenes.map((src) => `<a href="${src}" target="_blank"><img src="${src}" alt=""></a>`).join("")}</div>` : ""}
+        <p class="op" style="margin-top:8px;white-space:pre-wrap">${esc(c.guion)}</p>
+        <div class="meta" style="margin-top:8px"><a href="${esc(c.url)}" target="_blank">Ficha en Notion ↗</a></div>
+      </div>
+      <div>
+        <div class="meta"><b>Gancho:</b> ${esc(c.gancho)}</div>
+        <div class="msg" style="background:#fff;border:1px solid var(--crema2)">${esc(c.caption)}\n\n${esc(c.hashtags)}</div>
+        <div class="actions">${accionesCont(c)}</div>
+      </div>
+    </div>`).join("") : `<div class="empty">No hay piezas en "${filtroCont}".</div>`;
+}
+function fechaLinda(f) { if (!f) return "Sin fecha"; const d = new Date(f + "T12:00"); return d.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" }); }
+function accionesCont(c) {
+  const b = (estado, label, cls = "btn") => `<button class="${cls}" onclick="setEstadoCont('${c.id}','${estado}')">${label}</button>`;
+  const copiar = `<button class="btn ghost" onclick="navigator.clipboard.writeText(CONT.find(x=>x.id==='${c.id}').caption+'\\n\\n'+CONT.find(x=>x.id==='${c.id}').hashtags);this.textContent='Copiado ✓'">Copiar caption</button>`;
+  switch (c.estado) {
+    case "Para aprobar": return b("Aprobado", "Aprobar", "btn gold") + copiar + b("Borrador", "Pedir cambios", "btn red");
+    case "Borrador": return b("Para aprobar", "Pasar a aprobar", "btn ghost") + `<button class="btn" onclick="pedirCambio('${c.id}')">Hablar con Benteveo</button>`;
+    case "Grabar (humano)": return b("Aprobado", "Ya lo grabé", "btn gold") + copiar;
+    case "Aprobado": return copiar + b("Programado", "Ya lo programé");
+    case "Programado": return b("Publicado", "Ya se publicó");
+    default: return copiar;
+  }
+}
+async function setEstadoCont(id, estado) {
+  const r = await fetch("/api/contenido/" + id, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ estado }) });
+  if (!r.ok) return alert((await r.json()).error);
+  loadContenido();
+}
+function pedirCambio(id) {
+  const c = CONT.find((x) => x.id === id);
+  openChat("contenido").then(() => { $("#txt").value = `Sobre la pieza "${c.pieza}" (${c.fecha}): `; $("#txt").focus(); });
+}
+
+// ---------- Reportes ----------
+async function loadReportes() {
+  const list = await (await fetch("/api/reportes")).json();
+  $("#reportes").innerHTML = list.length ? list.map((r) => `<tr>
+    <td><b>${esc(r.cliente)}</b></td><td>${esc(r.mes)}</td>
+    <td><span class="pill ${r.listo ? "gold" : ""}">${r.listo ? "Listo para revisar" : "En armado"}</span></td>
+    <td>${r.files.filter((f) => /\.(html|pdf)$/.test(f)).map((f) => `<a href="/files/reportes/${encodeURIComponent(r.cliente)}/${encodeURIComponent(r.mes)}/${encodeURIComponent(f)}" target="_blank">${esc(f)}</a>`).join("")}</td>
+  </tr>`).join("") : `<tr><td colspan="4" class="empty">Todavía no hay reportes.</td></tr>`;
+}
+
+loadAgents(); loadProspectos(); loadPropuestas(); loadContenido();
+</script>
+</body>
+</html>

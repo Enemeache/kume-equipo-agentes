@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Küme HQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@300;400;500;600&display=swap">
+<style>
+/* Layout: página de venta angosta + la app real en una ventana interactiva al centro. Paleta = identidad Küme. */
+:root{
+  color-scheme: light;
+  --bg:#ECE6D8; --surface:#F5EFE0; --card:#FFFFFF; --ink:#16241D; --muted:#4F6157; --line:rgba(27,58,45,.14);
+  --verde:#1B3A2D; --verde2:#2D5A42; --side:#1B3A2D; --side-ink:#F5EFE0; --side-hover:#24493A;
+  --dorado:#C4973A; --dorado-ink:#1B3A2D; --msg:#DCF3D2;
+  --ok:#3F7E52; --warn:#C08A22; --bad:#A6473A;
+  --display:'Cormorant Garamond', Georgia, serif; --body:'DM Sans', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#0E1914; --surface:#13231B; --card:#1A2E24; --ink:#ECE5D4; --muted:#A8B5AA; --line:rgba(236,229,212,.12);
+    --verde:#E5D9BC; --verde2:#B9C8BB; --side:#0A140F; --side-ink:#ECE5D4; --side-hover:#173025;
+    --dorado:#D2A64B; --dorado-ink:#13231B; --msg:#21402F;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0E1914; --surface:#13231B; --card:#1A2E24; --ink:#ECE5D4; --muted:#A8B5AA; --line:rgba(236,229,212,.12);
+  --verde:#E5D9BC; --verde2:#B9C8BB; --side:#0A140F; --side-ink:#ECE5D4; --side-hover:#173025;
+  --dorado:#D2A64B; --dorado-ink:#13231B; --msg:#21402F;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:clip}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:300;line-height:1.55;padding-inline:16px}
+a{color:inherit}
+button{font-family:inherit;cursor:pointer;color:inherit}
+button:focus-visible,a:focus-visible,textarea:focus-visible{outline:2px solid var(--dorado);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);font-weight:600;color:var(--verde);line-height:1.05;text-wrap:balance}
+.wrap{max-width:1180px;margin:0 auto}
+.kicker{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--dorado);font-weight:500}
+
+/* Barra superior */
+.top{display:flex;justify-content:space-between;align-items:center;padding-block:22px}
+.logo{font-family:var(--display);font-size:30px;color:var(--verde);letter-spacing:.04em}
+.logo span{font-family:var(--body);font-size:11px;letter-spacing:.28em;color:var(--dorado);margin-left:8px;vertical-align:middle}
+.cta{display:inline-flex;align-items:center;gap:8px;background:var(--dorado);color:var(--dorado-ink);text-decoration:none;font-weight:500;font-size:14px;padding:11px 18px;border-radius:6px}
+
+/* Hero */
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:40px;align-items:end;padding-block:26px 30px}
+.hero h1{font-size:clamp(40px,6vw,74px);font-weight:500}
+.hero h1 em{color:var(--dorado);font-style:italic}
+.hero p{font-size:17px;color:var(--muted);max-width:52ch}
+.hero .note{font-size:13px;margin-top:14px;display:flex;gap:8px;align-items:center;color:var(--muted)}
+.hero .note i{width:8px;height:8px;border-radius:50%;background:var(--ok);display:block;animation:pulse 1.6s infinite}
+
+/* Ventana de la app */
+.window{background:var(--surface);border-radius:14px;overflow:hidden;box-shadow:0 30px 60px rgba(10,25,18,.22),0 0 0 1px var(--line)}
+.chrome{display:flex;align-items:center;gap:7px;padding:10px 14px;background:var(--side);}
+.chrome i{width:11px;height:11px;border-radius:50%;background:rgba(245,239,224,.25);display:block}
+.chrome span{margin-left:10px;font-size:12px;color:var(--side-ink);opacity:.7}
+.chrome button{margin-left:auto;background:none;border:1px solid rgba(245,239,224,.25);color:var(--side-ink);border-radius:4px;font-size:11px;padding:3px 9px}
+.app{display:grid;grid-template-columns:210px 1fr;height:660px;position:relative}
+aside{background:var(--side);color:var(--side-ink);padding:18px 12px;display:flex;flex-direction:column;gap:2px;overflow:auto}
+aside .lab{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--dorado);margin:18px 10px 6px}
+aside button{background:none;border:0;color:var(--side-ink);text-align:left;padding:9px 10px;font-size:13.5px;border-radius:6px;display:flex;align-items:center;gap:9px;opacity:.78}
+aside button.on,aside button:hover{background:var(--side-hover);opacity:1}
+aside .count{margin-left:auto;background:var(--dorado);color:#1B3A2D;font-size:11px;font-weight:600;border-radius:10px;padding:0 8px}
+aside img{width:26px;height:26px;border-radius:50%}
+aside small{display:block;font-size:10.5px;opacity:.6;line-height:1.2}
+main{overflow:auto;padding:26px 28px}
+.vhead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.vhead h2{font-size:34px}
+.vhead p{font-size:13.5px;color:var(--muted)}
+.view{display:none}.view.on{display:block}
+
+/* Oficina */
+.office{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;padding:22px;border-radius:12px;background-color:var(--bg);background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:26px 26px}
+.desk{background:var(--card);border-radius:10px;padding:16px;box-shadow:0 7px 0 var(--verde2);display:flex;flex-direction:column;gap:10px;transition:transform .2s}
+.desk:hover{transform:translateY(-3px)}
+.desk .t{display:flex;gap:12px;align-items:center}
+.desk img{width:54px;height:54px;border-radius:50%;box-shadow:0 0 0 2px var(--card),0 0 0 3px var(--dorado)}
+.desk h3{font-size:22px}
+.desk .rol{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dorado);font-weight:500}
+.desk p{font-size:12.5px;color:var(--muted);line-height:1.5}
+.status{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--ok);display:block}
+.status.busy i{background:var(--dorado);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+.stat{background:var(--card);border-top:2px solid var(--dorado);padding:12px 14px}
+.stat b{font-family:var(--display);font-size:32px;color:var(--verde);display:block;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:11.5px;color:var(--muted)}
+
+.btn{background:var(--verde);color:var(--surface);border:0;border-radius:6px;padding:8px 13px;font-size:12.5px;font-weight:500}
+.btn.gold{background:var(--dorado);color:#1B3A2D}
+.btn.ghost{background:none;color:var(--verde);border:1px solid var(--line)}
+.btn.red{background:none;color:var(--bad);border:1px solid color-mix(in srgb,var(--bad) 40%,transparent)}
+.row{display:flex;gap:7px;flex-wrap:wrap}
+
+/* Tarjetas */
+.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.tabs button{background:none;border:1px solid var(--line);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--verde)}
+.tabs button.on{background:var(--verde);color:var(--surface);border-color:var(--verde)}
+.card{background:var(--card);border-radius:10px;padding:16px 18px;margin-bottom:12px;display:grid;grid-template-columns:1fr 1.25fr;gap:18px;animation:in .35s ease}
+@keyframes in{from{transform:translateY(6px);opacity:.4}to{transform:none;opacity:1}}
+.card>div,main,.app>*{min-width:0}
+.card h3{font-size:21px}
+.meta{font-size:11.5px;color:var(--muted);margin:2px 0 8px}
+.pill{display:inline-block;font-size:10.5px;padding:2px 9px;border-radius:10px;background:var(--bg);color:var(--verde);margin:0 4px 4px 0}
+.pill.gold{background:var(--dorado);color:#1B3A2D;font-weight:500}
+.op{font-size:12.5px;color:var(--muted);line-height:1.5}
+.msg{background:var(--msg);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.5;white-space:pre-wrap;margin-bottom:10px}
+.empty{color:var(--muted);font-size:13px;padding:24px 0}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden}
+th,td{text-align:left;padding:12px 14px;font-size:12.5px;border-bottom:1px solid var(--line)}
+th{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td .link{background:none;border:0;color:var(--verde);text-decoration:underline;font-size:12.5px;padding:0}
+
+/* Mini slide de contenido */
+.slides{display:flex;gap:6px;overflow-x:auto;margin-top:8px}
+.slide{flex:0 0 88px;height:110px;border-radius:4px;padding:9px;display:flex;flex-direction:column;justify-content:center;font-family:var(--display);font-size:12px;line-height:1.1}
+.slide.v{background:#1B3A2D;color:#F5EFE0}.slide.c{background:#F5EFE0;color:#1B3A2D;border:1px solid var(--line)}
+.slide em{color:#C4973A;font-style:italic}
+.slide .n{color:#C4973A;font-size:22px}
+
+/* Chat */
+.chat{position:absolute;top:0;right:0;bottom:0;width:min(420px,100%);background:var(--card);box-shadow:-14px 0 30px rgba(0,0,0,.18);transform:translateX(105%);transition:transform .25s;display:flex;flex-direction:column;z-index:5}
+.chat.on{transform:none}
+.chead{background:var(--side);color:var(--side-ink);padding:14px 16px;display:flex;gap:10px;align-items:center}
+.chead img{width:38px;height:38px;border-radius:50%}
+.chead h3{color:var(--side-ink);font-size:20px}
+.chead small{font-size:11px;opacity:.7}
+.chead .x{margin-left:auto;background:none;border:0;color:var(--side-ink);font-size:22px;line-height:1}
+.msgs{flex:1;overflow:auto;padding:16px;background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.b{max-width:88%;padding:9px 12px;border-radius:10px;font-size:13px;line-height:1.5;white-space:pre-wrap}
+.b.vos{align-self:flex-end;background:var(--verde);color:var(--surface)}
+.b.ag{align-self:flex-start;background:var(--card);border:1px solid var(--line)}
+.step{align-self:flex-start;font-size:11.5px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.step i{width:6px;height:6px;border-radius:50%;background:var(--dorado);display:block}
+.step.done i{background:var(--ok)}
+.shorts{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px 0;border-top:1px solid var(--line)}
+.shorts button{background:var(--bg);border:0;border-radius:14px;padding:5px 10px;font-size:11.5px;color:var(--verde)}
+form.send{display:flex;gap:8px;padding:10px 14px 14px}
+form.send textarea{flex:1;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:9px 11px;font-family:inherit;font-size:13px;resize:none;height:52px}
+
+/* Modal documento */
+.modal{position:absolute;inset:0;background:rgba(10,20,15,.55);display:none;align-items:center;justify-content:center;z-index:8;padding:18px}
+.modal.on{display:flex}
+.doc{background:#F5EFE0;color:#16241D;width:min(520px,100%);max-height:100%;overflow:auto;border-radius:8px;box-shadow:0 20px 40px rgba(0,0,0,.3)}
+.doc .dh{background:#1B3A2D;color:#F5EFE0;padding:20px 24px}
+.doc .dh h3{color:#F5EFE0;font-size:26px}
+.doc .db{padding:18px 24px 24px;display:flex;flex-direction:column;gap:10px}
+.doc .db h3{color:#1B3A2D;font-size:18px}
+.doc p,.doc li{font-size:13px;line-height:1.5}
+.doc .sem{display:grid;grid-template-columns:14px 1fr;gap:8px;align-items:start;padding:6px 0;border-bottom:1px solid rgba(27,58,45,.12)}
+.doc .dot{width:11px;height:11px;border-radius:50%;margin-top:4px}
+.doc .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.doc .kpi{background:#fff;border-top:2px solid #C4973A;padding:8px}
+.doc .kpi b{font-family:var(--display);font-size:24px;display:block;color:#1B3A2D}
+.doc .kpi span{font-size:11px;color:#4F6157}
+.doc .close{align-self:flex-end}
+.doc .dk{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#C4973A;font-weight:500}
+
+/* Toast */
+.toast{position:absolute;left:50%;bottom:18px;transform:translate(-50%,30px);opacity:0;background:var(--verde);color:var(--surface);font-size:13px;padding:10px 16px;border-radius:8px;transition:.25s;z-index:9;pointer-events:none;max-width:90%}
+.toast.on{transform:translate(-50%,0);opacity:1}
+
+/* Secciones de venta */
+section.sell{padding-block:64px 8px}
+section.sell h2{font-size:clamp(30px,4vw,46px);max-width:22ch;margin-top:8px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:30px}
+.steps div{border-top:1px solid var(--dorado);padding-top:14px}
+.steps b{font-family:var(--display);font-size:30px;color:var(--dorado);display:block;line-height:1}
+.steps h3{font-size:21px;margin:8px 0 6px}
+.steps p{font-size:14px;color:var(--muted)}
+.team{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:28px}
+.team div{background:var(--surface);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.team img{width:46px;height:46px;border-radius:50%}
+.team h3{font-size:20px}
+.team p{font-size:13px;color:var(--muted)}
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:28px;align-items:start}
+.rules ul{list-style:none;display:flex;flex-direction:column;gap:2px}
+.rules li{padding:12px 0;border-bottom:1px solid var(--line);font-size:15px;display:grid;grid-template-columns:22px 1fr;gap:8px}
+.rules li::before{content:"✓";color:var(--ok);font-weight:600}
+.quote{font-family:var(--display);font-style:italic;font-size:26px;line-height:1.3;color:var(--verde);border-left:2px solid var(--dorado);padding-left:20px}
+.final{margin-block:70px 40px;background:var(--side);color:var(--side-ink);border-radius:14px;padding:44px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.final h2{color:var(--side-ink);font-size:clamp(28px,4vw,42px);max-width:20ch}
+.final p{opacity:.8;font-size:15px;margin-top:8px}
+footer{font-size:12px;color:var(--muted);padding-block:10px 30px;text-align:center}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;gap:16px;padding-block:10px 22px}
+  .hero p{font-size:15.5px}
+  /* En el celular la app se comporta como una app: menú fijo arriba, una sola barra de scroll, chat a pantalla completa */
+  .window{overflow:visible;border-radius:12px}
+  .chrome{border-radius:12px 12px 0 0}
+  .app{grid-template-columns:1fr;height:auto}
+  aside{flex-direction:row;overflow-x:auto;padding:8px;gap:4px;position:sticky;top:env(safe-area-inset-top,0px);z-index:4;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+  aside::-webkit-scrollbar{display:none}
+  aside .lab,aside .agent-btn{display:none}
+  aside button{white-space:nowrap;padding:9px 12px}
+  main{padding:18px 14px 26px;overflow:visible;border-radius:0 0 12px 12px;background:var(--surface)}
+  .vhead h2{font-size:30px}
+  .office{padding:12px;gap:14px}
+  .chat{position:fixed;inset:0;width:100%;z-index:50;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);transform:none;transition:none}
+  .chat:not(.on){display:none}
+  .modal{position:fixed;z-index:60}
+  .toast{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:70}
+  .btn{padding:10px 14px;font-size:13px}
+  form.send textarea{font-size:16px}
+  .card{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .steps,.team,.rules{grid-template-columns:1fr 1fr}
+}
+@media (max-width:520px){.steps,.team,.rules{grid-template-columns:1fr}.final{padding:28px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="logo">küme<span>HQ</span></div>
+    <a class="cta" href="https://wa.me/5491157517796?text=Hola%20K%C3%BCme!%20Vi%20la%20demo%20de%20K%C3%BCme%20HQ%20y%20quiero%20mi%20equipo%20de%20agentes." target="_blank" rel="noopener">Quiero mi equipo</a>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="kicker">Equipo de agentes de IA para tu negocio</div>
+      <h1>Cinco ayudantes que trabajan <em>mientras vos atendés</em> tu negocio.</h1>
+    </div>
+    <div>
+      <p>Buscan clientes, preparan diagnósticos y propuestas, planifican tu Instagram y arman tus reportes. Cada uno tiene nombre, una sola tarea y una regla de oro: nada sale sin tu aprobación.</p>
+      <div class="note"><i></i>Demo interactiva con datos de ejemplo. Tocá todo.</div>
+    </div>
+  </section>
+
+  <div class="window" id="demo">
+    <div class="chrome"><i></i><i></i><i></i><span>Küme HQ · tu oficina</span><button type="button" id="reset">Reiniciar demo</button></div>
+    <div class="app">
+      <aside>
+        <button type="button" data-v="oficina" class="on">Oficina</button>
+        <button type="button" data-v="aprobar">Para aprobar <span class="count" id="c-ap"></span></button>
+        <button type="button" data-v="diag">Diagnósticos</button>
+        <button type="button" data-v="prop">Propuestas</button>
+        <button type="button" data-v="cont">Contenido <span class="count" id="c-co"></span></button>
+        <button type="button" data-v="rep">Reportes</button>
+        <div class="lab">El equipo</div>
+        <div id="side-agents" style="display:contents"></div>
+      </aside>
+      <main>
+        <section class="view on" id="v-oficina">
+          <div class="vhead"><div><div class="kicker" id="saludo">Buen día</div><h2>Tu oficina</h2><p>Tocá un escritorio para pedirle algo a ese agente.</p></div></div>
+          <div class="office" id="office"></div>
+          <div class="stats">
+            <div class="stat"><b id="s1">0</b><span>mensajes para aprobar</span></div>
+            <div class="stat"><b id="s2">0</b><span>piezas para aprobar</span></div>
+            <div class="stat"><b id="s3">0</b><span>documentos listos</span></div>
+            <div class="stat"><b id="s4">5</b><span>agentes trabajando</span></div>
+          </div>
+        </section>
+        <section class="view" id="v-aprobar">
+          <div class="vhead"><div><div class="kicker">Caburé · Prospectos</div><h2>Para aprobar</h2><p>Caburé encontró estos negocios y les escribió el primer mensaje. Vos decidís.</p></div><button type="button" class="btn" data-chat="cabure">Pedir más prospectos</button></div>
+          <div class="tabs" id="tabs-ap"></div>
+          <div id="list-ap"></div>
+        </section>
+        <section class="view" id="v-diag">
+          <div class="vhead"><div><div class="kicker">Zorzal · Diagnóstico gratis</div><h2>Diagnósticos</h2><p>El regalo que mandás antes de la consulta.</p></div><button type="button" class="btn" data-chat="zorzal">Pedir un diagnóstico</button></div>
+          <table><thead><tr><th>Negocio</th><th>Estado</th><th></th></tr></thead><tbody id="list-diag"></tbody></table>
+        </section>
+        <section class="view" id="v-prop">
+          <div class="vhead"><div><div class="kicker">Calandria · Propuestas</div><h2>Propuestas</h2><p>Cada una hecha a medida, a partir de preguntas y análisis.</p></div><button type="button" class="btn" data-chat="calandria">Pedir una propuesta</button></div>
+          <table><thead><tr><th>Cliente</th><th>Fase</th><th></th></tr></thead><tbody id="list-prop"></tbody></table>
+        </section>
+        <section class="view" id="v-cont">
+          <div class="vhead"><div><div class="kicker">Benteveo · Tu Instagram</div><h2>Contenido</h2><p>Calendario, textos y diseños listos. Aprobás y programás.</p></div><button type="button" class="btn" data-chat="benteveo">Pedir contenido</button></div>
+          <div class="tabs" id="tabs-co"></div>
+          <div id="list-co"></div>
+        </section>
+        <section class="view" id="v-rep">
+          <div class="vhead"><div><div class="kicker">Tero · Reportes</div><h2>Reportes</h2><p>Lo que pasó en el mes, en lenguaje simple.</p></div><button type="button" class="btn" data-chat="tero">Pedir un reporte</button></div>
+          <table><thead><tr><th>Cliente</th><th>Mes</th><th>Estado</th><th></th></tr></thead><tbody id="list-rep"></tbody></table>
+        </section>
+      </main>
+
+      <div class="chat" id="chat" aria-live="polite">
+        <div class="chead"><img id="ch-img" alt=""><div><h3 id="ch-n"></h3><small id="ch-r"></small></div><button type="button" class="x" id="ch-x" aria-label="Cerrar chat">×</button></div>
+        <div class="msgs" id="msgs"></div>
+        <div class="shorts" id="shorts"></div>
+        <form class="send" id="send"><textarea id="txt" aria-label="Mensaje para el agente" placeholder="Pedile algo…"></textarea><button class="btn gold" id="go">Enviar</button></form>
+      </div>
+      <div class="modal" id="modal"><div class="doc" id="doc"></div></div>
+      <div class="toast" id="toast"></div>
+    </div>
+  </div>
+
+  <section class="sell">
+    <div class="kicker">El equipo</div>
+    <h2>Cada agente hace una sola cosa, y la hace bien.</h2>
+    <div class="team" id="team"></div>
+  </section>
+
+  <section class="sell">
+    <div class="kicker">Cómo lo armamos con vos</div>
+    <h2>De cero a tu equipo funcionando, en cuatro pasos.</h2>
+    <div class="steps">
+      <div><b>1</b><h3>Nos contás tu negocio</h3><p>Qué hacés, para quién y cómo hablás. Queda guardado para que todos los agentes lo sepan desde el primer día.</p></div>
+      <div><b>2</b><h3>Hacemos el mapa</h3><p>Cada tarea del mes, marcada: la hace un agente, la hacés vos, o la prepara un agente y vos aprobás.</p></div>
+      <div><b>3</b><h3>Creamos los agentes</h3><p>Uno por tarea, con sus reglas. Los probamos con tus casos reales hasta que salgan como los harías vos.</p></div>
+      <div><b>4</b><h3>Te damos tu oficina</h3><p>Esta app, conectada a tu Notion, para verlos, hablarles y aprobar todo en un solo lugar.</p></div>
+    </div>
+  </section>
+
+  <section class="sell">
+    <div class="kicker">Las reglas</div>
+    <h2>Vos tenés la última palabra. Siempre.</h2>
+    <div class="rules">
+      <ul>
+        <li>Ningún agente publica, envía mensajes ni manda mails sin tu OK.</li>
+        <li>Nunca inventan datos, casos ni métricas: si no lo saben, lo dicen.</li>
+        <li>Cada corrección que les hacés queda anotada y no se repite.</li>
+        <li>Se conectan a tu Notion: una sola versión de la verdad.</li>
+        <li>Corren en tu computadora, con tu cuenta de Claude.</li>
+      </ul>
+      <p class="quote">"Es como contratar a alguien: el primer día no le das una tarea, le explicás la empresa. Después, cada uno hace lo suyo."</p>
+    </div>
+  </section>
+
+  <section class="final">
+    <div><h2>¿Querés tu propio equipo de agentes?</h2><p>Lo armamos a medida de tu negocio. Primera charla sin cargo.</p></div>
+    <a class="cta" href="https://wa.me/5491157517796?text=Hola%20K%C3%BCme!%20Vi%20la%20demo%20de%20K%C3%BCme%20HQ%20y%20quiero%20mi%20equipo%20de%20agentes." target="_blank" rel="noopener">Hablemos por WhatsApp</a>
+  </section>
+  <footer>Küme · Raíz. Equilibrio. Resultados. · kumesomos@gmail.com · @kume.agenciamkt — Los negocios y números de esta demo son de ejemplo.</footer>
+</div>
+
+<script>
+const AV = {"cabure": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KICA8Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSI2MCIgZmlsbD0iIzFCM0EyRCIvPgogIDxjaXJjbGUgY3g9IjYwIiBjeT0iNjAiIHI9IjU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNDNDk3M0EiIHN0cm9rZS13aWR0aD0iMSIvPgogIDwhLS0gY3VlcnBvIGRlIGxlY2h1Y2l0YSAtLT4KICA8cGF0aCBkPSJNMzQgOTIgUTMwIDUwIDYwIDM4IFE5MCA1MCA4NiA5MiBaIiBmaWxsPSIjMkQ1QTQyIi8+CiAgPHBhdGggZD0iTTM4IDQwIEw0NiAzMCBMNTIgNDIgWiBNODIgNDAgTDc0IDMwIEw2OCA0MiBaIiBmaWxsPSIjMkQ1QTQyIi8+CiAgPHBhdGggZD0iTTQ0IDc4IFE2MCA5MCA3NiA3OCBRNzIgOTYgNjAgOTggUTQ4IDk2IDQ0IDc4IFoiIGZpbGw9IiNGNUVGRTAiIG9wYWNpdHk9Ii4yNSIvPgogIDwhLS0gb2pvcyBncmFuZGVzIC0tPgogIDxjaXJjbGUgY3g9IjQ4IiBjeT0iNTgiIHI9IjExIiBmaWxsPSIjRjVFRkUwIi8+CiAgPGNpcmNsZSBjeD0iNzIiIGN5PSI1OCIgcj0iMTEiIGZpbGw9IiNGNUVGRTAiLz4KICA8Y2lyY2xlIGN4PSI0OCIgY3k9IjU4IiByPSI2IiBmaWxsPSIjQzQ5NzNBIi8+CiAgPGNpcmNsZSBjeD0iNzIiIGN5PSI1OCIgcj0iNiIgZmlsbD0iI0M0OTczQSIvPgogIDxjaXJjbGUgY3g9IjQ4IiBjeT0iNTgiIHI9IjIuNSIgZmlsbD0iIzExMSIvPgogIDxjaXJjbGUgY3g9IjcyIiBjeT0iNTgiIHI9IjIuNSIgZmlsbD0iIzExMSIvPgogIDxwYXRoIGQ9Ik01NiA2NiBMNjAgNzQgTDY0IDY2IFoiIGZpbGw9IiNDNDk3M0EiLz4KICA8cGF0aCBkPSJNNDAgNDYgUTQ4IDQyIDU2IDQ4IE02NCA0OCBRNzIgNDIgODAgNDYiIHN0cm9rZT0iI0Y1RUZFMCIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==", "zorzal": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KICA8Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSI2MCIgZmlsbD0iIzFCM0EyRCIvPgogIDxjaXJjbGUgY3g9IjYwIiBjeT0iNjAiIHI9IjU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNDNDk3M0EiIHN0cm9rZS13aWR0aD0iMSIvPgogIDwhLS0gbHVwYSAtLT4KICA8Y2lyY2xlIGN4PSI0NCIgY3k9IjQ0IiByPSIxNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRjVFRkUwIiBzdHJva2Utd2lkdGg9IjMiIG9wYWNpdHk9Ii45Ii8+CiAgPHBhdGggZD0iTTU1IDU2IEw2NiA2NyIgc3Ryb2tlPSIjRjVFRkUwIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgb3BhY2l0eT0iLjkiLz4KICA8IS0tIHpvcnphbDogcGVjaG8gY2FuZWxhLCBjdWVycG8gbWFycsOzbi12ZXJkZSAtLT4KICA8cGF0aCBkPSJNNDAgOTIgUTM4IDY2IDYyIDYwIFE4NCA1NiA5MCA3NCBROTIgOTIgNzIgOTYgWiIgZmlsbD0iIzhBNkE0NSIvPgogIDxwYXRoIGQ9Ik01MiA3OCBRNjQgNzAgNzggODAgUTc0IDkyIDYyIDkzIFE1NCA5MCA1MiA3OFoiIGZpbGw9IiNDNDk3M0EiLz4KICA8cGF0aCBkPSJNNDAgOTAgTDI0IDk4IEwzNiA4MCBaIiBmaWxsPSIjNkU1NTM2Ii8+CiAgPGNpcmNsZSBjeD0iODAiIGN5PSI1OCIgcj0iMTIiIGZpbGw9IiM4QTZBNDUiLz4KICA8cGF0aCBkPSJNOTEgNTYgTDEwNCA1OCBMOTEgNjIgWiIgZmlsbD0iI0M0OTczQSIvPgogIDxjaXJjbGUgY3g9IjgzIiBjeT0iNTYiIHI9IjIuNiIgZmlsbD0iI0Y1RUZFMCIvPjxjaXJjbGUgY3g9IjgzIiBjeT0iNTYiIHI9IjEuMiIgZmlsbD0iIzExMSIvPgo8L3N2Zz4K", "calandria": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KICA8Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSI2MCIgZmlsbD0iI0Y1RUZFMCIvPgogIDxjaXJjbGUgY3g9IjYwIiBjeT0iNjAiIHI9IjU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNDNDk3M0EiIHN0cm9rZS13aWR0aD0iMSIvPgogIDwhLS0gcmFtYSAtLT4KICA8cGF0aCBkPSJNMTggODggUTYwIDgwIDEwNCA5MCIgc3Ryb2tlPSIjMUIzQTJEIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik04NCA4NiBxNiAtOCAxNCAtNiBxLTQgOCAtMTQgNloiIGZpbGw9IiMyRDVBNDIiLz4KICA8IS0tIGN1ZXJwbyBwYWphcml0byBjYW50YW5kbyAtLT4KICA8cGF0aCBkPSJNMzYgODIgUTM0IDU2IDU4IDUwIFE3NiA0OCA4MiA2MiBRODYgNzggNjYgODQgWiIgZmlsbD0iIzFCM0EyRCIvPgogIDxwYXRoIGQ9Ik0zNiA4MCBMMTggNzAgTDIyIDg0IFoiIGZpbGw9IiMxQjNBMkQiLz4KICA8Y2lyY2xlIGN4PSI3MiIgY3k9IjQ4IiByPSIxMyIgZmlsbD0iIzFCM0EyRCIvPgogIDxwYXRoIGQ9Ik04NCA0NCBMOTggNDAgTDg1IDUwIFoiIGZpbGw9IiNDNDk3M0EiLz4KICA8Y2lyY2xlIGN4PSI3NSIgY3k9IjQ1IiByPSIyLjUiIGZpbGw9IiNGNUVGRTAiLz4KICA8cGF0aCBkPSJNNjggNTIgcTQgMyAxMCAyIiBzdHJva2U9IiNGNUVGRTAiIHN0cm9rZS13aWR0aD0iMS41IiBmaWxsPSJub25lIi8+CiAgPHBhdGggZD0iTTQ2IDY2IFE1OCA2MCA3MCA3MCIgc3Ryb2tlPSIjQzQ5NzNBIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDwhLS0gbm90YXMgLS0+CiAgPHBhdGggZD0iTTEwMCAyNiB2MTIgTTEwMCAyNiBsNiAtMiIgc3Ryb2tlPSIjQzQ5NzNBIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxjaXJjbGUgY3g9Ijk4IiBjeT0iMzgiIHI9IjMiIGZpbGw9IiNDNDk3M0EiLz4KICA8Y2lyY2xlIGN4PSI5MCIgY3k9IjI0IiByPSIyIiBmaWxsPSIjQzQ5NzNBIi8+Cjwvc3ZnPgo=", "benteveo": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KICA8Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSI2MCIgZmlsbD0iIzJENUE0MiIvPgogIDxjaXJjbGUgY3g9IjYwIiBjeT0iNjAiIHI9IjU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNDNDk3M0EiIHN0cm9rZS13aWR0aD0iMSIvPgogIDwhLS0gYmVudGV2ZW86IHBlY2hvIGRvcmFkbywgYW50aWZheiAtLT4KICA8cGF0aCBkPSJNMzAgODggUTI2IDU4IDU0IDUwIFE4MCA0NiA4NiA2NiBROTAgODYgNjYgOTIgWiIgZmlsbD0iI0M0OTczQSIvPgogIDxwYXRoIGQ9Ik0zMCA4NiBMMTQgOTQgTDI4IDc0IFoiIGZpbGw9IiMxQjNBMkQiLz4KICA8cGF0aCBkPSJNNDQgNzAgUTYyIDYwIDgwIDcyIFE3NCA4NCA1OCA4NiBRNDYgODQgNDQgNzBaIiBmaWxsPSIjMUIzQTJEIiBvcGFjaXR5PSIuMzUiLz4KICA8Y2lyY2xlIGN4PSI3MCIgY3k9IjQ2IiByPSIxNiIgZmlsbD0iIzFCM0EyRCIvPgogIDxwYXRoIGQ9Ik01NiA0MiBRNzAgMzQgODYgNDIgTDg2IDQ2IFE3MCAzOSA1NiA0NyBaIiBmaWxsPSIjRjVFRkUwIi8+CiAgPHBhdGggZD0iTTg0IDUwIEwxMDIgNDggTDg1IDU2IFoiIGZpbGw9IiMxQjNBMkQiLz4KICA8Y2lyY2xlIGN4PSI3NiIgY3k9IjQ5IiByPSIyLjUiIGZpbGw9IiNGNUVGRTAiLz4KICA8cGF0aCBkPSJNNjQgMzAgTDcwIDI2IEw3MCAzMiBaIiBmaWxsPSIjQzQ5NzNBIi8+CiAgPCEtLSBnbG9ibyBkZSBkacOhbG9nbyAtLT4KICA8cmVjdCB4PSIyMCIgeT0iMjIiIHdpZHRoPSIzMCIgaGVpZ2h0PSIyMCIgcng9IjUiIGZpbGw9IiNGNUVGRTAiLz4KICA8cGF0aCBkPSJNMzAgNDIgTDM0IDQ4IEwzOCA0MiBaIiBmaWxsPSIjRjVFRkUwIi8+CiAgPGNpcmNsZSBjeD0iMjgiIGN5PSIzMiIgcj0iMiIgZmlsbD0iIzFCM0EyRCIvPjxjaXJjbGUgY3g9IjM1IiBjeT0iMzIiIHI9IjIiIGZpbGw9IiMxQjNBMkQiLz48Y2lyY2xlIGN4PSI0MiIgY3k9IjMyIiByPSIyIiBmaWxsPSIjMUIzQTJEIi8+Cjwvc3ZnPgo=", "tero": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj4KICA8Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSI2MCIgZmlsbD0iI0Y1RUZFMCIvPgogIDxjaXJjbGUgY3g9IjYwIiBjeT0iNjAiIHI9IjU0IiBmaWxsPSJub25lIiBzdHJva2U9IiNDNDk3M0EiIHN0cm9rZS13aWR0aD0iMSIvPgogIDwhLS0gZ3LDoWZpY28gZGUgYmFycmFzIGRlIGZvbmRvIC0tPgogIDxyZWN0IHg9IjIwIiB5PSI3MCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjIyIiBmaWxsPSIjQzQ5NzNBIiBvcGFjaXR5PSIuNSIvPgogIDxyZWN0IHg9IjM0IiB5PSI2MCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjMyIiBmaWxsPSIjQzQ5NzNBIiBvcGFjaXR5PSIuNSIvPgogIDxyZWN0IHg9Ijg4IiB5PSI1MiIgd2lkdGg9IjEwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjQzQ5NzNBIiBvcGFjaXR5PSIuNSIvPgogIDwhLS0gdGVybzogdmlnaWxhbnRlLCBkZSBwaWUgLS0+CiAgPHBhdGggZD0iTTUyIDkyIEw1MCAxMDQgTTY0IDkyIEw2NiAxMDQiIHN0cm9rZT0iIzFCM0EyRCIgc3Ryb2tlLXdpZHRoPSIyLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik00MiA4MCBRNDAgNTggNTggNTIgUTc2IDUwIDgwIDY2IFE4MiA4NCA2NCA5MiBRNTAgOTQgNDIgODBaIiBmaWxsPSIjMUIzQTJEIi8+CiAgPHBhdGggZD0iTTUwIDY2IFE2MCA2MiA3MiA2OCBRNzAgODQgNjAgODggUTUwIDg0IDUwIDY2WiIgZmlsbD0iI0Y1RUZFMCIvPgogIDxwYXRoIGQ9Ik00MiA3OCBMMjggODYgTDQwIDcwWiIgZmlsbD0iIzJENUE0MiIvPgogIDxjaXJjbGUgY3g9IjY0IiBjeT0iNDAiIHI9IjEyIiBmaWxsPSIjMkQ1QTQyIi8+CiAgPHBhdGggZD0iTTU4IDMwIFE1MCAyMCA0MiAyMiIgc3Ryb2tlPSIjMUIzQTJEIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik03NCA0MCBMODggNDIgTDc0IDQ1WiIgZmlsbD0iIzlCM0IyRSIvPgogIDxjaXJjbGUgY3g9IjY3IiBjeT0iMzgiIHI9IjMiIGZpbGw9IiM5QjNCMkUiLz48Y2lyY2xlIGN4PSI2NyIgY3k9IjM4IiByPSIxLjIiIGZpbGw9IiMxMTEiLz4KPC9zdmc+Cg=="};
+const AGENTS = [
+  {id:"cabure", n:"Caburé", r:"Prospectos", d:"Busca negocios que te pueden necesitar, los investiga y escribe el primer mensaje.", v:"aprobar",
+   s:["Buscame 5 gimnasios boutique en Núñez","Buscame 10 cafeterías en Palermo"]},
+  {id:"zorzal", n:"Zorzal", r:"Diagnóstico gratis", d:"Revisa web, Instagram y Google de un lead y arma un PDF con 3 mejoras.", v:"diag",
+   s:["Diagnóstico de Café Lumbre","Diagnóstico de Pilates Norte"]},
+  {id:"calandria", n:"Calandria", r:"Propuestas", d:"Hace preguntas, analiza y diseña la propuesta 100% a medida.", v:"prop",
+   s:["Arrancá la propuesta de Pilates Norte","Estas son las respuestas del cliente"]},
+  {id:"benteveo", n:"Benteveo", r:"Contenido", d:"Planifica y diseña tu Instagram: calendario, textos y carruseles.", v:"cont",
+   s:["Armá la semana que viene","Diseñá un carrusel sobre precios"]},
+  {id:"tero", n:"Tero", r:"Reportes", d:"Convierte los números del mes en un reporte claro con el plan siguiente.", v:"rep",
+   s:["Reporte de Pilates Norte de octubre","Reporte de Café Lumbre de octubre"]},
+];
+const INIT = () => ({
+  pros:[
+    {id:"p1",n:"Café Lumbre",rub:"Cafetería",z:"Palermo",pt:"4 · Muy bueno",st:"Mensaje listo",srv:["Web","Redes"],
+     op:"8,4K seguidores y sin web: el menú está en una foto de Instagram y los pedidos van por DM.",
+     m:"¡Hola, equipo de Lumbre! Somos de Küme. Vimos que el menú vive en una foto del perfil y que los pedidos llegan por DM. Con un menú online propio se lee mejor en el celu y no se pierde ningún pedido. ¿Les mostramos en 15 minutos cómo se vería? Sin cargo."},
+    {id:"p2",n:"Pilates Norte",rub:"Fitness",z:"Núñez",pt:"5 · Ideal",st:"Mensaje listo",srv:["Automatización","Web"],
+     op:"4,9★ con 210 reseñas. Las reservas de clases son por WhatsApp y varias reseñas dicen que cuesta conseguir turno.",
+     m:"¡Hola, Pilates Norte! Somos de Küme. 210 reseñas con 4,9 es una locura 👏 Notamos que varias mencionan lo difícil que es reservar por WhatsApp. Un sistema de reservas online les puede liberar horas por semana. ¿Charlamos 15 minutos? Sin cargo."},
+    {id:"p3",n:"Arce Propiedades",rub:"Inmobiliaria",z:"Belgrano",pt:"3 · Bueno",st:"Mensaje listo",srv:["Web"],
+     op:"Web de 2016 que no se adapta al celular. Instagram activo pero sin link a las propiedades.",
+     m:"¡Hola, equipo de Arce! Somos de Küme. Vimos que en Instagram muestran propiedades muy lindas, pero desde el celu la web cuesta navegarla. Tenemos 3 ideas simples para que más consultas lleguen desde Instagram. ¿Se las pasamos? Sin cargo."}
+  ],
+  diag:[{n:"Pilates Norte",ok:true}],
+  prop:[{n:"Estudio Ámbar",f:"Lista para revisar"},{n:"Pilates Norte",f:"Esperando respuestas"}],
+  cont:[
+    {id:"c1",t:"5 señales de que tu web te hace perder clientes",f:"Lunes · Carrusel",pl:"Educativo",st:"Para aprobar",
+     cap:"Tu web no tiene que ser perfecta. Tiene que no espantar a nadie. Deslizá y revisá las 5 señales. Escribinos \"WEB\" y te decimos cuáles son las tuyas.",
+     sl:[["v","Tu web te está <em>haciendo perder</em> clientes."],["c","<span class='n'>01</span>Hay que hacer zoom en el celu."],["c","<span class='n'>02</span>No se entiende qué vendés."],["c","<span class='n'>03</span>No hay botón para contactarte."],["v","¿Te reconociste en dos?"]]},
+    {id:"c2",t:"Por qué no te prometemos viralidad",f:"Miércoles · Reel",pl:"Opinión",st:"Grabar",
+     cap:"Lo viral es suerte. Lo que hace crecer un negocio es que la gente correcta entienda qué vendés.",sl:[["v","Si te prometen <em>viralidad</em>, desconfiá."]]},
+  ],
+  rep:[{c:"Estudio Ámbar",m:"Septiembre",ok:true}],
+});
+let S = INIT(), cur = null, fAp = "Mensaje listo", fCo = "Para aprobar", busy = {};
+const $ = (q) => document.querySelector(q);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ag = (id) => AGENTS.find((a) => a.id === id);
+const h = new Date().getHours(); $("#saludo").textContent = h < 13 ? "Buen día" : h < 20 ? "Buenas tardes" : "Buenas noches";
+
+function toast(t){ const el=$("#toast"); el.textContent=t; el.classList.add("on"); clearTimeout(toast.k); toast.k=setTimeout(()=>el.classList.remove("on"),2600); }
+function show(v){
+  document.querySelectorAll("aside [data-v]").forEach((b)=>b.classList.toggle("on",b.dataset.v===v));
+  document.querySelectorAll(".view").forEach((s)=>s.classList.toggle("on",s.id==="v-"+v));
+  if (innerWidth < 900) {
+    const a = document.querySelector(`aside [data-v="${v}"]`), bar = document.querySelector("aside");
+    if (a) bar.scrollTo({ left: a.offsetLeft - bar.clientWidth / 2 + a.offsetWidth / 2, behavior: "smooth" });
+    const top = $("#demo").getBoundingClientRect().top; if (top < 0) $("#demo").scrollIntoView({block:"start"});
+  }
+}
+document.querySelectorAll("aside [data-v]").forEach((b)=>b.onclick=()=>show(b.dataset.v));
+document.addEventListener("click",(e)=>{ const c=e.target.closest("[data-chat]"); if(c) openChat(c.dataset.chat); });
+
+function render(){
+  $("#side-agents").innerHTML = AGENTS.map((a)=>`<button type="button" class="agent-btn" data-chat="${a.id}"><img src="${AV[a.id]}" alt=""><span>${a.n}<small>${a.r}</small></span></button>`).join("");
+  $("#office").innerHTML = AGENTS.map((a)=>`<div class="desk"><div class="t"><img src="${AV[a.id]}" alt=""><div><div class="rol">${a.r}</div><h3>${a.n}</h3></div></div><p>${a.d}</p><span class="status ${busy[a.id]?"busy":""}"><i></i>${busy[a.id]?"Trabajando…":"Disponible"}</span><div class="row"><button type="button" class="btn" data-chat="${a.id}">Hablar con ${a.n}</button><button type="button" class="btn ghost" onclick="show('${a.v}')">Ver</button></div></div>`).join("");
+  $("#team").innerHTML = AGENTS.map((a)=>`<div><img src="${AV[a.id]}" alt=""><div class="kicker">${a.r}</div><h3>${a.n}</h3><p>${a.d}</p></div>`).join("");
+  const nAp=S.pros.filter((p)=>p.st==="Mensaje listo").length, nCo=S.cont.filter((c)=>c.st==="Para aprobar").length;
+  $("#c-ap").textContent=nAp||""; $("#c-ap").hidden=!nAp; $("#c-co").textContent=nCo||""; $("#c-co").hidden=!nCo;
+  $("#s1").textContent=nAp; $("#s2").textContent=nCo; $("#s3").textContent=S.diag.length+S.prop.filter(p=>p.f==="Lista para revisar").length+S.rep.length;
+  // prospectos
+  const EST=["Mensaje listo","Aprobado","Contactado","Descartado"];
+  $("#tabs-ap").innerHTML=EST.map((e)=>`<button type="button" class="${e===fAp?"on":""}" data-fap="${e}">${e} (${S.pros.filter((p)=>p.st===e).length})</button>`).join("");
+  const ps=S.pros.filter((p)=>p.st===fAp);
+  $("#list-ap").innerHTML=ps.length?ps.map((p)=>`<div class="card"><div><h3>${esc(p.n)}</h3><div class="meta">${esc(p.rub)} · ${esc(p.z)}</div><span class="pill gold">${esc(p.pt)}</span>${p.srv.map((s)=>`<span class="pill">${s}</span>`).join("")}<p class="op" style="margin-top:6px">${esc(p.op)}</p></div><div><div class="msg">${esc(p.m)}</div><div class="row">${accAp(p)}</div></div></div>`).join(""):`<div class="empty">No hay prospectos en "${fAp}".</div>`;
+  // diagnosticos / propuestas / reportes
+  $("#list-diag").innerHTML=S.diag.map((d)=>`<tr><td><b>${esc(d.n)}</b></td><td><span class="pill ${d.ok?"gold":""}">${d.ok?"Listo para revisar":"Revisando…"}</span></td><td>${d.ok?`<button type="button" class="link" data-doc="diag" data-n="${esc(d.n)}">Ver PDF</button>`:""}</td></tr>`).join("");
+  $("#list-prop").innerHTML=S.prop.map((p)=>`<tr><td><b>${esc(p.n)}</b></td><td><span class="pill ${p.f==="Lista para revisar"?"gold":""}">${esc(p.f)}</span></td><td>${p.f==="Lista para revisar"?`<button type="button" class="link" data-doc="prop" data-n="${esc(p.n)}">Ver propuesta</button>`:""}</td></tr>`).join("");
+  $("#list-rep").innerHTML=S.rep.map((r)=>`<tr><td><b>${esc(r.c)}</b></td><td>${esc(r.m)}</td><td><span class="pill ${r.ok?"gold":""}">${r.ok?"Listo para revisar":"Armando…"}</span></td><td>${r.ok?`<button type="button" class="link" data-doc="rep" data-n="${esc(r.c)}" data-m="${esc(r.m)}">Ver reporte</button>`:""}</td></tr>`).join("");
+  // contenido
+  const EC=["Para aprobar","Grabar","Aprobado"];
+  $("#tabs-co").innerHTML=EC.map((e)=>`<button type="button" class="${e===fCo?"on":""}" data-fco="${e}">${e} (${S.cont.filter((c)=>c.st===e).length})</button>`).join("");
+  const cs=S.cont.filter((c)=>c.st===fCo);
+  $("#list-co").innerHTML=cs.length?cs.map((c)=>`<div class="card"><div><div class="meta">${esc(c.f)}</div><h3>${esc(c.t)}</h3><span class="pill gold">${esc(c.pl)}</span><div class="slides">${c.sl.map((s)=>`<div class="slide ${s[0]}">${s[1]}</div>`).join("")}</div></div><div><div class="msg" style="background:var(--surface)">${esc(c.cap)}</div><div class="row">${c.st==="Para aprobar"?`<button type="button" class="btn gold" data-co="${c.id}" data-st="Aprobado">Aprobar</button><button type="button" class="btn red" data-chat="benteveo">Pedir cambios</button>`:c.st==="Grabar"?`<button type="button" class="btn gold" data-co="${c.id}" data-st="Aprobado">Ya lo grabé</button>`:`<span class="pill">Listo para programar</span>`}</div></div></div>`).join(""):`<div class="empty">No hay piezas en "${fCo}".</div>`;
+}
+function accAp(p){
+  const b=(st,l,c="btn")=>`<button type="button" class="${c}" data-ap="${p.id}" data-st="${st}">${l}</button>`;
+  if(p.st==="Mensaje listo") return b("Aprobado","Aprobar","btn gold")+b("Descartado","Descartar","btn red");
+  if(p.st==="Aprobado") return `<button type="button" class="btn ghost" data-copy="${p.id}">Copiar mensaje</button>`+b("Contactado","Ya lo envié")+`<button type="button" class="btn ghost" data-chat="zorzal">Diagnóstico</button>`;
+  if(p.st==="Contactado") return `<button type="button" class="btn ghost" data-chat="zorzal">Pedir diagnóstico a Zorzal</button>`;
+  return b("Mensaje listo","Recuperar","btn ghost");
+}
+document.addEventListener("click",(e)=>{
+  const t=e.target;
+  if(t.dataset.fap){fAp=t.dataset.fap;render();}
+  if(t.dataset.fco){fCo=t.dataset.fco;render();}
+  if(t.dataset.ap){S.pros.find((p)=>p.id===t.dataset.ap).st=t.dataset.st;render();toast({Aprobado:"Aprobado ✓ Ahora copiás el mensaje y lo mandás vos.",Contactado:"Marcado como enviado.",Descartado:"Descartado.","Mensaje listo":"Recuperado."}[t.dataset.st]);}
+  if(t.dataset.co){S.cont.find((c)=>c.id===t.dataset.co).st=t.dataset.st;render();toast("Pieza aprobada ✓ Lista para que la programes.");}
+  if(t.dataset.copy){const p=S.pros.find((x)=>x.id===t.dataset.copy);navigator.clipboard?.writeText(p.m).catch(()=>{});t.textContent="Copiado ✓";}
+  if(t.dataset.doc) openDoc(t.dataset.doc,t.dataset.n,t.dataset.m);
+  if(t.id==="modal"||t.dataset.close!==undefined) $("#modal").classList.remove("on");
+});
+
+/* ---------- Documentos de ejemplo ---------- */
+function openDoc(kind,n,m){
+  const dot=(c)=>`<span class="dot" style="background:${c}"></span>`;
+  let html="";
+  if(kind==="diag") html=`<div class="dh"><div class="dk">Diagnóstico gratis</div><h3>${esc(n)}, visto desde el celular de un cliente</h3></div><div class="db">
+    <div class="sem">${dot("#A6473A")}<p><b>Web:</b> no hay una página propia con horarios, precios y cómo reservar.</p></div>
+    <div class="sem">${dot("#3F7E52")}<p><b>Google:</b> 4,9★ con 210 reseñas. Excelente.</p></div>
+    <div class="sem">${dot("#C08A22")}<p><b>Reservas:</b> solo por WhatsApp; 6 reseñas mencionan demoras para conseguir turno.</p></div>
+    <h3>3 mejoras para esta semana</h3><ol style="padding-left:18px"><li>Respondé las reseñas que hablan de turnos: "ya estamos mejorando cómo reservar".</li><li>Fijá un post con horarios de clases y cómo reservar.</li><li>Sumá en la bio el link directo a WhatsApp con un mensaje armado.</li></ol>
+    <button type="button" class="btn close" data-close>Cerrar</button></div>`;
+  if(kind==="prop") html=`<div class="dh"><div class="dk">Propuesta a medida</div><h3>${esc(n)}: que tu web reserve por vos</h3></div><div class="db">
+    <p><b>Lo que vimos:</b> la marca está pensada con mucho cuidado, pero cada consulta pasa por un mail.</p>
+    <p><b>La solución:</b> web nueva con portfolio y agenda de reuniones online, más un asistente que responde las preguntas frecuentes.</p>
+    <div class="kpis"><div class="kpi"><b>2</b><span>opciones de inversión</span></div><div class="kpi"><b>5</b><span>semanas de trabajo</span></div><div class="kpi"><b>3</b><span>tramos de pago</span></div></div>
+    <p style="font-size:12px;color:#4F6157">Antes de diseñarla, Calandria te muestra el resumen y el precio y espera tu OK.</p>
+    <button type="button" class="btn close" data-close>Cerrar</button></div>`;
+  if(kind==="rep") html=`<div class="dh"><div class="dk">Reporte mensual · ${esc(m||"")}</div><h3>${esc(n)}</h3></div><div class="db">
+    <p style="font-family:var(--display);font-style:italic;font-size:18px">Un mes de crecimiento: más gente te vio y más gente pidió turno.</p>
+    <div class="kpis"><div class="kpi"><b>+64%</b><span>cuentas alcanzadas</span></div><div class="kpi"><b>+38%</b><span>consultas</span></div><div class="kpi"><b>12</b><span>publicaciones</span></div></div>
+    <h3>El plan para el mes que viene</h3><ol style="padding-left:18px"><li>Más reels del detrás de escena (fueron los más compartidos).</li><li>Sacar del feed los posts de horarios: van a una destacada.</li><li>Un carrusel de preguntas frecuentes, fijado.</li></ol>
+    <button type="button" class="btn close" data-close>Cerrar</button></div>`;
+  $("#doc").innerHTML=html; $("#modal").classList.add("on");
+}
+
+/* ---------- Chat con guiones de ejemplo ---------- */
+const SCRIPTS={
+  cabure:{steps:["Buscando negocios en Google Maps…","Revisando webs e Instagram…","Leyendo reseñas…","Puntuando y escribiendo mensajes…"],
+    reply:"Encontré 2 negocios que encajan muy bien y te dejé el primer mensaje escrito para cada uno. Están en \"Para aprobar\". No le escribí a nadie.",
+    run(){S.pros.unshift(
+      {id:"p"+Date.now(),n:"Estudio Mova",rub:"Fitness",z:"Núñez",pt:"5 · Ideal",st:"Mensaje listo",srv:["Web","Automatización"],op:"Gimnasio boutique con 3,1K seguidores. La grilla de clases es una historia que vence cada 24 horas.",m:"¡Hola, Mova! Somos de Küme. Vimos que la grilla de clases está en una historia que dura un día. Fijarla en la web o en una destacada les ahorra muchas preguntas por DM. ¿Les pasamos cómo? Sin cargo."},
+      {id:"p"+(Date.now()+1),n:"Fuerza Barrio",rub:"Fitness",z:"Núñez",pt:"4 · Muy bueno",st:"Mensaje listo",srv:["Redes"],op:"Buenas reseñas (4,7★) pero el último post de Instagram es de hace 4 meses.",m:"¡Hola, Fuerza Barrio! Somos de Küme. Sus reseñas son muy buenas, pero Instagram está quieto hace unos meses y es lo primero que mira alguien nuevo. ¿Les mostramos un plan simple de 2 posts por semana? Sin cargo."});
+      fAp="Mensaje listo";}},
+  zorzal:{steps:["Abriendo la web como un celular…","Revisando Instagram…","Leyendo reseñas de Google…","Armando el PDF de 2 páginas…"],
+    reply:"Listo el diagnóstico gratis: semáforo por canal y 3 mejoras que pueden hacer solos esta semana. Está en Diagnósticos para que lo revises. No lo mandé.",
+    run(n){S.diag.unshift({n:n||"Café Lumbre",ok:true});}},
+  calandria:{steps:["Leyendo lo que vieron Caburé y Zorzal…","Analizando competidores de la zona…","Armando preguntas a medida…"],
+    reply:"Antes de proponer necesito saber 3 cosas del cliente:\n1. ¿Cuántas clases por semana dan y cuántos lugares tiene cada una?\n2. ¿Cobran por clase, por pack o con cuota mensual?\n3. ¿Qué les quita más tiempo hoy: reservar, cobrar o reprogramar?\nCopiáselas por WhatsApp y pegame las respuestas.",
+    run(){const p=S.prop.find((x)=>x.n==="Pilates Norte"); if(p)p.f="Esperando respuestas";}},
+  benteveo:{steps:["Revisando qué se publicó este mes…","Eligiendo temas y ganchos…","Diseñando el carrusel…"],
+    reply:"Te armé la semana: 2 carruseles, 1 reel con guión y 1 post. Te dejé el primer carrusel diseñado en Contenido, para aprobar.",
+    run(){S.cont.unshift({id:"c"+Date.now(),t:"Cuánto cuesta de verdad tener redes",f:"Próximo lunes · Carrusel",pl:"Educativo",st:"Para aprobar",cap:"El precio de una agencia no es lo único que pagás. Deslizá y mirá los 4 costos que nadie te cuenta. Guardalo.",sl:[["v","Lo que <em>de verdad</em> cuesta tener redes."],["c","<span class='n'>01</span>Tu tiempo."],["c","<span class='n'>02</span>La constancia."],["v","¿Lo hablamos?"]]}); fCo="Para aprobar";}},
+  tero:{steps:["Leyendo la exportación de Meta…","Comparando con el mes anterior…","Chequeando que los totales cierren…","Armando el reporte…"],
+    reply:"Reporte listo: el mes en una frase, los números que importan, lo que funcionó, lo que no y 3 acciones para el mes que viene. Está en Reportes para que lo revises.",
+    run(){S.rep.unshift({c:"Pilates Norte",m:"Octubre",ok:true});}},
+};
+const chats={};
+function openChat(id){
+  cur=ag(id); $("#ch-img").src=AV[id]; $("#ch-n").textContent=cur.n; $("#ch-r").textContent=cur.r;
+  $("#shorts").innerHTML=cur.s.map((t)=>`<button type="button">${esc(t)}</button>`).join("");
+  $("#shorts").querySelectorAll("button").forEach((b)=>b.onclick=()=>send(b.textContent));
+  drawChat(); $("#chat").classList.add("on");
+  document.body.style.overflow = innerWidth < 900 ? "hidden" : "";
+}
+function drawChat(){
+  const list=chats[cur.id]||[];
+  $("#msgs").innerHTML=list.length?list.map((m)=>m.k==="step"?`<div class="step ${m.done?"done":""}"><i></i>${esc(m.t)}</div>`:`<div class="b ${m.k}">${esc(m.t)}</div>`).join(""):`<div class="step"><i></i>Probá con un atajo de abajo.</div>`;
+  $("#msgs").scrollTop=1e9; $("#go").disabled=!!busy[cur.id];
+}
+$("#ch-x").onclick=()=>{ $("#chat").classList.remove("on"); document.body.style.overflow=""; };
+$("#send").onsubmit=(e)=>{e.preventDefault(); const t=$("#txt").value.trim(); if(t){ $("#txt").value=""; send(t);} };
+$("#txt").addEventListener("keydown",(e)=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("#send").requestSubmit();}});
+function send(text){
+  if(!cur||busy[cur.id])return;
+  const a=cur, sc=SCRIPTS[a.id], list=(chats[a.id]=chats[a.id]||[]);
+  list.push({k:"vos",t:text}); busy[a.id]=true; render(); drawChat();
+  const name=(text.match(/de ([A-ZÁÉÍÓÚ][\wáéíóúñ]+(?: [A-ZÁÉÍÓÚ][\wáéíóúñ]+)?)/)||[])[1];
+  sc.steps.forEach((st,i)=>setTimeout(()=>{ list.forEach((m)=>{if(m.k==="step")m.done=true;}); list.push({k:"step",t:st}); if(cur?.id===a.id)drawChat(); },700+i*900));
+  setTimeout(()=>{ list.forEach((m)=>{if(m.k==="step")m.done=true;}); list.push({k:"ag",t:sc.reply}); sc.run(name); busy[a.id]=false; render(); if(cur?.id===a.id)drawChat(); toast(`${a.n} terminó. Revisalo en ${({cabure:"Para aprobar",zorzal:"Diagnósticos",calandria:"Propuestas",benteveo:"Contenido",tero:"Reportes"})[a.id]}.`); },700+sc.steps.length*900+500);
+}
+$("#reset").onclick=()=>{S=INIT();fAp="Mensaje listo";fCo="Para aprobar";for(const k in chats)delete chats[k];busy={};$("#chat").classList.remove("on");document.body.style.overflow="";show("oficina");render();toast("Demo reiniciada.");};
+render();
+</script>
+</body>
+</html>

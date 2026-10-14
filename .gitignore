@@ -1,0 +1,12 @@
+# Claves y datos locales: nunca se suben
+app/.env
+.env
+*.env
+app/data/
+
+# Python / sistema
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,67 @@
+[
+  {
+    "id": "prospectos",
+    "nombre": "Caburé",
+    "rol": "Prospectos",
+    "descripcion": "Busca negocios, los investiga, los puntúa y deja escrito el primer mensaje.",
+    "carpeta": "../agentes/prospectos",
+    "avatar": "avatars/cabure.svg",
+    "atajos": [
+      "Buscame 10 cafeterías en Palermo",
+      "Buscame 10 inmobiliarias en Belgrano",
+      "Buscame 5 gimnasios boutique en Núñez"
+    ]
+  },
+  {
+    "id": "diagnostico",
+    "nombre": "Zorzal",
+    "rol": "Diagnóstico gratis",
+    "descripcion": "Revisa web, Instagram y Google de un lead y arma un PDF de 2 páginas con semáforo y 3 mejoras.",
+    "carpeta": "../agentes/diagnostico",
+    "avatar": "avatars/zorzal.svg",
+    "atajos": [
+      "Diagnóstico de [negocio] — [web o Instagram]",
+      "Aprobado, armá el PDF",
+      "Pasale los hallazgos a Calandria"
+    ]
+  },
+  {
+    "id": "propuestas",
+    "nombre": "Calandria",
+    "rol": "Propuestas",
+    "descripcion": "Analiza un negocio, arma las preguntas y diseña la propuesta 100% a medida.",
+    "carpeta": "../agentes/propuestas",
+    "avatar": "avatars/calandria.svg",
+    "atajos": [
+      "Arrancá el análisis de [negocio] — [web o Instagram]",
+      "Estas son las respuestas del cliente: …",
+      "Aprobado, diseñá la propuesta"
+    ]
+  },
+  {
+    "id": "contenido",
+    "nombre": "Benteveo",
+    "rol": "Contenido",
+    "descripcion": "Planifica y diseña el Instagram de Küme: calendario, ganchos, captions, guiones y carruseles.",
+    "carpeta": "../agentes/contenido",
+    "avatar": "avatars/benteveo.svg",
+    "atajos": [
+      "Armá la semana que viene",
+      "Diseñá el carrusel de [tema]",
+      "Esta semana pasó esto: …"
+    ]
+  },
+  {
+    "id": "reportes",
+    "nombre": "Tero",
+    "rol": "Reportes",
+    "descripcion": "Arma el reporte mensual de cada cliente con los números que le pases: qué funcionó, qué no y el plan.",
+    "carpeta": "../agentes/reportes",
+    "avatar": "avatars/tero.svg",
+    "atajos": [
+      "Reporte de [cliente] de [mes]: te dejé la exportación en datos/",
+      "Estos son los números de [cliente]: …",
+      "Aprobado, armá el PDF"
+    ]
+  }
+]

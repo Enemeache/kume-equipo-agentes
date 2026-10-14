@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Propuesta Hornero (DEMO)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --verde:#1B3A2D; --verde2:#2D5A42; --dorado:#C4973A; --crema:#F5EFE0; --negro:#111;
+    --cafe:#5B3A29; --cafe-claro:#E9DCCB;
+  }
+  @page{size:A4;margin:0}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;font-weight:300;color:var(--negro);background:#d9d4c7;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .page{width:210mm;height:297mm;margin:0 auto 10mm;position:relative;overflow:hidden;background:var(--crema);padding:22mm 20mm;page-break-after:always;break-after:page}
+  @media print{body{background:none}.page{margin:0}}
+  .dark{background:var(--verde);color:var(--crema)}
+  h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:600;line-height:1.05}
+  h2{font-size:34pt;color:var(--verde);margin-bottom:6mm}
+  .dark h2{color:var(--crema)}
+  h3{font-size:17pt;color:var(--verde);margin-bottom:2mm}
+  .kicker{font-size:8pt;letter-spacing:.25em;text-transform:uppercase;color:var(--dorado);font-weight:500;margin-bottom:3mm}
+  .line{width:22mm;height:1px;background:var(--dorado);margin:6mm 0}
+  p{font-size:10.5pt;line-height:1.6}
+  .lead{font-size:13pt;line-height:1.55}
+  .foot{position:absolute;bottom:12mm;left:20mm;right:20mm;display:flex;justify-content:space-between;font-size:7.5pt;letter-spacing:.15em;text-transform:uppercase;color:var(--verde2);opacity:.7}
+  .dark .foot{color:var(--crema)}
+  .demo{position:absolute;top:8mm;right:10mm;font-size:7pt;letter-spacing:.2em;background:var(--dorado);color:var(--verde);padding:1.5mm 3mm;font-weight:500}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8mm}
+  .card{background:#fff;padding:6mm;border-top:2px solid var(--dorado)}
+  .card p{font-size:9.5pt}
+  ul.clean{list-style:none}
+  ul.clean li{font-size:10pt;line-height:1.5;padding:2mm 0 2mm 6mm;position:relative;border-bottom:1px solid rgba(27,58,45,.1)}
+  ul.clean li::before{content:"";position:absolute;left:0;top:4.2mm;width:2.5mm;height:1px;background:var(--dorado)}
+  .quote{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19pt;line-height:1.3;color:var(--verde);border-left:2px solid var(--dorado);padding-left:6mm;margin:6mm 0}
+  .num{font-family:'Cormorant Garamond',serif;font-size:40pt;color:var(--dorado);line-height:1}
+  .stat small{display:block;font-size:8.5pt;line-height:1.4;margin-top:1mm}
+
+  /* Portada */
+  .cover{display:flex;flex-direction:column;justify-content:space-between}
+  .cover .brand{font-family:'Cormorant Garamond',serif;font-size:20pt;letter-spacing:.1em}
+  .cover h1{font-size:62pt;font-weight:400}
+  .cover h1 em{color:var(--dorado);font-style:italic}
+  .cover .meta{font-size:9pt;line-height:1.8;letter-spacing:.05em}
+  .seal{width:34mm;height:34mm;border:1px solid var(--dorado);border-radius:50%;display:flex;align-items:center;justify-content:center;position:absolute;right:20mm;top:22mm}
+  .seal::after{content:"✦";color:var(--dorado);font-size:20pt}
+
+  /* Solución */
+  .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm;margin-top:6mm}
+  .pillar{border:1px solid rgba(196,151,58,.5);padding:5mm}
+  .pillar .n{font-family:'Cormorant Garamond',serif;color:var(--dorado);font-size:24pt}
+  .pillar h3{color:var(--crema);font-size:15pt}
+  .pillar p{font-size:9pt;opacity:.9}
+
+  /* Mockups */
+  .mock-wrap{display:flex;gap:10mm;align-items:flex-start;margin-top:4mm}
+  .mock-wrap>div:first-child{flex:1.6}
+  .mock-wrap>div:last-child{flex:1}
+  .browser{background:#fff;border-radius:3mm;overflow:hidden;box-shadow:0 3mm 8mm rgba(0,0,0,.12)}
+  .bar{background:#eee;padding:2mm 3mm;display:flex;gap:1.5mm;align-items:center}
+  .bar i{width:2mm;height:2mm;border-radius:50%;background:#ccc;display:block}
+  .bar span{margin-left:3mm;font-size:6.5pt;color:#777;background:#fff;padding:.8mm 3mm;border-radius:2mm}
+  .site-hero{background:var(--cafe);color:var(--cafe-claro);padding:7mm 6mm}
+  .site-hero b{font-family:'Cormorant Garamond',serif;font-size:19pt;font-weight:600;display:block;line-height:1.05}
+  .site-hero small{font-size:7pt;opacity:.85}
+  .btn{display:inline-block;margin-top:3mm;background:var(--dorado);color:var(--cafe);font-size:6.5pt;font-weight:500;padding:1.5mm 3.5mm;letter-spacing:.08em}
+  .prods{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm;padding:4mm}
+  .prod{font-size:6.5pt;line-height:1.35}
+  .prod .img{height:15mm;background:linear-gradient(135deg,#8a5a3c,#c99b6d);margin-bottom:1.5mm;position:relative}
+  .prod:nth-child(2) .img{background:linear-gradient(135deg,#3f2a1d,#94643f)}
+  .prod:nth-child(3) .img{background:linear-gradient(135deg,#6b4a2b,#d8b98a)}
+  .prod .tag{position:absolute;top:1mm;left:1mm;background:var(--dorado);color:var(--cafe);font-size:5pt;padding:.5mm 1.5mm}
+  .subs{margin:0 4mm 4mm;background:var(--cafe-claro);padding:3mm;font-size:6.8pt;display:flex;justify-content:space-between;align-items:center}
+  .subs b{font-family:'Cormorant Garamond',serif;font-size:11pt}
+  .phone{background:#0b141a;border-radius:6mm;padding:3mm;box-shadow:0 3mm 8mm rgba(0,0,0,.15)}
+  .phone .scr{background:#efe7dd;border-radius:4mm;overflow:hidden;height:118mm;display:flex;flex-direction:column}
+  .wa-top{background:#075e54;color:#fff;font-size:7pt;padding:2.5mm 3mm;font-weight:500}
+  .wa-top small{display:block;font-weight:300;opacity:.8;font-size:5.5pt}
+  .msgs{padding:3mm;display:flex;flex-direction:column;gap:2mm}
+  .m{font-size:6.6pt;line-height:1.4;padding:1.8mm 2.5mm;border-radius:2mm;max-width:85%}
+  .in{background:#fff;align-self:flex-start}
+  .out{background:#dcf8c6;align-self:flex-end}
+  .cap{font-size:8pt;margin-top:3mm;color:var(--verde2);line-height:1.4}
+
+  /* Plan */
+  .timeline{margin-top:4mm}
+  .step{display:grid;grid-template-columns:30mm 1fr;gap:6mm;padding:5mm 0;border-bottom:1px solid rgba(27,58,45,.15)}
+  .step .when{font-family:'Cormorant Garamond',serif;font-size:15pt;color:var(--dorado)}
+  .step p{font-size:9.5pt}
+
+  /* Inversión */
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin-top:4mm}
+  .opt{background:#fff;padding:7mm;position:relative}
+  .opt.rec{background:var(--verde);color:var(--crema)}
+  .opt.rec h3{color:var(--crema)}
+  .badge{position:absolute;top:-3mm;right:6mm;background:var(--dorado);color:var(--verde);font-size:7pt;letter-spacing:.15em;padding:1.2mm 3mm;font-weight:500}
+  .price{font-family:'Cormorant Garamond',serif;font-size:30pt;color:var(--dorado);margin:3mm 0}
+  .opt ul.clean li{font-size:9pt;border-color:rgba(196,151,58,.25)}
+  table{width:100%;border-collapse:collapse;font-size:9pt;margin-top:4mm}
+  td,th{padding:2.2mm 2mm;text-align:left;border-bottom:1px solid rgba(27,58,45,.15)}
+  th{font-weight:500;font-size:7.5pt;letter-spacing:.12em;text-transform:uppercase;color:var(--verde2)}
+  .small{font-size:8pt;line-height:1.5;opacity:.85}
+  .steps-next{counter-reset:s}
+  .steps-next div{counter-increment:s;padding:5mm 0 5mm 16mm;position:relative;border-bottom:1px solid rgba(196,151,58,.3)}
+  .steps-next div::before{content:counter(s,decimal-leading-zero);position:absolute;left:0;top:3mm;font-family:'Cormorant Garamond',serif;font-size:24pt;color:var(--dorado)}
+</style>
+</head>
+<body>
+
+<!-- 1 · PORTADA -->
+<section class="page dark cover">
+  <div class="demo">DEMO · NEGOCIO FICTICIO</div>
+  <div class="seal"></div>
+  <div class="brand">küme</div>
+  <div>
+    <div class="kicker">Propuesta para Hornero Tostadores</div>
+    <h1>Que Hornero<br>venda <em>solo</em>.</h1>
+    <div class="line"></div>
+    <p class="lead" style="max-width:120mm;opacity:.9">Una tienda que cuenta tus orígenes, una suscripción para los que ya te eligen todos los meses y un asistente que contesta lo que te preguntan siempre. Para que el café siga siendo tuyo y el celular, no tanto.</p>
+  </div>
+  <div class="meta">
+    Preparada por Ignacio &amp; Delfi — Küme<br>
+    13 de octubre de 2026 · Válida hasta el 12 de noviembre de 2026
+  </div>
+</section>
+
+<!-- 2 · LO QUE VIMOS / LO QUE NOS CONTASTE -->
+<section class="page">
+  <div class="demo">DEMO</div>
+  <div class="kicker">01 · Dónde está Hornero hoy</div>
+  <h2>Tenés el café.<br>Te falta tiempo.</h2>
+  <div class="grid2">
+    <div>
+      <h3>Lo que vimos</h3>
+      <ul class="clean">
+        <li><b>4,8★ con 96 reseñas</b> en Google. La gente ama el café y la atención.</li>
+        <li>Tus posts del tueste y los sacos de origen tienen <b>3 a 4 veces más interacción</b> que el resto.</li>
+        <li>En los comentarios se repite: <i>"¿hacen envíos?", "¿cuánto el kilo?", "¿lo tienen para moka?"</i></li>
+        <li>Tres reseñas mencionan que tardaste en responder el WhatsApp.</li>
+        <li>No hay web: hoy, para comprarte, hay que escribirte.</li>
+        <li>Los tostadores de referencia en CABA ya venden online con suscripción. Ninguno cuenta el origen tan bien como vos.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Lo que nos contaste</h3>
+      <div class="quote">"Dejar de vivir pegado al celular y vender más sin contestar cada mensaje."</div>
+      <ul class="clean">
+        <li>2 a 3 horas por día con WhatsApp, muchas veces de noche.</li>
+        <li>Unos <b>40 clientes</b> te compran lo mismo todos los meses y les escribís vos para recordarles.</li>
+        <li>Querés sumar cafeterías, pero no tenés tiempo de salir a buscarlas.</li>
+        <li>Mercado Libre no funcionó: comisiones altas y sin lugar para la historia.</li>
+        <li>En marzo llega un <b>microlote de Etiopía</b>.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Küme × Hornero</span><span>02</span></div>
+</section>
+
+<!-- 3 · EL PROBLEMA REAL + SOLUCIÓN -->
+<section class="page dark">
+  <div class="demo">DEMO</div>
+  <div class="kicker">02 · El problema real</div>
+  <h2>No te falta vender más.<br>Te sobra intermediar.</h2>
+  <p class="lead" style="max-width:150mm;opacity:.9">Hoy cada kilo que vendés pasa por tu celular. Eso hace que el techo de Hornero sea la cantidad de mensajes que podés contestar en un día. Más seguidores o más posts no cambian eso: lo cambia un sistema que venda mientras vos tostás.</p>
+  <div class="line"></div>
+  <div class="kicker">03 · La solución</div>
+  <div class="pillars">
+    <div class="pillar"><div class="n">I</div><h3>Una tienda con origen</h3><p>Web propia donde cada café tiene su historia, su productor y su tueste. Elegís molienda, pagás con MercadoPago y ves el costo de envío a CABA e interior al instante.</p></div>
+    <div class="pillar"><div class="n">II</div><h3>El Club Hornero</h3><p>Suscripción mensual con cobro automático. Tus 40 clientes de siempre dejan de depender de tu recordatorio, y los nuevos tienen un motivo para quedarse.</p></div>
+    <div class="pillar"><div class="n">III</div><h3>Un asistente que contesta</h3><p>WhatsApp que responde precios, envíos y moliendas, toma pedidos y te pasa a vos solo lo que necesita tu mano.</p></div>
+  </div>
+  <p class="small" style="margin-top:8mm;max-width:150mm">Y para la opción completa: el lanzamiento del microlote de Etiopía como estreno de todo el sistema, y un kit para abrir la puerta de nuevas cafeterías.</p>
+  <div class="foot"><span>Küme × Hornero</span><span>03</span></div>
+</section>
+
+<!-- 4 · MOCKUP -->
+<section class="page">
+  <div class="demo">DEMO</div>
+  <div class="kicker">04 · Así se vería</div>
+  <h2>Hornero, abierto<br>las 24 horas.</h2>
+  <div class="mock-wrap">
+    <div>
+      <div class="browser">
+        <div class="bar"><i></i><i></i><i></i><span>hornerotostadores.com.ar</span></div>
+        <div class="site-hero">
+          <small>TOSTADO EN CHACARITA · ESTA SEMANA</small>
+          <b>Del productor a tu taza,<br>en 48 horas.</b>
+          <span class="btn">VER LOS CAFÉS</span>
+        </div>
+        <div class="prods">
+          <div class="prod"><div class="img"><span class="tag">NUEVO · MARZO</span></div><b>Etiopía Guji</b><br>Floral, durazno · Tueste claro<br>$ — / 250 g</div>
+          <div class="prod"><div class="img"></div><b>Colombia Huila</b><br>Caramelo, cacao · Tueste medio<br>$ — / 250 g</div>
+          <div class="prod"><div class="img"></div><b>Brasil Cerrado</b><br>Nuez, chocolate · Para espresso<br>$ — / 250 g</div>
+        </div>
+        <div class="subs"><div><b>Club Hornero</b><br>Tu café cada mes, sin escribirnos.</div><span class="btn" style="margin:0">SUMARME</span></div>
+      </div>
+      <p class="cap">Tienda propia: los orígenes al frente, molienda a elección, envío calculado al instante y suscripción a un clic.</p>
+    </div>
+    <div>
+      <div class="phone"><div class="scr">
+        <div class="wa-top">Hornero Tostadores<small>Asistente · responde al instante</small></div>
+        <div class="msgs">
+          <div class="m in">Hola! ¿Hacen envíos a Córdoba? ¿Cuánto sale el kilo?</div>
+          <div class="m out">¡Hola! 🔥 Sí, enviamos a todo el país. En la tienda ves el envío exacto a tu código postal. El kilo del Colombia Huila está a $ —. ¿Para qué cafetera lo querés?</div>
+          <div class="m in">Moka</div>
+          <div class="m out">Perfecto, te lo molemos medio-fino. Te dejo el link con eso ya elegido 👉 hornero…/huila-moka</div>
+          <div class="m in">¿Y si quiero que me llegue todos los meses?</div>
+          <div class="m out">Para eso está el Club Hornero ☕ Te llega solo y lo pausás cuando quieras.</div>
+        </div>
+      </div></div>
+      <p class="cap">Asistente de WhatsApp: responde lo repetido y deriva al dueño lo especial.</p>
+    </div>
+  </div>
+  <p class="small" style="margin-top:4mm">Mockup ilustrativo. Dominio, textos y precios se definen con Hornero.</p>
+  <div class="foot"><span>Küme × Hornero</span><span>04</span></div>
+</section>
+
+<!-- 5 · PLAN -->
+<section class="page">
+  <div class="demo">DEMO</div>
+  <div class="kicker">05 · Cómo llegamos a marzo</div>
+  <h2>Cuatro etapas,<br>un estreno.</h2>
+  <div class="timeline">
+    <div class="step"><div class="when">Semana 1</div><div><h3>Origen</h3><p>Relevamos tus cafés, productores, precios, moliendas y zonas de envío. Ordenamos tus fotos y armamos los textos de cada origen.</p></div></div>
+    <div class="step"><div class="when">Semanas 2–5</div><div><h3>Tienda</h3><p>Diseño y desarrollo de la web con tienda, cotizador de envíos y pagos con MercadoPago. La revisás en dos rondas antes de publicarla.</p></div></div>
+    <div class="step"><div class="when">Semanas 5–7</div><div><h3>Club y asistente</h3><p>Activamos la suscripción con cobro automático e invitamos a tus 40 clientes recurrentes. Entrenamos el asistente de WhatsApp con tus respuestas y lo probamos con vos antes de que hable con clientes.</p></div></div>
+    <div class="step"><div class="when">Marzo</div><div><h3>Estreno: Etiopía</h3><p><i>Solo en Tueste Completo.</i> Un mes de contenido para lanzar el microlote: cuenta regresiva, la historia del productor, el tueste en vivo y preventa en la tienda. Además, el kit para cafeterías.</p></div></div>
+  </div>
+  <div class="grid2" style="margin-top:8mm">
+    <div class="stat"><div class="num">1,5–2 h</div><small><b>por día recuperadas (estimado).</b> Supone que el asistente responde entre el 60 y el 70% de los mensajes repetidos. Lo medimos en el primer mes.</small></div>
+    <div class="stat"><div class="num">~10</div><small><b>suscriptores en el primer mes (estimado).</b> Supone que 1 de cada 4 de tus 40 clientes recurrentes se pasa al Club.</small></div>
+  </div>
+  <div class="foot"><span>Küme × Hornero</span><span>05</span></div>
+</section>
+
+<!-- 6 · INVERSIÓN -->
+<section class="page">
+  <div class="demo">DEMO</div>
+  <div class="kicker">06 · Inversión</div>
+  <h2>Dos formas<br>de arrancar.</h2>
+  <div class="opts">
+    <div class="opt">
+      <h3>Tueste Medio</h3>
+      <p class="small">El sistema que te saca del celular.</p>
+      <div class="price">$1.000.000</div>
+      <ul class="clean">
+        <li>Tienda online con historia de cada origen</li>
+        <li>Cotizador de envíos CABA e interior</li>
+        <li>Club Hornero: suscripción con cobro automático</li>
+        <li>Asistente de WhatsApp entrenado con tus respuestas</li>
+        <li>2 rondas de revisión · 30 días de soporte</li>
+      </ul>
+    </div>
+    <div class="opt rec">
+      <span class="badge">RECOMENDADA</span>
+      <h3>Tueste Completo</h3>
+      <p class="small">El sistema más el estreno de Etiopía.</p>
+      <div class="price">$1.450.000</div>
+      <ul class="clean">
+        <li>Todo lo de Tueste Medio</li>
+        <li>Lanzamiento del microlote de Etiopía: 1 mes de contenido en Instagram</li>
+        <li>Kit para cafeterías: catálogo mayorista, presentación y mensaje de contacto</li>
+        <li>Reporte de resultados al cierre del lanzamiento</li>
+      </ul>
+    </div>
+  </div>
+  <table>
+    <tr><th>Pago en 3 tramos</th><th>Tueste Medio</th><th>Tueste Completo</th></tr>
+    <tr><td>Al arrancar (40%)</td><td>$400.000</td><td>$580.000</td></tr>
+    <tr><td>Tienda publicada (30%)</td><td>$300.000</td><td>$435.000</td></tr>
+    <tr><td>Club y asistente activos / lanzamiento (30%)</td><td>$300.000</td><td>$435.000</td></tr>
+  </table>
+  <p class="small" style="margin-top:4mm"><b>No incluye:</b> dominio y hosting (costo anual aparte, te ayudamos a contratarlo a tu nombre), comisiones de MercadoPago, costo de envíos ni pauta publicitaria. <b>Necesitamos de vos:</b> lista de cafés y precios, fotos que ya tengas y una respuesta en 48 h en cada revisión.<br>Precios en ARS con impuestos incluidos. MercadoPago: 2 cuotas +9%, 3 cuotas +14%.</p>
+  <div class="foot"><span>Küme × Hornero</span><span>06</span></div>
+</section>
+
+<!-- 7 · PRÓXIMOS PASOS -->
+<section class="page dark">
+  <div class="demo">DEMO</div>
+  <div class="kicker">07 · Próximos pasos</div>
+  <h2>Si te cierra,<br>arrancamos esta semana.</h2>
+  <div class="steps-next" style="max-width:140mm;margin-top:6mm">
+    <div><h3 style="color:var(--crema)">Elegís la opción</h3><p>Nos escribís cuál te cierra. Si querés ajustar algo, lo charlamos.</p></div>
+    <div><h3 style="color:var(--crema)">Primer tramo por MercadoPago</h3><p>Te mandamos el link de pago.</p></div>
+    <div><h3 style="color:var(--crema)">Kick-off</h3><p>Una hora en el tostadero para conocer tus cafés, en menos de una semana.</p></div>
+  </div>
+  <div class="line"></div>
+  <p class="lead" style="max-width:140mm;opacity:.9">Somos dos personas, Ignacio y Delfi. Cuando trabajás con Küme, hablás con nosotros, no con un intermediario.</p>
+  <p style="margin-top:8mm;font-size:10pt;line-height:1.9">WhatsApp +54 9 11 5751-7796<br>kumesomos@gmail.com · @kume.agenciamkt<br>kume-website.vercel.app</p>
+  <div class="foot"><span>küme · Raíz. Equilibrio. Resultados.</span><span>07</span></div>
+</section>
+
+</body>
+</html>

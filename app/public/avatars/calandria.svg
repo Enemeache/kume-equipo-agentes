@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <circle cx="60" cy="60" r="60" fill="#F5EFE0"/>
+  <circle cx="60" cy="60" r="54" fill="none" stroke="#C4973A" stroke-width="1"/>
+  <!-- rama -->
+  <path d="M18 88 Q60 80 104 90" stroke="#1B3A2D" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M84 86 q6 -8 14 -6 q-4 8 -14 6Z" fill="#2D5A42"/>
+  <!-- cuerpo pajarito cantando -->
+  <path d="M36 82 Q34 56 58 50 Q76 48 82 62 Q86 78 66 84 Z" fill="#1B3A2D"/>
+  <path d="M36 80 L18 70 L22 84 Z" fill="#1B3A2D"/>
+  <circle cx="72" cy="48" r="13" fill="#1B3A2D"/>
+  <path d="M84 44 L98 40 L85 50 Z" fill="#C4973A"/>
+  <circle cx="75" cy="45" r="2.5" fill="#F5EFE0"/>
+  <path d="M68 52 q4 3 10 2" stroke="#F5EFE0" stroke-width="1.5" fill="none"/>
+  <path d="M46 66 Q58 60 70 70" stroke="#C4973A" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- notas -->
+  <path d="M100 26 v12 M100 26 l6 -2" stroke="#C4973A" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle cx="98" cy="38" r="3" fill="#C4973A"/>
+  <circle cx="90" cy="24" r="2" fill="#C4973A"/>
+</svg>

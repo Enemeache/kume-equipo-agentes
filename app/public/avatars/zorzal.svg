@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <circle cx="60" cy="60" r="60" fill="#1B3A2D"/>
+  <circle cx="60" cy="60" r="54" fill="none" stroke="#C4973A" stroke-width="1"/>
+  <!-- lupa -->
+  <circle cx="44" cy="44" r="16" fill="none" stroke="#F5EFE0" stroke-width="3" opacity=".9"/>
+  <path d="M55 56 L66 67" stroke="#F5EFE0" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+  <!-- zorzal: pecho canela, cuerpo marrón-verde -->
+  <path d="M40 92 Q38 66 62 60 Q84 56 90 74 Q92 92 72 96 Z" fill="#8A6A45"/>
+  <path d="M52 78 Q64 70 78 80 Q74 92 62 93 Q54 90 52 78Z" fill="#C4973A"/>
+  <path d="M40 90 L24 98 L36 80 Z" fill="#6E5536"/>
+  <circle cx="80" cy="58" r="12" fill="#8A6A45"/>
+  <path d="M91 56 L104 58 L91 62 Z" fill="#C4973A"/>
+  <circle cx="83" cy="56" r="2.6" fill="#F5EFE0"/><circle cx="83" cy="56" r="1.2" fill="#111"/>
+</svg>

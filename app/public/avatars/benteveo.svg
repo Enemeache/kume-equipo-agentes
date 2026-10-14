@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <circle cx="60" cy="60" r="60" fill="#2D5A42"/>
+  <circle cx="60" cy="60" r="54" fill="none" stroke="#C4973A" stroke-width="1"/>
+  <!-- benteveo: pecho dorado, antifaz -->
+  <path d="M30 88 Q26 58 54 50 Q80 46 86 66 Q90 86 66 92 Z" fill="#C4973A"/>
+  <path d="M30 86 L14 94 L28 74 Z" fill="#1B3A2D"/>
+  <path d="M44 70 Q62 60 80 72 Q74 84 58 86 Q46 84 44 70Z" fill="#1B3A2D" opacity=".35"/>
+  <circle cx="70" cy="46" r="16" fill="#1B3A2D"/>
+  <path d="M56 42 Q70 34 86 42 L86 46 Q70 39 56 47 Z" fill="#F5EFE0"/>
+  <path d="M84 50 L102 48 L85 56 Z" fill="#1B3A2D"/>
+  <circle cx="76" cy="49" r="2.5" fill="#F5EFE0"/>
+  <path d="M64 30 L70 26 L70 32 Z" fill="#C4973A"/>
+  <!-- globo de diálogo -->
+  <rect x="20" y="22" width="30" height="20" rx="5" fill="#F5EFE0"/>
+  <path d="M30 42 L34 48 L38 42 Z" fill="#F5EFE0"/>
+  <circle cx="28" cy="32" r="2" fill="#1B3A2D"/><circle cx="35" cy="32" r="2" fill="#1B3A2D"/><circle cx="42" cy="32" r="2" fill="#1B3A2D"/>
+</svg>

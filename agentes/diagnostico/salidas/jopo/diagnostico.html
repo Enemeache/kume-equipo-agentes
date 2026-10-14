@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Diagnóstico Jopo</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--verde:#1B3A2D;--verde2:#2D5A42;--dorado:#C4973A;--crema:#F5EFE0}
+  @page{size:A4;margin:0}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;font-weight:300;color:#111;background:#d9d4c7;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .page{width:210mm;height:297mm;margin:0 auto 10mm;position:relative;overflow:hidden;background:var(--crema);padding:18mm 18mm;break-after:page}
+  @media print{body{background:none}.page{margin:0}}
+  h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:600;line-height:1.05;color:var(--verde)}
+  h1{font-size:34pt;font-weight:500}
+  h2{font-size:22pt;margin-bottom:4mm}
+  h3{font-size:13pt;margin-bottom:1mm}
+  .kicker{font-size:7.5pt;letter-spacing:.25em;text-transform:uppercase;color:var(--dorado);font-weight:500;margin-bottom:2.5mm}
+  p{font-size:9.6pt;line-height:1.55}
+  .head{background:var(--verde);color:var(--crema);margin:-18mm -18mm 7mm;padding:14mm 18mm 10mm}
+  .head h1{color:var(--crema)}
+  .frase{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15pt;line-height:1.35;margin-top:4mm;opacity:.95}
+  .grid{display:grid;grid-template-columns:1.25fr 1fr;gap:7mm}
+  .sem{display:grid;grid-template-columns:7mm 1fr;gap:3mm;padding:3mm 0;border-bottom:1px solid rgba(27,58,45,.12);align-items:start}
+  .dot{width:5mm;height:5mm;border-radius:50%;margin-top:1mm}
+  .r{background:#B5503F}.a{background:#D9A33A}.v{background:#4E8C5E}
+  .sem b{font-weight:500}
+  .sem p{font-size:9pt}
+  .shot{border-radius:3mm;overflow:hidden;box-shadow:0 2mm 6mm rgba(0,0,0,.15);background:#fff}
+  .shot img{width:100%;display:block;height:92mm;object-fit:cover;object-position:top}
+  .cap{font-size:7.8pt;color:var(--verde2);margin-top:2mm;line-height:1.4}
+  .fort{background:#fff;border-top:2px solid var(--dorado);padding:4mm 5mm;margin-top:6mm}
+  .fort li{font-size:9.3pt;line-height:1.5;margin-left:4mm;margin-top:1mm}
+  .mejora{display:grid;grid-template-columns:14mm 1fr;gap:3mm;padding:5mm 0;border-bottom:1px solid rgba(196,151,58,.35)}
+  .mejora .n{font-family:'Cormorant Garamond',serif;font-size:28pt;color:var(--dorado);line-height:.9}
+  .tip{background:#fff;border-left:2px solid var(--dorado);padding:2.5mm 4mm;font-size:8.8pt;margin-top:2mm;line-height:1.5}
+  .mas{background:var(--verde);color:var(--crema);padding:6mm 7mm;margin-top:7mm}
+  .mas h3{color:var(--crema)}
+  .mas p{opacity:.92}
+  .cta{margin-top:6mm;display:flex;justify-content:space-between;align-items:flex-end;gap:6mm}
+  .cta p{font-size:9pt}
+  .foot{position:absolute;bottom:9mm;left:18mm;right:18mm;display:flex;justify-content:space-between;font-size:7pt;letter-spacing:.15em;text-transform:uppercase;opacity:.55}
+  .borrador{position:absolute;top:6mm;right:8mm;font-size:6.5pt;letter-spacing:.2em;background:var(--dorado);color:var(--verde);padding:1.2mm 2.5mm;font-weight:500;z-index:2}
+</style>
+</head>
+<body>
+
+<section class="page">
+  <div class="borrador">BORRADOR · PARA REVISAR</div>
+  <div class="head">
+    <div class="kicker">Diagnóstico gratis · Octubre 2026</div>
+    <h1>Jopo, visto desde el celular de un cliente</h1>
+    <div class="frase">Jopo tiene una identidad hermosa y una propuesta que la prensa ya eligió. Lo que hoy frena es el camino entre "qué rico se ve" y "ya lo pedí".</div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="kicker">Cómo está cada canal</div>
+      <div class="sem"><span class="dot r"></span><div><b>Web</b><p>No hay web propia: todo pasa por Linktree y un PDF. Quien busca "Jopo" en Google no encuentra un lugar propio con menú, horarios y cómo pedir.</p></div></div>
+      <div class="sem"><span class="dot v"></span><div><b>Instagram</b><p>11,6K seguidores, bio clara (qué ofrecen, horario, "sin reserva") y destacadas de promos y heladería.</p></div></div>
+      <div class="sem"><span class="dot a"></span><div><b>Google</b><p>No pudimos ver el puntaje ni las reseñas desde afuera. Muy bien que el Linktree pida reseñas.</p></div></div>
+      <div class="sem"><span class="dot a"></span><div><b>Menú y pedidos</b><p>El menú es un PDF de Drive a dos columnas: en el celular hay que hacer zoom, y el archivo se llama <b>"MAYO"</b>. Para pedir, Rappi o escribir por WhatsApp.</p></div></div>
+
+      <div class="fort">
+        <h3>Lo que ya está muy bien</h3>
+        <ul>
+          <li>Una identidad visual cuidada y coherente en todo: logo, Linktree y menú.</li>
+          <li>Prensa positiva (Ámbito, Time Out, Minuto Uno) y una propuesta distinta: helado, café de especialidad y brunch, de 8 a 00 todos los días.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="kicker">Así se ve hoy el menú en un celular</div>
+      <div class="shot"><img src="menu-celular.png" alt="Menú de Jopo en Google Drive visto desde un celular"></div>
+      <p class="cap">Captura del 13/10/2026, simulando un iPhone. El nombre del archivo y el botón "Acceder" de Google aparecen antes que el menú.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Küme × Jopo</span><span>01</span></div>
+</section>
+
+<section class="page">
+  <div class="borrador">BORRADOR · PARA REVISAR</div>
+  <div class="kicker">Para hacer esta semana</div>
+  <h2>3 mejoras que podés hacer solo y gratis</h2>
+
+  <div class="mejora"><span class="n">01</span><div>
+    <h3>Actualizá el menú y su nombre</h3>
+    <p>Si los precios cambiaron desde mayo, subí la versión nueva. Y renombrá el archivo para que no diga un mes viejo: es lo primero que ve el cliente.</p>
+    <div class="tip">Nombre sugerido: <b>"Menú Jopo"</b> (sin mes). Si podés, una versión a una sola columna se lee mucho mejor en el celular.</div>
+  </div></div>
+
+  <div class="mejora"><span class="n">02</span><div>
+    <h3>Un botón "Menú del día" en el Linktree</h3>
+    <p>El menú de mediodía cambia todos los días y hoy solo se ve si justo mirás la story. Creá una destacada "Hoy" y sumá un botón en el Linktree que lleve ahí.</p>
+  </div></div>
+
+  <div class="mejora"><span class="n">03</span><div>
+    <h3>Un post fijado "Cómo pedir"</h3>
+    <p>En una sola imagen: delivery (Rappi), para retirar (WhatsApp), horario y dirección. Fijalo primero en el perfil, así nadie tiene que preguntar.</p>
+    <div class="tip">Texto sugerido: <b>"¿Antojo? 🍦 Pedí por Rappi o escribinos por WhatsApp y lo retirás en Juramento 5299. Todos los días de 8 a 00."</b></div>
+  </div></div>
+
+  <div class="mas">
+    <h3>Lo que haríamos con más tiempo</h3>
+    <p>Una web simple con el menú siempre actualizado y pensado para el celular, y pedidos para retirar o delivery propio sin pasar por la comisión de una app. Así, quien encuentra a Jopo en Google o Instagram llega a pedir en dos toques.</p>
+  </div>
+
+  <div class="cta">
+    <div>
+      <div class="kicker">¿Lo charlamos?</div>
+      <p>15 minutos, sin cargo y sin compromiso. Te mostramos cómo se vería.<br>
+      WhatsApp +54 9 11 5751-7796 · kumesomos@gmail.com · @kume.agenciamkt</p>
+    </div>
+    <p style="text-align:right;font-family:'Cormorant Garamond',serif;font-size:18pt;color:var(--verde)">Ignacio &amp; Delfi<br><span style="font-size:10pt;font-family:'DM Sans';color:var(--dorado);letter-spacing:.2em">KÜME</span></p>
+  </div>
+  <div class="foot"><span>küme · Raíz. Equilibrio. Resultados.</span><span>02</span></div>
+</section>
+
+</body>
+</html>

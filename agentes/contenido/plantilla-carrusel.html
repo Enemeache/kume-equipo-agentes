@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Carrusel Küme — plantilla</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  /* PLANTILLA: copiá este archivo como piezas.html y cambiá solo el contenido de cada .slide */
+  :root{--verde:#1B3A2D;--verde2:#2D5A42;--dorado:#C4973A;--crema:#F5EFE0}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#888;display:flex;flex-direction:column;gap:40px;padding:40px;align-items:center}
+  .slide{width:1080px;height:1350px;position:relative;overflow:hidden;padding:120px 110px;display:flex;flex-direction:column;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:300}
+  .verde{background:var(--verde);color:var(--crema)}
+  .crema{background:var(--crema);color:#111}
+  .kicker{font-size:26px;letter-spacing:.28em;text-transform:uppercase;color:var(--dorado);font-weight:500;margin-bottom:40px}
+  h1{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:118px;line-height:1.02}
+  h1 em{color:var(--dorado);font-style:italic}
+  h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:84px;line-height:1.05;color:var(--verde)}
+  .verde h2{color:var(--crema)}
+  .line{width:120px;height:2px;background:var(--dorado);margin:56px 0}
+  p{font-size:40px;line-height:1.5}
+  .num{font-family:'Cormorant Garamond',serif;font-size:200px;line-height:.8;color:var(--dorado);margin-bottom:30px}
+  .foot{position:absolute;bottom:70px;left:110px;right:110px;display:flex;justify-content:space-between;font-size:24px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
+  .sello{font-family:'Cormorant Garamond',serif;font-size:56px;letter-spacing:.08em;text-transform:none;opacity:1}
+  .swipe{color:var(--dorado);opacity:1}
+  .cta{display:inline-block;margin-top:60px;border:2px solid var(--dorado);color:var(--dorado);padding:26px 44px;font-size:34px;font-weight:500;letter-spacing:.06em}
+</style>
+</head>
+<body>
+
+<!-- PORTADA -->
+<section class="slide verde">
+  <div class="kicker">Para emprendedores</div>
+  <h1>Título que <em>frena</em> el scroll.</h1>
+  <div class="line"></div>
+  <p style="opacity:.85">Subtítulo de una línea que promete algo concreto.</p>
+  <div class="foot"><span>@kume.agenciamkt</span><span class="swipe">Deslizá →</span></div>
+</section>
+
+<!-- INTERIOR -->
+<section class="slide crema">
+  <div class="num">01</div>
+  <h2>Idea principal de la slide.</h2>
+  <div class="line"></div>
+  <p>Explicación corta, máximo 25 palabras, que se lee de un vistazo.</p>
+  <div class="foot"><span>küme</span><span>1/5</span></div>
+</section>
+
+<!-- CIERRE -->
+<section class="slide verde">
+  <h2>Cierre que resume y lleva a la acción.</h2>
+  <div class="line"></div>
+  <p style="opacity:.85">Una línea más de contexto.</p>
+  <div><span class="cta">Guardalo · Escribinos "WEB"</span></div>
+  <div class="foot"><span class="sello">küme</span><span>Raíz. Equilibrio. Resultados.</span></div>
+</section>
+
+</body>
+</html>
