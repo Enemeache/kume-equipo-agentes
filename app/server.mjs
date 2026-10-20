@@ -6,6 +6,7 @@ import { spawn } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPiloto } from "./piloto.mjs";
+import { zip } from "./zip.mjs";
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const PORT = 4747;
@@ -133,6 +134,7 @@ async function mapContenido(pg) {
     id: pg.id, url: pg.url, pieza: txt(pr["Pieza"]), fecha: pr["Fecha"]?.date?.start || "",
     formato: pr["Formato"]?.select?.name || "", pilar: pr["Pilar"]?.select?.name || "", estado: pr["Estado"]?.select?.name || "",
     gancho: txt(pr["Gancho"]), caption: txt(pr["Caption"]), guion: txt(pr["Guión o slides"]), hashtags: txt(pr["Hashtags"]),
+    carpeta,
     imagenes: imagenes.map((f) => `/files/contenido/${encodeURIComponent(carpeta)}/${encodeURIComponent(f)}`),
   };
 }
@@ -234,6 +236,24 @@ const server = http.createServer(async (req, res) => {
       if (!permitidos.includes(estado)) return json(res, 400, { error: "Estado no válido" });
       const r = await notion("PATCH", `pages/${m[1]}`, { properties: { Estado: { select: { name: estado } } } });
       return json(res, r.error ? 500 : 200, r.error ? { error: r.error } : { ok: true });
+    }
+
+    // Descargar todas las imágenes de una pieza en un ZIP: /api/contenido-zip/<carpeta>
+    if ((m = p.match(/^\/api\/contenido-zip\/([^/]+)$/))) {
+      const base = salidasDe("contenido"), dir = path.resolve(base, m[1]);
+      if (!dir.startsWith(base + path.sep)) { res.writeHead(403); return res.end(); }
+      const pngs = (await readdir(dir).catch(() => [])).filter((f) => /\.png$/i.test(f)).sort();
+      if (!pngs.length) return json(res, 404, { error: "Esta pieza no tiene imágenes" });
+      const buf = zip(await Promise.all(pngs.map(async (f) => ({ name: f, data: await readFile(path.join(dir, f)) }))));
+      res.writeHead(200, { "Content-Type": "application/zip", "Content-Length": buf.length, "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(m[1])}.zip` });
+      return res.end(buf);
+    }
+    // Abrir la carpeta de una pieza en el Explorador de Windows
+    if ((m = p.match(/^\/api\/abrir-carpeta\/([\w-]+)\/([^/]+)$/)) && req.method === "POST" && agents.some((a) => a.id === m[1])) {
+      const base = salidasDe(m[1]), dir = path.resolve(base, m[2]);
+      if (!dir.startsWith(base + path.sep) || !existsSync(dir)) return json(res, 404, { error: "No encontré la carpeta" });
+      spawn("explorer.exe", [dir], { detached: true, stdio: "ignore" }).unref();
+      return json(res, 200, { ok: true });
     }
 
     // Archivos de salida de cualquier agente: /files/<agente>/<ruta>

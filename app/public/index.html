@@ -440,7 +440,12 @@ async function loadContenido() {
         <div class="meta">${esc(fechaLinda(c.fecha))} · ${esc(c.formato)}</div>
         <h3>${esc(c.pieza)}</h3>
         <span class="pill gold">${esc(c.pilar)}</span>
-        ${c.imagenes.length ? `<div class="thumbs">${c.imagenes.map((src) => `<a href="${src}" target="_blank"><img src="${src}" alt=""></a>`).join("")}</div>` : ""}
+        ${c.imagenes.length ? `<div class="thumbs">${c.imagenes.map((src, i) => `<a href="${src}" download="${esc(c.carpeta)}-${String(i + 1).padStart(2, "0")}.png" title="Descargar esta imagen"><img src="${src}" alt="Slide ${i + 1}"></a>`).join("")}</div>
+        <div class="actions" style="margin-top:10px">
+          <a class="btn gold" style="text-decoration:none" href="/api/contenido-zip/${encodeURIComponent(c.carpeta)}" download>⬇️ Descargar ${c.formato === "Carrusel" ? "carrusel" : "imágenes"} (${c.imagenes.length})</a>
+          <button class="btn ghost" onclick="abrirCarpeta('${esc(c.carpeta)}')">📂 Abrir carpeta</button>
+        </div>
+        <div class="meta" style="margin-top:6px">Tocá una imagen para bajarla sola. El ZIP va a tu carpeta de Descargas.</div>` : ""}
         <p class="op" style="margin-top:8px;white-space:pre-wrap">${esc(c.guion)}</p>
         <div class="meta" style="margin-top:8px"><a href="${esc(c.url)}" target="_blank">Ficha en Notion ↗</a></div>
       </div>
@@ -468,6 +473,10 @@ async function setEstadoCont(id, estado) {
   const r = await fetch("/api/contenido/" + id, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ estado }) });
   if (!r.ok) return alert((await r.json()).error);
   loadContenido();
+}
+async function abrirCarpeta(carpeta) {
+  const r = await fetch(`/api/abrir-carpeta/contenido/${encodeURIComponent(carpeta)}`, { method: "POST" });
+  if (!r.ok) alert((await r.json()).error);
 }
 function pedirCambio(id) {
   const c = CONT.find((x) => x.id === id);
