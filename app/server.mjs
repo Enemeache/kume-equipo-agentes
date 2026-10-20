@@ -5,6 +5,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { spawn } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createPiloto } from "./piloto.mjs";
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const PORT = 4747;
@@ -201,6 +202,14 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (p === "/api/propuestas") return json(res, 200, await listPropuestas());
+
+    // ---------- Piloto automático ----------
+    if (p === "/api/rutinas") return json(res, 200, await piloto.listar());
+    if ((m = p.match(/^\/api\/rutinas\/([\w-]+)$/)) && req.method === "PATCH") {
+      const { activa } = await readBody(req);
+      return json(res, (await piloto.activar(m[1], activa)) ? 200 : 404, { ok: true });
+    }
+    if ((m = p.match(/^\/api\/rutinas\/([\w-]+)\/correr$/)) && req.method === "POST") return json(res, 200, await piloto.correrAhora(m[1]));
     if (p === "/api/reportes") return json(res, 200, await listReportes());
     if (p === "/api/diagnosticos") {
       const base = salidasDe("diagnostico");
@@ -249,6 +258,9 @@ const server = http.createServer(async (req, res) => {
     return json(res, 500, { error: e.message });
   }
 });
+
+const piloto = createPiloto({ DIR, DATA, agents, agentDir, runClaude, notion, running, loadChat, saveChat });
+piloto.iniciar();
 
 server.requestTimeout = 0; // los agentes pueden tardar varios minutos
 server.listen(PORT, "127.0.0.1", () => console.log(`Küme HQ en http://localhost:${PORT}`));

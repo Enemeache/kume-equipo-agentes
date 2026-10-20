@@ -151,6 +151,7 @@
     <button data-view="propuestas">Propuestas <span class="count" id="c-prop" hidden>0</span></button>
     <button data-view="contenido">Contenido <span class="count" id="c-cont" hidden>0</span></button>
     <button data-view="reportes">Reportes</button>
+    <button data-view="piloto">🤖 Piloto automático <span class="count" id="c-piloto" hidden>ON</span></button>
   </nav>
   <div class="side-title">El equipo</div>
   <div id="side-agents"></div>
@@ -196,6 +197,15 @@
     <div id="contenido"></div>
   </section>
 
+  <!-- PILOTO AUTOMÁTICO -->
+  <section class="view" id="v-piloto">
+    <div class="head"><div><div class="kicker">Rutinas del equipo</div><h1>Piloto automático</h1><p>Trabajan solos en su horario mientras la app esté abierta. Preparan todo; nada se envía ni se publica sin tu OK.</p></div>
+      <button class="btn ghost" onclick="loadPiloto()">Actualizar</button></div>
+    <div id="rutinas"></div>
+    <h3 style="margin:26px 0 10px">Lo último que hicieron</h3>
+    <table><thead><tr><th>Cuándo</th><th>Quién</th><th>Resultado</th></tr></thead><tbody id="historial"></tbody></table>
+  </section>
+
   <!-- REPORTES -->
   <section class="view" id="v-reportes">
     <div class="head"><div><div class="kicker">Oscar · Reportes mensuales</div><h1>Reportes</h1><p>Uno por cliente y por mes. Revisalo antes de enviarlo.</p></div>
@@ -236,7 +246,33 @@ function show(v) {
   if (v === "contenido") loadContenido();
   if (v === "reportes") loadReportes();
   if (v === "diagnosticos") loadDiagnosticos();
+  if (v === "piloto") loadPiloto();
 }
+
+// ---------- Piloto automático ----------
+const DIAS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
+const cuando = (iso) => { if (!iso) return "—"; const d = new Date(iso), n = new Date(); const mismoDia = d.toDateString() === n.toDateString(); return (mismoDia ? "hoy" : d.toLocaleDateString("es-AR", { weekday: "short", day: "numeric", month: "short" })) + " " + d.toTimeString().slice(0, 5); };
+async function loadPiloto() {
+  const r = await (await fetch("/api/rutinas")).json();
+  const on = r.rutinas.some((x) => x.activa);
+  $("#c-piloto").hidden = !on;
+  const nombre = (id) => (AGENTS.find((a) => a.id === id) || {}).nombre || id;
+  $("#rutinas").innerHTML = r.rutinas.map((x) => `
+    <div class="card" style="grid-template-columns:auto 1fr auto;align-items:center">
+      <img src="${(AGENTS.find((a) => a.id === x.agente) || {}).avatar || ""}" style="width:56px;height:56px;border-radius:50%" alt="">
+      <div>
+        <h3>${esc(nombre(x.agente))} · ${esc(x.nombre)}</h3>
+        <div class="meta">${x.dias.map((d) => DIAS[d]).join(", ")} a las ${x.hora} · última vez: ${x.ultima ? esc(x.ultima) : "nunca"} · ${x.trabajando ? "<b>💻 trabajando ahora</b>" : x.activa ? "próxima: " + cuando(x.proxima) : "pausada"}</div>
+      </div>
+      <div class="actions" style="margin:0">
+        <button class="btn ghost" onclick="correrRutina('${x.id}')" ${x.trabajando ? "disabled" : ""}>Correr ahora</button>
+        <button class="btn ${x.activa ? "gold" : ""}" onclick="toggleRutina('${x.id}', ${!x.activa})">${x.activa ? "Activa" : "Pausada"}</button>
+      </div>
+    </div>`).join("");
+  $("#historial").innerHTML = r.historial.length ? r.historial.map((h) => `<tr><td>${cuando(h.fecha)}</td><td>${esc(nombre(h.agente))}</td><td style="white-space:pre-wrap">${h.ok ? "" : "⚠️ "}${esc(h.resumen)}</td></tr>`).join("") : `<tr><td colspan="3" class="empty">Todavía no corrió ninguna rutina.</td></tr>`;
+}
+async function toggleRutina(id, activa) { await fetch("/api/rutinas/" + id, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ activa }) }); loadPiloto(); }
+async function correrRutina(id) { await fetch(`/api/rutinas/${id}/correr`, { method: "POST" }); setTimeout(() => { loadPiloto(); loadAgents(); }, 800); }
 
 const PORTRAITS = {};
 async function loadAgents() {
@@ -255,6 +291,8 @@ window.onOfficeReady = (of) => {
 let PEND = { pros: 0, cont: 0 };
 function updateInbox() { window.OF && window.OF.setInbox(PEND.pros + PEND.cont); }
 setInterval(loadAgents, 5000);
+// cada minuto refresca contadores (las rutinas cargan cosas nuevas solas)
+setInterval(() => { loadProspectos(); loadContenido(); if (document.body.classList.contains("panel") && $("#v-piloto").classList.contains("on")) loadPiloto(); }, 60000);
 
 // ---------- Chat ----------
 async function openChat(id) {

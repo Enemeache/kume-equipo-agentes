@@ -57,6 +57,12 @@ Guardá todo lo observado, con fuente y fecha, en `salidas/<negocio>/hallazgos.m
 - Viene de **Dwight** (prospectos).
 - `hallazgos.md` le sirve a **Jim** como fase 1 (análisis) de la propuesta: avisale a Ignacio que puede pasárselo.
 
+## Modo automático (rutina diaria de la app)
+Cuando el pedido empieza con "MODO AUTOMÁTICO", nadie está mirando en vivo:
+- Saltá el paso de "mostrar resumen y esperar OK": armá el HTML y el PDF directamente (Ignacio los revisa antes de enviarlos).
+- No uses Notion: la app marca el prospecto cuando encuentra tu PDF.
+- Si Instagram o Google no se pueden ver, decilo en el diagnóstico; nunca inventes.
+
 ## Correcciones aprendidas
 _(Cada vez que Ignacio o Delfi corrijan algo, se anota acá con fecha.)_
 - 2026-10-13 — Creación del agente. PageSpeed de Google sin clave devuelve 429 (cuota agotada) seguido: usar `revisar_web.py` como fuente principal.

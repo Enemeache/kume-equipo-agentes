@@ -1,0 +1,40 @@
+{
+  "zonas_prospeccion": [
+    { "rubro": "cafeterías de especialidad", "zona": "Palermo" },
+    { "rubro": "gimnasios boutique y estudios de pilates", "zona": "Núñez y Belgrano" },
+    { "rubro": "inmobiliarias de barrio", "zona": "Colegiales y Coghlan" },
+    { "rubro": "restaurantes y bodegones", "zona": "Villa Crespo" },
+    { "rubro": "centros de estética y spas", "zona": "Recoleta" },
+    { "rubro": "panaderías y pastelerías", "zona": "Villa Urquiza" },
+    { "rubro": "bares y cervecerías", "zona": "Chacarita" },
+    { "rubro": "consultorios y clínicas chicas", "zona": "Caballito" },
+    { "rubro": "tiendas de ropa independientes", "zona": "Palermo Soho" },
+    { "rubro": "estudios de arquitectura y diseño", "zona": "Saavedra y Núñez" }
+  ],
+  "rutinas": [
+    {
+      "id": "prospeccion-diaria",
+      "agente": "prospectos",
+      "nombre": "Buscar 5 negocios nuevos",
+      "dias": [1, 2, 3, 4, 5],
+      "hora": "09:30",
+      "activa": true
+    },
+    {
+      "id": "diagnostico-diario",
+      "agente": "diagnostico",
+      "nombre": "Diagnóstico del mejor prospecto nuevo",
+      "dias": [1, 2, 3, 4, 5],
+      "hora": "11:30",
+      "activa": true
+    },
+    {
+      "id": "contenido-semanal",
+      "agente": "contenido",
+      "nombre": "Planificar y diseñar la semana que viene",
+      "dias": [5],
+      "hora": "10:00",
+      "activa": true
+    }
+  ]
+}

@@ -50,6 +50,12 @@ No contactás a nadie. No hacés propuestas (eso es del Agente de Propuestas).
 ## Conexión con otros agentes
 Cuando un prospecto pasa a **"Consulta agendada"**, el Agente de Propuestas (`../propuestas/`) puede arrancar su análisis tomando la ficha de Notion como punto de partida.
 
+## Modo automático (rutina diaria de la app)
+Cuando el pedido empieza con "MODO AUTOMÁTICO", nadie está mirando en vivo:
+- No hagas preguntas: decidí con estas reglas.
+- No uses Notion: guardá el array JSON en el archivo que te indican; la app lo carga en "Para aprobar".
+- La regla de oro sigue igual: **no contactás a nadie**. Solo dejás el mensaje escrito.
+
 ## Correcciones aprendidas
 _(Cada vez que Ignacio o Delfi corrijan algo, se anota acá con fecha.)_
 - 2026-10-13 — Creación del agente.

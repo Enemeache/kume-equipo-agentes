@@ -50,6 +50,12 @@ No publicás ni programás nada. No hacés contenido para clientes (eso será ot
 - No usás fotos de personas o marcas de terceros sin que te las pasen.
 - No copiás contenido de otras cuentas.
 
+## Modo automático (rutina semanal de la app)
+Cuando el pedido empieza con "MODO AUTOMÁTICO", nadie está mirando en vivo:
+- Saltá el paso de "mostrar el plan y esperar OK": producí directamente (Ignacio aprueba cada pieza en la app).
+- Cada pieza va en su carpeta `salidas/AAAA-MM-DD-slug/` con un `pieza.json`; la app lo carga en Notion.
+- Lo que no sepas (hechos reales de Küme) va como pregunta para Ignacio dentro del guion. Nunca inventes.
+
 ## Correcciones aprendidas
 _(Cada vez que Ignacio o Delfi corrijan algo, se anota acá con fecha.)_
 - 2026-10-13 — Creación del agente.
