@@ -15,6 +15,13 @@ const hoy = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).p
 const rt = (s) => [{ type: "text", text: { content: String(s ?? "").slice(0, 1990) } }];
 const txt = (p) => (p?.rich_text || p?.title || []).map((t) => t.plain_text).join("");
 const norm = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim();
+// "@usuario", "instagram.com/usuario" o el link completo → link completo
+export const igUrl = (v) => {
+  const s = String(v || "").trim(); if (!s) return "";
+  if (/^https?:\/\//.test(s)) return s;
+  const user = s.replace(/^@/, "").replace(/^(www\.)?instagram\.com\//i, "").replace(/\/.*$/, "");
+  return /^[\w.]+$/.test(user) ? `https://www.instagram.com/${user}/` : "";
+};
 const oneOf = (v, list, def) => list.find((x) => norm(x) === norm(v)) || list.find((x) => norm(v) && (norm(x).includes(norm(v)) || norm(v).includes(norm(x)))) || def;
 
 export function createPiloto({ DIR, DATA, agents, agentDir, runClaude, notion, running, loadChat, saveChat, log = console.log }) {
@@ -105,8 +112,9 @@ No uses Notion: la app lo carga sola. Respondé con la tabla de la semana.`,
           Fecha: { date: { start: hoy() } },
           "Servicio sugerido": { multi_select: (p.servicios || []).map((s) => oneOf(s, SERVICIOS, null)).filter(Boolean).map((name) => ({ name })) },
         };
-        if (/^https?:\/\//.test(p.web || "")) props.Web = { url: p.web };
-        if (/^https?:\/\//.test(p.instagram || "")) props.Instagram = { url: p.instagram };
+        const web = String(p.web || "").trim(), ig = igUrl(p.instagram);
+        if (web) props.Web = { url: /^https?:\/\//.test(web) ? web : "https://" + web.replace(/^\/+/, "") };
+        if (ig) props.Instagram = { url: ig };
         if (/@/.test(p.email || "")) props["Email público"] = { email: p.email };
         const r = await notion("POST", "pages", { parent: { type: "data_source_id", data_source_id: PROSPECTOS_DS }, properties: props });
         if (r.error) log("Notion (prospecto):", r.error); else { n++; ya.add(p.negocio.toLowerCase()); }
