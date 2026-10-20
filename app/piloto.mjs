@@ -94,7 +94,7 @@ No uses Notion: la app lo carga sola. Respondé con la tabla de la semana.`,
   // ---------- Importar lo producido a Notion ----------
   async function importarProspectos() {
     const dir = salidas("prospectos"); let n = 0;
-    for (const f of (await readdir(dir).catch(() => [])).filter((f) => /^prospectos-.*\.json$/.test(f))) {
+    for (const f of (await readdir(dir).catch(() => [])).filter((f) => /^prospectos-[\d-]+\.json$/.test(f))) {
       let list; try { list = JSON.parse((await readFile(path.join(dir, f), "utf8")).replace(/^[^[]*/, "").replace(/[^\]]*$/, "")); } catch (e) { log("No pude leer", f, e.message); continue; }
       const ya = new Set((await notionAll(PROSPECTOS_DS)).map((p) => txt(p.properties["Negocio"]).toLowerCase()));
       for (const p of list) {
