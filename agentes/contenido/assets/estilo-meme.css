@@ -1,0 +1,44 @@
+/* Estilo "meme" de los carruseles de Küme: escenas ilustradas, texto grande con borde, stickers y logo en cada slide. */
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap");
+:root { --verde: #1B3A2D; --verde2: #2D5A42; --crema: #F5EFE0; --dorado: #C4973A; --tinta: #10241B; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #777; display: flex; flex-direction: column; gap: 40px; padding: 40px; align-items: center; }
+
+.slide { width: 1080px; height: 1350px; position: relative; overflow: hidden; font-family: "DM Sans", sans-serif; color: var(--tinta); }
+.escena, .escena svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+.slide > *:not(.escena) { position: relative; z-index: 1; }
+/* oscurece un poco la escena para que el texto se lea */
+.slide.velo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(16,36,27,.55), rgba(16,36,27,0) 42%, rgba(16,36,27,0) 62%, rgba(16,36,27,.55)); z-index: 0; }
+
+/* Texto tipo meme: grande, redondeado como el logo, con borde */
+.meme { position: absolute !important; left: 70px; right: 70px; font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 92px; line-height: 1.02; color: #FFFFFF; text-align: center; letter-spacing: -.01em;
+  -webkit-text-stroke: 14px var(--tinta); paint-order: stroke fill; text-wrap: balance; z-index: 2 !important; }
+.meme.arriba { top: 90px; } .meme.abajo { bottom: 190px; }
+.meme em { font-style: normal; color: #F2C14E; }
+.meme.chico { font-size: 70px; -webkit-text-stroke-width: 11px; }
+
+/* Tarjeta de texto (el "por qué") */
+.nota { position: absolute !important; left: 90px; right: 90px; background: var(--crema); border: 6px solid var(--tinta); border-radius: 36px; padding: 40px 46px; font-size: 40px; line-height: 1.4; box-shadow: 12px 12px 0 var(--tinta); transform: rotate(-1.5deg); }
+.nota b { font-weight: 700; color: var(--verde); }
+.nota.abajo { bottom: 170px; } .nota.medio { top: 50%; transform: translateY(-50%) rotate(-1.5deg); }
+
+/* Número de la señal/paso, estilo sticker redondo */
+.num { position: absolute !important; top: 70px; left: 70px; width: 150px; height: 150px; border-radius: 50%; background: var(--dorado); border: 7px solid var(--tinta); display: grid; place-items: center;
+  font-family: "Fredoka"; font-weight: 700; font-size: 86px; color: var(--tinta); box-shadow: 8px 8px 0 var(--tinta); transform: rotate(-8deg); }
+
+/* Stickers */
+.sticker { position: absolute !important; display: inline-block; font-family: "Fredoka"; font-weight: 600; font-size: 46px; padding: 16px 30px; border-radius: 999px;
+  background: var(--st-bg, #fff); color: var(--st-fg, var(--tinta)); border: 5px solid var(--tinta); outline: 9px solid #fff; box-shadow: 0 14px 22px rgba(0,0,0,.35); white-space: nowrap; z-index: 3 !important; }
+.cinta { position: absolute !important; width: 190px; height: 54px; background: rgba(242,193,78,.82); transform: rotate(-12deg); z-index: 3 !important; box-shadow: 0 3px 6px rgba(0,0,0,.15); }
+.ojitos { position: absolute !important; width: 230px; height: 110px; background: url("logo-ojos.png") center/contain no-repeat; z-index: 3 !important; filter: drop-shadow(0 8px 10px rgba(0,0,0,.35)); }
+
+/* Logo en cada slide */
+.marca { position: absolute !important; left: 50%; bottom: 52px; transform: translateX(-50%); background: var(--crema); border: 5px solid var(--tinta); border-radius: 999px; padding: 14px 34px 12px; box-shadow: 6px 6px 0 var(--tinta); display: flex; align-items: center; gap: 18px; z-index: 4 !important; }
+.marca img { height: 62px; display: block; }
+.marca span { font-family: "DM Sans"; font-weight: 700; font-size: 24px; color: var(--verde); letter-spacing: .04em; }
+.contador { position: absolute !important; right: 56px; bottom: 64px; font-family: "Fredoka"; font-weight: 700; font-size: 30px; color: #fff; -webkit-text-stroke: 7px var(--tinta); paint-order: stroke fill; z-index: 4 !important; }
+.logo-grande { position: absolute !important; left: 50%; transform: translateX(-50%); width: 700px; }
+
+/* Slide final */
+.cta { position: absolute !important; left: 90px; right: 90px; bottom: 210px; background: var(--dorado); border: 7px solid var(--tinta); border-radius: 30px; padding: 34px; text-align: center;
+  font-family: "Fredoka"; font-weight: 700; font-size: 54px; line-height: 1.15; color: var(--tinta); box-shadow: 12px 12px 0 var(--tinta); transform: rotate(1deg); }

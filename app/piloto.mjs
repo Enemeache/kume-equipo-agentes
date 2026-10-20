@@ -83,7 +83,7 @@ Guardá todo en salidas/${slug}/ (hallazgos.md, diagnostico.html y diagnostico.p
       texto: `MODO AUTOMÁTICO (rutina semanal, nadie está mirando en vivo: no esperes OK del plan, seguí directo; Ignacio aprueba cada pieza después).
 Armá la semana que arranca el lunes ${hoy(lunes)}: 4 piezas (2 carruseles, 1 reel, 1 post único) respetando los pilares.
 No repitas temas de estas piezas recientes: ${recientes.join(" | ") || "(ninguna)"}.
-Diseñá los 2 carruseles con tu plantilla y exportá las PNG (python render_piezas.py ...). Cada pieza va en salidas/AAAA-MM-DD-slug/ y dentro de cada carpeta dejá un pieza.json con este formato exacto:
+Tono informal, con humor y memes. Diseñá los 2 carruseles y el post único en el estilo "meme Küme" (copiá plantilla-carrusel.html: escenas ilustradas estilo sitcom mezcladas, stickers, logo en todas las slides; nunca capturas reales de series) y exportá las PNG (python render_piezas.py ...). Cada pieza va en salidas/AAAA-MM-DD-slug/ y dentro de cada carpeta dejá un pieza.json con este formato exacto:
 {"pieza":"","fecha":"AAAA-MM-DD","formato":"${FORMATOS.join("|")}","pilar":"${PILARES.join("|")}","gancho":"","caption":"","guion":"","hashtags":""}
 Los hechos de "Detrás de escena" o "Resultados" que no conozcas van como pregunta para Ignacio dentro del guion: no inventes.
 No uses Notion: la app lo carga sola. Respondé con la tabla de la semana.`,

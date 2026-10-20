@@ -2,57 +2,78 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>Carrusel Küme — plantilla</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  /* PLANTILLA: copiá este archivo como piezas.html y cambiá solo el contenido de cada .slide */
-  :root{--verde:#1B3A2D;--verde2:#2D5A42;--dorado:#C4973A;--crema:#F5EFE0}
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:#888;display:flex;flex-direction:column;gap:40px;padding:40px;align-items:center}
-  .slide{width:1080px;height:1350px;position:relative;overflow:hidden;padding:120px 110px;display:flex;flex-direction:column;justify-content:center;font-family:'DM Sans',sans-serif;font-weight:300}
-  .verde{background:var(--verde);color:var(--crema)}
-  .crema{background:var(--crema);color:#111}
-  .kicker{font-size:26px;letter-spacing:.28em;text-transform:uppercase;color:var(--dorado);font-weight:500;margin-bottom:40px}
-  h1{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:118px;line-height:1.02}
-  h1 em{color:var(--dorado);font-style:italic}
-  h2{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:84px;line-height:1.05;color:var(--verde)}
-  .verde h2{color:var(--crema)}
-  .line{width:120px;height:2px;background:var(--dorado);margin:56px 0}
-  p{font-size:40px;line-height:1.5}
-  .num{font-family:'Cormorant Garamond',serif;font-size:200px;line-height:.8;color:var(--dorado);margin-bottom:30px}
-  .foot{position:absolute;bottom:70px;left:110px;right:110px;display:flex;justify-content:space-between;font-size:24px;letter-spacing:.2em;text-transform:uppercase;opacity:.6}
-  .sello{font-family:'Cormorant Garamond',serif;font-size:56px;letter-spacing:.08em;text-transform:none;opacity:1}
-  .swipe{color:var(--dorado);opacity:1}
-  .cta{display:inline-block;margin-top:60px;border:2px solid var(--dorado);color:var(--dorado);padding:26px 44px;font-size:34px;font-weight:500;letter-spacing:.06em}
-</style>
+<title>Plantilla carrusel Küme (estilo meme)</title>
+<link rel="stylesheet" href="../../assets/estilo-meme.css">
+<script src="../../assets/escenas.js"></script>
 </head>
 <body>
+<!-- PLANTILLA: copiá este archivo a salidas/AAAA-MM-DD-slug/piezas.html y cambiá solo textos, escenas y stickers.
+     Escenas: oficina · cafe · depto · pizarra · bar · verde · crema · dorado (ver assets/escenas.js)
+     Stickers: pivot · camara · comoteva · bazinga · legendario · ojo · real · guardalo · desliza · plot · jefe (podés cambiar el texto)
+     Piezas fijas: .meme (texto grande) · .nota (explicación) · .num (número) · .ojitos · .cinta · .marca (logo, en TODAS) · .contador -->
 
-<!-- PORTADA -->
-<section class="slide verde">
-  <div class="kicker">Para emprendedores</div>
-  <h1>Título que <em>frena</em> el scroll.</h1>
-  <div class="line"></div>
-  <p style="opacity:.85">Subtítulo de una línea que promete algo concreto.</p>
-  <div class="foot"><span>@kume.agenciamkt</span><span class="swipe">Deslizá →</span></div>
+<!-- 1 · PORTADA -->
+<section class="slide velo" data-escena="oficina">
+  <div class="meme arriba">Cuando tu web <em>espanta clientes</em> y vos ni enterado</div>
+  <span class="sticker" data-sticker="camara" style="left:120px;top:640px;transform:rotate(-6deg)"></span>
+  <span class="sticker" data-sticker="desliza" style="right:70px;bottom:190px;transform:rotate(5deg)"></span>
+  <div class="marca"><img src="../../assets/palabra-verde.png" alt="küme"><span>agencia creativa</span></div>
 </section>
 
-<!-- INTERIOR -->
-<section class="slide crema">
-  <div class="num">01</div>
-  <h2>Idea principal de la slide.</h2>
-  <div class="line"></div>
-  <p>Explicación corta, máximo 25 palabras, que se lee de un vistazo.</p>
-  <div class="foot"><span>küme</span><span>1/5</span></div>
+<!-- 2 -->
+<section class="slide velo" data-escena="cafe">
+  <div class="num">1</div>
+  <div class="meme arriba" style="top:250px">Hay que hacer zoom en el celu 🔍</div>
+  <div class="nota abajo">La mayoría te va a ver desde el teléfono. <b>Si se lee mal ahí, se lee mal y punto.</b></div>
+  <span class="sticker" data-sticker="plot" style="right:80px;top:110px;transform:rotate(8deg)">ups 😬</span>
+  <div class="marca"><img src="../../assets/palabra-verde.png" alt="küme"></div><div class="contador">1/5</div>
 </section>
 
-<!-- CIERRE -->
-<section class="slide verde">
-  <h2>Cierre que resume y lleva a la acción.</h2>
-  <div class="line"></div>
-  <p style="opacity:.85">Una línea más de contexto.</p>
-  <div><span class="cta">Guardalo · Escribinos "WEB"</span></div>
-  <div class="foot"><span class="sello">küme</span><span>Raíz. Equilibrio. Resultados.</span></div>
+<!-- 3 -->
+<section class="slide velo" data-escena="depto">
+  <div class="num">2</div>
+  <div class="meme arriba" style="top:250px">En 5 segundos nadie entiende qué vendés</div>
+  <div class="nota abajo">Mostrásela a un amigo. Si no puede decirte qué hacés, <b>el título está fallando.</b></div>
+  <span class="sticker" data-sticker="comoteva" style="right:70px;top:120px;transform:rotate(6deg)"></span>
+  <div class="marca"><img src="../../assets/palabra-verde.png" alt="küme"></div><div class="contador">2/5</div>
+</section>
+
+<!-- 4 -->
+<section class="slide velo" data-escena="pizarra">
+  <div class="num">3</div>
+  <div class="meme arriba" style="top:250px">Contactarte es más difícil que esta pizarra</div>
+  <div class="nota abajo">Un solo botón claro: <b>WhatsApp, reservar o comprar.</b> Que se vea sin bajar.</div>
+  <span class="sticker" data-sticker="bazinga" style="right:60px;top:120px;transform:rotate(-5deg)"></span>
+  <div class="marca"><img src="../../assets/palabra-verde.png" alt="küme"></div><div class="contador">3/5</div>
+</section>
+
+<!-- 5 -->
+<section class="slide velo" data-escena="oficina">
+  <div class="num">4</div>
+  <div class="meme arriba" style="top:250px">Los precios dicen <em>2019</em></div>
+  <div class="nota abajo">Una web vieja grita <b>"negocio descuidado"</b>, aunque laburen todos los días.</div>
+  <div class="ojitos" style="right:90px;top:110px;transform:rotate(10deg)"></div>
+  <div class="cinta" style="left:430px;top:560px"></div>
+  <div class="marca"><img src="../../assets/palabra-verde.png" alt="küme"></div><div class="contador">4/5</div>
+</section>
+
+<!-- 6 -->
+<section class="slide velo" data-escena="bar">
+  <div class="num">5</div>
+  <div class="meme arriba" style="top:250px">Todo habla de vos, nada de tu cliente</div>
+  <div class="nota abajo">"Somos líderes en…" no vende. <b>"Vas a resolver…"</b> sí.</div>
+  <span class="sticker" data-sticker="legendario" style="right:60px;top:120px;transform:rotate(7deg)">eso sí es leeegendario ✨</span>
+  <div class="marca"><img src="../../assets/palabra-verde.png" alt="küme"></div><div class="contador">5/5</div>
+</section>
+
+<!-- 7 · CIERRE -->
+<section class="slide" data-escena="verde">
+  <img class="logo-grande" src="../../assets/palabra-crema.png" alt="küme" style="top:150px">
+  <div class="meme" style="top:470px">¿Te reconociste en 2 o más?</div>
+  <span class="sticker" data-sticker="pivot" style="left:110px;top:700px;transform:rotate(-7deg)">¡PIVOT! (sin rehacer todo)</span>
+  <div class="cta">Escribinos <span style="background:#fff;padding:0 14px;border-radius:12px">WEB</span> por DM y te decimos cuáles arreglar</div>
+  <span class="sticker" data-sticker="guardalo" style="right:70px;top:880px;transform:rotate(6deg)"></span>
+  <div class="marca"><img src="../../assets/palabra-verde.png" alt="küme"><span>agencia creativa</span></div>
 </section>
 
 </body>

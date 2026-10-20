@@ -73,7 +73,10 @@ Küme es como un consultor de ~32 años que salió de una agencia grande para ha
 - Colores: Verde Küme `#1B3A2D` (60%) · Crema `#F5EFE0` / Blanco (25%) · Dorado `#C4973A` (15%, solo acento) · Verde medio `#2D5A42`.
 - Tipografías: **Cormorant Garamond** (títulos) + **DM Sans** (cuerpo). Nunca más de dos.
 - Estética: *lujo discreto, naturaleza intelectual, calma que comunica*. Líneas finas doradas, mucho aire, texturas sutiles. Nada de neón ni gradientes saturados.
-- Logos: `../LogoKume - 1.png` a `../LogoKume - 5.png`.
+- **Logo real**: la palabra "küme." en letra redondeada y gruesa, con **dos ojitos de dibujo animado sobre la ü** y el subtítulo "agencia creativa.". Es un logo juguetón: la marca en redes es cercana y con humor.
+  - Originales: `../LogoKume - 1.png` a `../LogoKume - 5.png` (fondos crema, blanco, dorado, negro y verde).
+  - Sin fondo, listos para usar: `agentes/contenido/assets/palabra-verde.png`, `palabra-crema.png`, `logo-verde.png`, `logo-crema.png` y `logo-ojos.png` (los ojitos como sticker).
+- **En redes** el tono es informal, con memes y guiños a sitcoms (ver el estilo "meme Küme" en `agentes/contenido/CLAUDE.md`). Las propuestas, los diagnósticos y los reportes mantienen el estilo prolijo.
 - Detalle completo: `../KUME-BRAND-BIBLE.md`.
 
 ## Contenido propio (Instagram de Küme)
