@@ -4,7 +4,7 @@ Abrila con el acceso directo **"Küme HQ"** del Escritorio (o doble clic en `abr
 Se abre en su propia ventana en `http://localhost:4747`. Solo funciona en esta computadora.
 
 ## Qué tiene
-- **Oficina**: los escritorios de cada agente (Caburé y Calandria), su estado y los números del día.
+- **Oficina**: los escritorios de cada agente (Dwight y Jim), su estado y los números del día.
 - **Chat con cada agente**: un chat por agente. Por detrás corre Claude Code dentro de la carpeta del agente, así que lee su `CLAUDE.md` y `NEGOCIO.md`. "Chat nuevo" ahorra uso cuando la conversación se hace larga.
 - **Para aprobar**: los prospectos de Notion con su mensaje. Aprobar → copiar → enviarlo vos → "Ya lo envié". Nada se envía solo.
 - **Propuestas**: cada carpeta de `agentes/propuestas/salidas/`, en qué fase está y sus archivos.

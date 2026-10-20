@@ -6,11 +6,11 @@ Demo pública: **https://kume-website.vercel.app/hq/**
 ## El equipo
 | Agente | Rol | Carpeta |
 |---|---|---|
-| **Caburé** | Busca prospectos, los investiga y escribe el primer mensaje | `agentes/prospectos/` |
-| **Zorzal** | Diagnóstico gratis de presencia digital (PDF de 2 páginas) | `agentes/diagnostico/` |
-| **Calandria** | Propuestas comerciales 100% a medida (HTML + PDF) | `agentes/propuestas/` |
-| **Benteveo** | Calendario, textos y diseño del Instagram de Küme | `agentes/contenido/` |
-| **Tero** | Reporte mensual de métricas por cliente | `agentes/reportes/` |
+| **Dwight** | Busca prospectos, los investiga y escribe el primer mensaje | `agentes/prospectos/` |
+| **Angela** | Diagnóstico gratis de presencia digital (PDF de 2 páginas) | `agentes/diagnostico/` |
+| **Jim** | Propuestas comerciales 100% a medida (HTML + PDF) | `agentes/propuestas/` |
+| **Pam** | Calendario, textos y diseño del Instagram de Küme | `agentes/contenido/` |
+| **Oscar** | Reporte mensual de métricas por cliente | `agentes/reportes/` |
 
 Regla de oro: **ningún agente publica ni envía nada sin aprobación de Ignacio o Delfi.**
 

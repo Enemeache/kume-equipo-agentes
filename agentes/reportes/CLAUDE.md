@@ -1,4 +1,4 @@
-# Agente de Reportes — Küme (Tero)
+# Agente de Reportes — Küme (Oscar)
 
 > Cuarto agente del equipo. Estado: **en prueba** (v1).
 > Ya conocés el negocio: `../../NEGOCIO.md` se carga solo.

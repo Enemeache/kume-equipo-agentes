@@ -4,13 +4,23 @@
 import * as THREE from "three";
 
 // ---------- Aspecto de cada persona ----------
+// Inspirados en los personajes de The Office.
 const LOOKS = {
-  prospectos:  { skin: "#E8B48C", hair: "#2B1D14", hairStyle: "short",  shirt: "#2D5A42", pants: "#26313A", shoes: "#1A1A1A", extra: "cap", capColor: "#C4973A" },
-  diagnostico: { skin: "#C98E62", hair: "#4A2E1C", hairStyle: "curly",  shirt: "#C4973A", pants: "#3B3F46", shoes: "#3A2618", extra: "glasses" },
-  propuestas:  { skin: "#F0C7A4", hair: "#7A3E1D", hairStyle: "long",   shirt: "#F5EFE0", pants: "#1B3A2D", shoes: "#5A2A1A", extra: "earrings" },
-  contenido:   { skin: "#8D5A3B", hair: "#141010", hairStyle: "bun",    shirt: "#D96C3F", pants: "#2C3440", shoes: "#F2F2F2", extra: "headphones" },
-  reportes:    { skin: "#EAC2A0", hair: "#8C8C8C", hairStyle: "side",   shirt: "#8FA3B5", pants: "#2A2F36", shoes: "#1A1A1A", extra: "tie" },
-  vos:         { skin: "#E6B994", hair: "#3A2A1E", hairStyle: "short",  shirt: "#1B3A2D", pants: "#20262C", shoes: "#111111", extra: "none" },
+  prospectos:  { name: "Dwight", skin: "#EAC2A0", hair: "#5A3A22", hairStyle: "side",  shirt: "#C9A227", pants: "#3A3226", shoes: "#2A1A10", extras: ["glasses", "tie"], tie: "#6B4423" },
+  diagnostico: { name: "Angela", skin: "#F2D3B8", hair: "#E2C27A", hairStyle: "bun",   shirt: "#E9D8A6", pants: "#5B5F6B", shoes: "#3A2618", extras: [], scale: 0.9 },
+  propuestas:  { name: "Jim",    skin: "#EDC6A6", hair: "#6B4A2E", hairStyle: "short", shirt: "#DCE6F0", pants: "#2E3440", shoes: "#1A1A1A", extras: ["tie"], tie: "#2B3A55", scale: 1.1 },
+  contenido:   { name: "Pam",    skin: "#F0C7A4", hair: "#A0603A", hairStyle: "long",  shirt: "#E7A7B5", pants: "#3D4A5C", shoes: "#5A2A1A", extras: ["earrings"] },
+  reportes:    { name: "Oscar",  skin: "#C68E62", hair: "#1A1410", hairStyle: "short", shirt: "#5B7FA6", pants: "#2A2F36", shoes: "#1A1A1A", extras: ["tie"], tie: "#1E2A3A" },
+  vos:         { name: "Vos",    skin: "#E6B994", hair: "#3A2A1E", hairStyle: "side",  shirt: "#F2F2F2", pants: "#20262C", shoes: "#111111", extras: ["tie"], tie: "#1E2F55" },
+};
+// frases de cada personaje cuando están sin trabajar
+const QUIPS = {
+  prospectos: ["🥬 Dato: la remolacha es el mejor vegetal", "📌 Tengo 3 zonas nuevas", "🧐 Pregunta: ¿quién llamó a ese cliente?", "🥋 Cinturón negro en ventas"],
+  diagnostico: ["🐈 Mis gatos me esperan", "😒 Eso no está bien hecho", "📋 Lo revisé dos veces", "🧹 Orden, por favor"],
+  propuestas: ["👀 (mira a cámara)", "😏", "🏀 ¿Un tirito?", "🍮 ¿Quién puso mi abrochadora en gelatina?"],
+  contenido: ["🎨 Dibujando ideas", "📸 ¿Foto para el feed?", "💛 ¡Qué lindo quedó!", "☎️ Küme, buen día"],
+  reportes: ["🤓 En realidad…", "📊 Los números no mienten", "🧾 Cierra perfecto", "🍷 Esto merece un brindis"],
+  vos: ["😏 Eso dijo ella", "☕ Mejor Jefe del Mundo", "🎬 ¿Hacemos una reunión?", "📧 Leyendo mails"],
 };
 
 // ---------- Plano de la oficina ----------
@@ -66,7 +76,8 @@ const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 function buildPerson(look) {
   const g = new THREE.Group();
   const body = new THREE.Group(); g.add(body);
-  const L = look;
+  const L = look, X = new Set(L.extras || []);
+  if (L.scale) g.scale.setScalar(L.scale);
   // piernas (pivote en la cadera)
   const legs = [-0.13, 0.13].map((x) => {
     const p = new THREE.Group(); p.position.set(x, 0.62, 0); body.add(p);
@@ -76,7 +87,7 @@ function buildPerson(look) {
   });
   // torso
   const torso = box(0.56, 0.55, 0.32, L.shirt, 0, 0.92, 0, body);
-  if (L.extra === "tie") box(0.08, 0.36, 0.02, "#9B3B2E", 0, 0.95, 0.17, body);
+  if (X.has("tie")) { box(0.08, 0.36, 0.02, L.tie || "#9B3B2E", 0, 0.95, 0.17, body); box(0.2, 0.06, 0.02, "#FFFFFF", 0, 1.17, 0.165, body); }
   // brazos (pivote en el hombro)
   const arms = [-0.36, 0.36].map((x) => {
     const p = new THREE.Group(); p.position.set(x, 1.16, 0); body.add(p);
@@ -98,10 +109,8 @@ function buildPerson(look) {
   if (L.hairStyle === "bun") { box(0.5, 0.12, 0.46, H, 0, 0.25, 0, head); box(0.5, 0.26, 0.1, H, 0, 0.1, -0.2, head); box(0.22, 0.2, 0.2, H, 0, 0.4, -0.08, head); }
   if (L.hairStyle === "side") { box(0.5, 0.1, 0.46, H, 0, 0.25, 0, head); [-0.25, 0.25].forEach((x) => box(0.05, 0.2, 0.36, H, x, 0.08, -0.03, head)); box(0.5, 0.22, 0.08, H, 0, 0.08, -0.2, head); }
   // accesorios
-  if (L.extra === "glasses") { [-0.1, 0.1].forEach((x) => box(0.13, 0.11, 0.02, "#111", x, 0.03, 0.225, head, { roughness: 0.3 })); box(0.08, 0.02, 0.02, "#111", 0, 0.05, 0.225, head); }
-  if (L.extra === "cap") { box(0.52, 0.12, 0.48, L.capColor, 0, 0.29, 0, head); box(0.44, 0.04, 0.22, L.capColor, 0, 0.24, 0.3, head); }
-  if (L.extra === "headphones") { box(0.54, 0.06, 0.1, "#1B1B1B", 0, 0.3, 0, head); [-0.27, 0.27].forEach((x) => box(0.08, 0.18, 0.16, "#1B1B1B", x, 0.04, 0, head)); }
-  if (L.extra === "earrings") [-0.24, 0.24].forEach((x) => box(0.04, 0.06, 0.04, "#C4973A", x, -0.1, 0.02, head, { metalness: 0.6, roughness: 0.3 }));
+  if (X.has("glasses")) { [-0.1, 0.1].forEach((x) => box(0.13, 0.11, 0.02, "#111", x, 0.03, 0.225, head, { roughness: 0.3 })); box(0.08, 0.02, 0.02, "#111", 0, 0.05, 0.225, head); }
+  if (X.has("earrings")) [-0.24, 0.24].forEach((x) => box(0.04, 0.06, 0.04, "#C4973A", x, -0.1, 0.02, head, { metalness: 0.6, roughness: 0.3 }));
   // papel en la mano (para entregar)
   const paper = box(0.26, 0.02, 0.34, "#FFFFFF", 0, -0.52, 0.12, arms[1]); paper.visible = false;
   g.userData.parts = { body, legs, arms, head, torso, paper };
@@ -273,6 +282,11 @@ export function createOffice(el, opts = {}) {
   box(2.8, 0.12, 1.2, "#6E4A2E", 0, 0.8, 0, bossDesk);
   box(2.7, 0.75, 1.1, "#7E5636", 0, 0.38, 0.0, bossDesk);
   chair(0, -0.95, 0, bossDesk);
+  // taza "Mejor Jefe del Mundo"
+  const mugTex = canvasTex(256, 128, (c, w, h) => { c.fillStyle = "#FFFFFF"; c.fillRect(0, 0, w, h); c.fillStyle = "#1A1A1A"; c.textAlign = "center"; c.font = "bold 26px Georgia, serif"; c.fillText("MEJOR JEFE", w / 2, 52); c.fillText("DEL MUNDO", w / 2, 88); });
+  const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.1, 0.22, 20), [new THREE.MeshStandardMaterial({ map: mugTex }), mat("#FFFFFF"), mat("#3A2010")]);
+  mug.position.set(-0.8, 0.97, 0.25); mug.rotation.y = 0.6; mug.castShadow = true; bossDesk.add(mug);
+  const handle = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.018, 6, 12), mat("#FFFFFF")); handle.position.set(-0.68, 0.97, 0.18); handle.rotation.y = 0.6; bossDesk.add(handle);
   // bandeja con papeles
   const inbox = new THREE.Group(); inbox.position.set(9.4, 0.86, -5.8); scene.add(inbox);
   box(0.6, 0.06, 0.45, "#C4973A", 0, 0, 0, inbox, { metalness: 0.4, roughness: 0.4 });
@@ -356,12 +370,12 @@ export function createOffice(el, opts = {}) {
   // ---------- Comportamiento ----------
   const others = (id) => Object.keys(people).filter((k) => k !== id && k !== "vos");
   function idleAction(p) {
-    if (p.id === "vos") { if (Math.random() < 0.35) say("vos", pick(["📧 Leyendo mails", "☎️ En una llamada", "🤔"])); p.timer = rnd(10, 18); return; }
-    const opts2 = ["cafe", "agua", "ventana", "visita", "visita", "mesa", "estirar"];
+    if (p.id === "vos") { if (Math.random() < 0.4) say("vos", pick(QUIPS.vos)); p.timer = rnd(10, 18); return; }
+    const opts2 = ["cafe", "agua", "ventana", "visita", "visita", "mesa", "frase", "frase"];
     if (["propuestas", "diagnostico", "reportes"].includes(p.id)) opts2.push("impresora", "impresora");
     if (p.id === "prospectos") opts2.push("pizarra", "pizarra");
     const a = pick(opts2);
-    if (a === "estirar") { say(p.id, pick(["🙆 Estirando", "🎧 Musiquita", "💭"])); p.timer = rnd(6, 12); return; }
+    if (a === "frase") { say(p.id, pick(QUIPS[p.id] || ["💭"]), 3.6); p.timer = rnd(6, 12); return; }
     if (a === "visita") {
       const o = people[pick(others(p.id))]; const d = DESKS[o.id];
       const spot = d.row === "back"

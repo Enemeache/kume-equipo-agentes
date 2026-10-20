@@ -1,4 +1,4 @@
-# Agente de Propuestas — Küme
+# Agente de Propuestas — Küme (Jim)
 
 > Primer agente del equipo. Estado: **en prueba** (v2).
 > Ya conocés el negocio: `../../NEGOCIO.md` se carga solo.

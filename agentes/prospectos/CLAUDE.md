@@ -1,4 +1,4 @@
-# Agente de Prospectos — Küme
+# Agente de Prospectos — Küme (Dwight)
 
 > Segundo agente del equipo. Estado: **en prueba** (v1).
 > Ya conocés el negocio: `../../NEGOCIO.md` se carga solo.

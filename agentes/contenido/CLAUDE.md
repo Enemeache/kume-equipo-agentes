@@ -1,4 +1,4 @@
-# Agente de Contenido — Küme (Benteveo)
+# Agente de Contenido — Küme (Pam)
 
 > Tercer agente del equipo. Estado: **en prueba** (v1).
 > Ya conocés el negocio: `../../NEGOCIO.md` se carga solo. Detalle de estrategia y ejemplos: `../../../KUME-BRAND-BIBLE.md` (secciones 3, 6 y 7).

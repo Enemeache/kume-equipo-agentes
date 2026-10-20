@@ -166,7 +166,7 @@
 
   <!-- APROBAR -->
   <section class="view" id="v-aprobar">
-    <div class="head"><div><div class="kicker">Caburé · Prospectos</div><h1>Para aprobar</h1><p>Leé el mensaje, aprobalo y envialo vos. Después marcá "Contactado".</p></div>
+    <div class="head"><div><div class="kicker">Dwight · Prospectos</div><h1>Para aprobar</h1><p>Leé el mensaje, aprobalo y envialo vos. Después marcá "Contactado".</p></div>
       <button class="btn ghost" onclick="loadProspectos()">Actualizar</button></div>
     <div id="notion-msg"></div>
     <div class="tabs" id="tabs-estado"></div>
@@ -175,21 +175,21 @@
 
   <!-- DIAGNÓSTICOS -->
   <section class="view" id="v-diagnosticos">
-    <div class="head"><div><div class="kicker">Zorzal · Diagnóstico gratis</div><h1>Diagnósticos</h1><p>El regalo antes de la consulta. Revisalo y mandalo vos.</p></div>
+    <div class="head"><div><div class="kicker">Angela · Diagnóstico gratis</div><h1>Diagnósticos</h1><p>El regalo antes de la consulta. Revisalo y mandalo vos.</p></div>
       <button class="btn" onclick="openChat('diagnostico')">Pedir un diagnóstico</button></div>
     <table><thead><tr><th>Negocio</th><th>Estado</th><th>Archivos</th></tr></thead><tbody id="diagnosticos"></tbody></table>
   </section>
 
   <!-- PROPUESTAS -->
   <section class="view" id="v-propuestas">
-    <div class="head"><div><div class="kicker">Calandria · Propuestas</div><h1>Propuestas</h1><p>Cada cliente tiene su carpeta. Revisá antes de enviar.</p></div>
+    <div class="head"><div><div class="kicker">Jim · Propuestas</div><h1>Propuestas</h1><p>Cada cliente tiene su carpeta. Revisá antes de enviar.</p></div>
       <button class="btn" onclick="openChat('propuestas')">Pedir una propuesta</button></div>
     <table><thead><tr><th>Cliente</th><th>Fase</th><th>Archivos</th></tr></thead><tbody id="propuestas"></tbody></table>
   </section>
 
   <!-- CONTENIDO -->
   <section class="view" id="v-contenido">
-    <div class="head"><div><div class="kicker">Benteveo · Instagram de Küme</div><h1>Contenido</h1><p>Revisá cada pieza. Aprobada, la programás vos.</p></div>
+    <div class="head"><div><div class="kicker">Pam · Instagram de Küme</div><h1>Contenido</h1><p>Revisá cada pieza. Aprobada, la programás vos.</p></div>
       <div style="display:flex;gap:8px"><button class="btn ghost" onclick="loadContenido()">Actualizar</button><button class="btn" onclick="openChat('contenido')">Pedir contenido</button></div></div>
     <div id="cont-msg"></div>
     <div class="tabs" id="tabs-cont"></div>
@@ -198,7 +198,7 @@
 
   <!-- REPORTES -->
   <section class="view" id="v-reportes">
-    <div class="head"><div><div class="kicker">Tero · Reportes mensuales</div><h1>Reportes</h1><p>Uno por cliente y por mes. Revisalo antes de enviarlo.</p></div>
+    <div class="head"><div><div class="kicker">Oscar · Reportes mensuales</div><h1>Reportes</h1><p>Uno por cliente y por mes. Revisalo antes de enviarlo.</p></div>
       <button class="btn" onclick="openChat('reportes')">Pedir un reporte</button></div>
     <table><thead><tr><th>Cliente</th><th>Mes</th><th>Estado</th><th>Archivos</th></tr></thead><tbody id="reportes"></tbody></table>
   </section>
@@ -335,13 +335,13 @@ function renderProspectos() {
 function acciones(p) {
   const b = (estado, label, cls = "btn") => `<button class="${cls}" onclick="setEstado('${p.id}','${estado}')">${label}</button>`;
   const copiar = p.mensaje ? `<button class="btn ghost" onclick="navigator.clipboard.writeText(PROS.find(x=>x.id==='${p.id}').mensaje);this.textContent='Copiado ✓'">Copiar mensaje</button>` : "";
-  const diag = `<button class="btn ghost" onclick="pedirDiagnostico('${p.id}')">Diagnóstico (Zorzal)</button>`;
+  const diag = `<button class="btn ghost" onclick="pedirDiagnostico('${p.id}')">Diagnóstico (Angela)</button>`;
   switch (p.estado) {
     case "Mensaje listo": return b("Aprobado", "Aprobar", "btn gold") + copiar + b("Descartado", "Descartar", "btn red");
     case "Aprobado": return copiar + b("Contactado", "Ya lo envié") + diag;
     case "Contactado": return b("Respondió", "Respondió") + diag + b("Descartado", "No respondió", "btn red");
     case "Respondió": return b("Consulta agendada", "Agendamos consulta", "btn gold") + diag;
-    case "Consulta agendada": return `<button class="btn" onclick="pedirPropuesta('${p.id}')">Pasarle a Calandria</button>`;
+    case "Consulta agendada": return `<button class="btn" onclick="pedirPropuesta('${p.id}')">Pasarle a Jim</button>`;
     default: return b("Mensaje listo", "Recuperar", "btn ghost");
   }
 }
@@ -353,12 +353,12 @@ async function setEstado(id, estado) {
 }
 function pedirPropuesta(id) {
   const p = PROS.find((x) => x.id === id);
-  openChat("propuestas").then(() => { $("#txt").value = `Arrancá el análisis de ${p.negocio} (${p.rubro}, ${p.zona}). ${p.instagram || p.web || ""}\nLo que ya sabemos por Caburé: ${p.oportunidad}`; });
+  openChat("propuestas").then(() => { $("#txt").value = `Arrancá el análisis de ${p.negocio} (${p.rubro}, ${p.zona}). ${p.instagram || p.web || ""}\nLo que ya sabemos por Dwight: ${p.oportunidad}`; });
 }
 
 function pedirDiagnostico(id) {
   const p = PROS.find((x) => x.id === id);
-  openChat("diagnostico").then(() => { $("#txt").value = `Diagnóstico de ${p.negocio} (${p.rubro}, ${p.zona}) — ${p.instagram || p.web || "sin link"}\nLo que ya vio Caburé: ${p.oportunidad}`; });
+  openChat("diagnostico").then(() => { $("#txt").value = `Diagnóstico de ${p.negocio} (${p.rubro}, ${p.zona}) — ${p.instagram || p.web || "sin link"}\nLo que ya vio Dwight: ${p.oportunidad}`; });
 }
 
 // ---------- Diagnósticos ----------
@@ -419,7 +419,7 @@ function accionesCont(c) {
   const copiar = `<button class="btn ghost" onclick="navigator.clipboard.writeText(CONT.find(x=>x.id==='${c.id}').caption+'\\n\\n'+CONT.find(x=>x.id==='${c.id}').hashtags);this.textContent='Copiado ✓'">Copiar caption</button>`;
   switch (c.estado) {
     case "Para aprobar": return b("Aprobado", "Aprobar", "btn gold") + copiar + b("Borrador", "Pedir cambios", "btn red");
-    case "Borrador": return b("Para aprobar", "Pasar a aprobar", "btn ghost") + `<button class="btn" onclick="pedirCambio('${c.id}')">Hablar con Benteveo</button>`;
+    case "Borrador": return b("Para aprobar", "Pasar a aprobar", "btn ghost") + `<button class="btn" onclick="pedirCambio('${c.id}')">Hablar con Pam</button>`;
     case "Grabar (humano)": return b("Aprobado", "Ya lo grabé", "btn gold") + copiar;
     case "Aprobado": return copiar + b("Programado", "Ya lo programé");
     case "Programado": return b("Publicado", "Ya se publicó");
