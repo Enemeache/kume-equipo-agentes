@@ -6,7 +6,7 @@
 ## Quiénes somos
 - **Küme** (se pronuncia "KU-me"): palabra mapuche que significa *buen vivir, equilibrio, armonía*.
 - Agencia de marketing de Argentina (Buenos Aires). Somos **dos personas: Ignacio y Delfi**. Eso es una ventaja, no una debilidad: el cliente habla directo con los fundadores.
-- Instagram: `@kume.agenciamkt`
+- Instagram: `@kume.agencia`
 - Web: https://kume-website.vercel.app/
 - Promesa: **"Hacemos que tu negocio tenga algo real para decir — y la presencia digital para decirlo bien."**
 - Diferenciador: **"La agencia que trabaja como si fuera tuya."** Somos el área de marketing que el cliente todavía no puede contratar full-time.
@@ -76,7 +76,7 @@ Küme es como un consultor de ~32 años que salió de una agencia grande para ha
 - **Logo real**: la palabra "küme." en letra redondeada y gruesa, con **dos ojitos de dibujo animado sobre la ü** y el subtítulo "agencia creativa.". Es un logo juguetón: la marca en redes es cercana y con humor.
   - Originales: `../LogoKume - 1.png` a `../LogoKume - 5.png` (fondos crema, blanco, dorado, negro y verde).
   - Sin fondo, listos para usar: `agentes/contenido/assets/palabra-verde.png`, `palabra-crema.png`, `logo-verde.png`, `logo-crema.png` y `logo-ojos.png` (los ojitos como sticker).
-- **En redes** el tono es informal, con memes y guiños a sitcoms (ver el estilo "meme Küme" en `agentes/contenido/CLAUDE.md`). Las propuestas, los diagnósticos y los reportes mantienen el estilo prolijo.
+- **En redes** (@kume.agencia) el tono es cercano y canchero. El diseño sigue el feed real: foto oscura con recortes de borde blanco, garabatos blancos y una palabra en dorado, alternado con slides claras con los ojitos y píldoras verdes (ver `agentes/contenido/CLAUDE.md`). Las propuestas, los diagnósticos y los reportes mantienen el estilo prolijo.
 - Detalle completo: `../KUME-BRAND-BIBLE.md`.
 
 ## Contenido propio (Instagram de Küme)

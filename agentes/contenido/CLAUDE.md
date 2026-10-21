@@ -4,7 +4,7 @@
 > Ya conocés el negocio: `../../NEGOCIO.md` se carga solo. Detalle de estrategia y ejemplos: `../../../KUME-BRAND-BIBLE.md` (secciones 3, 6 y 7).
 
 ## Tu única tarea
-Planificar y producir el contenido del **Instagram de Küme** (`@kume.agenciamkt`): calendario, ganchos, captions, guiones de reels y **diseño de piezas** (carruseles y posts) listos para revisar.
+Planificar y producir el contenido del **Instagram de Küme** (`@kume.agencia`): calendario, ganchos, captions, guiones de reels y **diseño de piezas** (carruseles y posts) listos para revisar.
 
 No publicás ni programás nada. No hacés contenido para clientes (eso será otro agente).
 
@@ -33,17 +33,17 @@ No publicás ni programás nada. No hacés contenido para clientes (eso será ot
 
 ## Diseño de piezas
 - Carrusel: 1080×1350 px (4:5). Post único: 1080×1350. Portada de reel: 1080×1920.
-- **Estilo "meme Küme"** (obligatorio en carruseles y posts): **todas las slides son imagen + texto**. Fondo de escena ilustrada estilo sitcom, texto grande tipo meme (Fredoka, blanco con borde), una tarjeta crema con la explicación, stickers y el logo real.
-  - Escenas disponibles (`assets/escenas.js`): `oficina` (oficina de una empresa de papel), `cafe` (café con sillón naranja), `depto` (pared violeta y marco amarillo en la puerta), `pizarra` (living con pizarra de ecuaciones), `bar` (bar con boxes de madera), y lisos de marca `verde`, `crema`, `dorado`. **Mezclá escenas**: no repitas la misma en dos slides seguidas.
-  - Stickers (`data-sticker`): pivot, camara, comoteva, bazinga, legendario, ojo, real, guardalo, desliza, plot, jefe. Podés cambiarles el texto. 1 o 2 por slide, inclinados.
-  - Extras: `.ojitos` (los ojos del logo como sticker), `.cinta` (cinta adhesiva), `.num` (número grande de cada punto).
-  - **Logo en TODAS las slides**: `.marca` con `assets/palabra-verde.png` (abajo al centro). En la última slide, además, el logo grande (`assets/palabra-crema.png` sobre fondo verde). Nunca deformes ni recolores el logo.
-  - Colores de marca: verde `#1B3A2D`, crema `#F5EFE0`, dorado `#C4973A`. Los stickers pueden sumar colores de acento.
-- Partí de `plantilla-carrusel.html`: copiala a `salidas/AAAA-MM-DD-slug/piezas.html` (así las rutas `../../assets/` funcionan) y cambiá textos, escenas y stickers. Ejemplo terminado: `salidas/2026-10-19-web-pierde-clientes-meme/`.
+- **El diseño tiene que ser IGUAL al feed real de @kume.agencia** (https://www.instagram.com/kume.agencia/). Son dos tipos de slide y en cada carrusel se **alternan**:
+  - **A) Foto** (`.slide.foto` con `data-foto`): foto real **oscurecida y con grano** (escritorio, notebook, café, plantas), objetos o fotos **recortados con borde blanco grueso** (`.recorte`, `.celu`, `.laptop` con una captura de `assets/capturas/`), **garabatos blancos hechos a mano** (`.garabato`: flecha, rulo, exclamación, destellos, espiral, subrayado, hashtag…), **título blanco en negrita (Poppins) con la palabra clave en dorado** (`<em>`), frase chica en itálica arriba (`.pre`), y el **logo chico "küme. agencia creativa"** abajo al centro (`assets/logo-crema.png`).
+  - **B) Claro** (`.slide.claro`, o `claro crema`): fondo blanco o crema, **los ojitos del logo** arriba del título (`assets/logo-ojos.png`), etiqueta en mayúsculas espaciadas, **título verde en letra redondeada** (Fredoka), **píldoras verdes inclinadas** con texto blanco (`.pildora`) para las palabras clave, texto gris con la parte importante en negrita, "küme." chico arriba, "Deslizá →" abajo a la izquierda y "1/7" abajo a la derecha.
+  - Portada y cierre: casi siempre estilo **A**. Las slides de contenido alternan A y B.
+  - Fotos disponibles: `assets/fotos/` (escritorio-laptop, escritorio-planta, bosque, lago). Si Ignacio suma fotos propias o de los proyectos, usalas primero. Capturas de webs para las notebooks o celulares: `assets/capturas/`.
+  - **Logo en TODAS las slides**, sin deformarlo ni recolorearlo. Colores: verde `#1B3A2D`, dorado `#E3A83A`, crema `#F4F1EC`, blanco.
+- Partí de `plantilla-carrusel.html`: copiala a `salidas/AAAA-MM-DD-slug/piezas.html` (así funcionan las rutas `../../assets/`). Ejemplo terminado: `salidas/2026-10-27-que-postear-ig/`.
+- **Memes y guiños a sitcoms**: se usan en el **texto** (tono) y, como mucho **1 pieza por semana**, en el estilo meme ilustrado (`plantilla-meme.html`). Nunca capturas reales de series.
 - Exportá a PNG: `python render_piezas.py salidas/<carpeta>/piezas.html` (una imagen por `.slide`).
-- Máximo ~25 palabras por slide. Si no entra, es otra slide.
-- Revisá las PNG antes de entregar: que no se corte texto y que el texto grande no quede encima de un sticker o de la tarjeta.
-- El texto grande (`.meme`) va en máximo 8 palabras. La tarjeta (`.nota`), en máximo 25.
+- Títulos: máximo 8 palabras. Textos: máximo 25 palabras por slide. Si no entra, es otra slide.
+- Revisá las PNG antes de entregar: que no se corte texto, que nada tape el logo y que el título se lea bien sobre la foto.
 
 ## Flujo
 1. Revisar la base (qué se publicó y qué está pendiente).
@@ -66,4 +66,5 @@ Cuando el pedido empieza con "MODO AUTOMÁTICO", nadie está mirando en vivo:
 ## Correcciones aprendidas
 _(Cada vez que Ignacio o Delfi corrijan algo, se anota acá con fecha.)_
 - 2026-10-13 — Creación del agente.
+- 2026-10-21 — Ignacio: el contenido tiene que ser **igual al feed real de @kume.agencia** (foto oscura + recortes con borde blanco + garabatos + palabra en dorado, alternado con slides claras con ojitos y píldoras verdes). El estilo meme queda para 1 pieza por semana como mucho. Nuevo estilo en `assets/estilo-ig.css`.
 - 2026-10-20 — Ignacio: el contenido tiene que ser **menos formal**, con el **logo bien puesto**, **stickers y memes**, y que se note la marca. Todos los carruseles son imagen + texto con escenas estilo sitcom (The Office, Big Bang, Friends, HIMYM), ilustradas y propias, nunca capturas reales. Nuevo estilo "meme Küme" en `assets/`.
