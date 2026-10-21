@@ -1,0 +1,22 @@
+{
+  "titulo": "NUESTRO GRANO | Walden Café",
+  "descripcion": "",
+  "viewport_mobile": true,
+  "scroll_horizontal": false,
+  "h1": "",
+  "whatsapp": false,
+  "instagram": false,
+  "telefono": false,
+  "email": false,
+  "formulario": false,
+  "imagenes": 2,
+  "imagenes_sin_alt": 1,
+  "anio_copyright": "",
+  "texto_visible_arriba": "Ir al contenido principal\nHOME",
+  "url_final": "https://www.waldencafe.com.ar/nuestro-grano",
+  "https": true,
+  "estado_http": 200,
+  "segundos_hasta_carga": 2.2,
+  "peso_aprox_mb": 1.6,
+  "captura": "web-celular.png"
+}

@@ -63,5 +63,122 @@
       "Estos son los números de [cliente]: …",
       "Aprobado, armá el PDF"
     ]
+  },
+  {
+    "id": "seguimientos",
+    "nombre": "Andy",
+    "rol": "Seguimientos",
+    "descripcion": "Escribe el segundo mensaje a quien no respondió y te sugiere qué contestar a quien sí.",
+    "carpeta": "../agentes/seguimientos",
+    "avatar": "avatars/persona.svg",
+    "atajos": [
+      "Armá los seguimientos de los que no respondieron",
+      "[negocio] respondió esto: …",
+      "¿A quién le conviene escribir hoy?"
+    ]
+  },
+  {
+    "id": "mockups",
+    "nombre": "Darryl",
+    "rol": "Mockups",
+    "descripcion": "Arma maquetas visuales de cómo se vería la web, el feed o el menú de un negocio.",
+    "carpeta": "../agentes/mockups",
+    "avatar": "avatars/persona.svg",
+    "atajos": [
+      "Maqueta de la web de [negocio] — [Instagram o web]",
+      "Feed nuevo para [negocio]",
+      "Menú digital para [negocio]"
+    ]
+  },
+  {
+    "id": "casos",
+    "nombre": "Holly",
+    "rol": "Casos de éxito",
+    "descripcion": "Convierte cada proyecto terminado en testimonio, caso de éxito y contenido.",
+    "carpeta": "../agentes/casos",
+    "avatar": "avatars/persona.svg",
+    "atajos": [
+      "Terminamos con [cliente]: hicimos …",
+      "Estas son las respuestas del testimonio: …",
+      "Armá el caso en PDF"
+    ]
+  },
+  {
+    "id": "contenido-clientes",
+    "nombre": "Kelly",
+    "rol": "Contenido para clientes",
+    "descripcion": "Planifica y diseña el Instagram de cada cliente de redes, con su marca.",
+    "carpeta": "../agentes/contenido-clientes",
+    "avatar": "avatars/persona.svg",
+    "atajos": [
+      "Armá el mes de [cliente]",
+      "Diseñá el carrusel de [cliente] sobre …",
+      "Creá la ficha de marca de [cliente] — [Instagram]"
+    ]
+  },
+  {
+    "id": "onboarding",
+    "nombre": "Erin",
+    "rol": "Onboarding",
+    "descripcion": "Cuando cerrás un cliente: bienvenida, accesos a pedir, brief y fichas para el equipo.",
+    "carpeta": "../agentes/onboarding",
+    "avatar": "avatars/persona.svg",
+    "atajos": [
+      "Cerramos con [cliente]: contrató [servicios], arranca el [fecha]",
+      "Mensaje de bienvenida para [cliente]",
+      "Checklist de accesos para [servicio]"
+    ]
+  },
+  {
+    "id": "comunidad",
+    "nombre": "Phyllis",
+    "rol": "Comunidad",
+    "descripcion": "Prepara respuestas a reseñas, comentarios y DMs, listas para copiar.",
+    "carpeta": "../agentes/comunidad",
+    "avatar": "avatars/persona.svg",
+    "atajos": [
+      "Respuestas para estas reseñas de [cliente]: …",
+      "Revisá las reseñas de Google de [cliente]",
+      "Respondé estos comentarios de Küme: …"
+    ]
+  },
+  {
+    "id": "cobros",
+    "nombre": "Kevin",
+    "rol": "Cobros",
+    "descripcion": "Lleva la planilla de cobros, el estado del mes y los recordatorios de pago.",
+    "carpeta": "../agentes/cobros",
+    "avatar": "avatars/persona.svg",
+    "atajos": [
+      "¿Cómo venimos con los cobros este mes?",
+      "Sumá: [cliente] pagó [servicio]",
+      "Armá los recordatorios de esta semana"
+    ]
+  },
+  {
+    "id": "blog",
+    "nombre": "Ryan",
+    "rol": "Blog SEO",
+    "descripcion": "Escribe un artículo por mes para el blog de la web, pensado para Google.",
+    "carpeta": "../agentes/blog",
+    "avatar": "avatars/persona.svg",
+    "atajos": [
+      "Proponé el artículo de este mes",
+      "Escribí el artículo sobre …",
+      "Pasale ideas del artículo a Pam"
+    ]
+  },
+  {
+    "id": "tendencias",
+    "nombre": "Creed",
+    "rol": "Tendencias",
+    "descripcion": "Cada semana trae tendencias, fechas y lo que hace la competencia, con ideas para Pam y Kelly.",
+    "carpeta": "../agentes/tendencias",
+    "avatar": "avatars/persona.svg",
+    "atajos": [
+      "¿Qué está funcionando esta semana?",
+      "Fechas especiales de las próximas 3 semanas",
+      "¿Qué publicó la competencia?"
+    ]
   }
 ]

@@ -79,10 +79,12 @@ Guardá todo en salidas/${slug}/ (hallazgos.md, diagnostico.html y diagnostico.p
     const cont = await notionAll(CONTENIDO_DS);
     const recientes = cont.map((c) => `${c.properties["Fecha"]?.date?.start || ""} ${txt(c.properties["Pieza"])}`).sort().slice(-12);
     const lunes = new Date(); lunes.setDate(lunes.getDate() + ((8 - lunes.getDay()) % 7 || 7));
+    // si Creed dejó un informe de tendencias, Pam lo usa
+    const tend = (await readdir(salidas("tendencias")).catch(() => [])).filter((f) => /tendencias\.md$/.test(f)).sort().pop();
     return {
       texto: `MODO AUTOMÁTICO (rutina semanal, nadie está mirando en vivo: no esperes OK del plan, seguí directo; Ignacio aprueba cada pieza después).
 Armá la semana que arranca el lunes ${hoy(lunes)}: 4 piezas (2 carruseles, 1 reel, 1 post único) respetando los pilares.
-No repitas temas de estas piezas recientes: ${recientes.join(" | ") || "(ninguna)"}.
+No repitas temas de estas piezas recientes: ${recientes.join(" | ") || "(ninguna)"}.${tend ? `\nLeé las ideas de Creed en ../tendencias/salidas/${tend} y usá las que sirvan.` : ""}
 Tono informal, con humor y memes. Diseñá los 2 carruseles y el post único en el estilo "meme Küme" (copiá plantilla-carrusel.html: escenas ilustradas estilo sitcom mezcladas, stickers, logo en todas las slides; nunca capturas reales de series) y exportá las PNG (python render_piezas.py ...). Cada pieza va en salidas/AAAA-MM-DD-slug/ y dentro de cada carpeta dejá un pieza.json con este formato exacto:
 {"pieza":"","fecha":"AAAA-MM-DD","formato":"${FORMATOS.join("|")}","pilar":"${PILARES.join("|")}","gancho":"","caption":"","guion":"","hashtags":""}
 Los hechos de "Detrás de escena" o "Resultados" que no conozcas van como pregunta para Ignacio dentro del guion: no inventes.
@@ -90,6 +92,48 @@ No uses Notion: la app lo carga sola. Respondé con la tabla de la semana.`,
       meta: {},
     };
   }
+
+  async function promptSeguimientos() {
+    const pros = await notionAll(PROSPECTOS_DS);
+    const limite = Date.now() - 4 * 86400000;
+    const cand = pros.filter((p) => {
+      const est = p.properties["Estado"]?.select?.name, f = txt(p.properties["Fuentes"]);
+      const fecha = Date.parse(p.properties["Fecha"]?.date?.start || p.created_time);
+      const segs = (f.match(/SEGUIMIENTO PREPARADO/g) || []).length;
+      return (est === "Contactado" && fecha < limite && segs < 2) || est === "Respondió";
+    }).slice(0, 8);
+    if (!cand.length) return null;
+    const lista = cand.map((p) => {
+      const pr = p.properties, segs = (txt(pr["Fuentes"]).match(/SEGUIMIENTO PREPARADO/g) || []).length;
+      return `- ${txt(pr["Negocio"])} · estado: ${pr["Estado"]?.select?.name} · seguimientos previos: ${segs} · Instagram: ${pr["Instagram"]?.url || "—"}\n  Primer mensaje: ${txt(pr["Mensaje propuesto"])}\n  Oportunidad: ${txt(pr["Oportunidad"])}`;
+    }).join("\n");
+    return {
+      texto: `MODO AUTOMÁTICO (rutina diaria). Estos prospectos necesitan seguimiento:\n${lista}\nPara los "Contactado", escribí el siguiente mensaje (distinto del primero, con algo nuevo). Para los "Respondió", sugerí la respuesta que avance a la consulta gratis.\nGuardá el array JSON en salidas/seguimientos-${hoy()}.json con el formato [{"negocio":"","seguimiento":"","nota":""}]. No uses Notion. Respondé con un resumen de 3 líneas.`,
+      meta: { ids: Object.fromEntries(cand.map((p) => [txt(p.properties["Negocio"]).toLowerCase(), p.id])) },
+    };
+  }
+  async function importarSeguimientos(meta) {
+    const dir = salidas("seguimientos"); let n = 0;
+    for (const f of (await readdir(dir).catch(() => [])).filter((f) => /^seguimientos-[\d-]+\.json$/.test(f))) {
+      let list; try { list = JSON.parse((await readFile(path.join(dir, f), "utf8")).replace(/^[^[]*/, "").replace(/[^\]]*$/, "")); } catch { continue; }
+      for (const s of list) {
+        const id = meta?.ids?.[String(s.negocio || "").toLowerCase()]; if (!id || !s.seguimiento) continue;
+        const page = await notion("GET", `pages/${id}`); if (page.error) continue;
+        const prev = txt(page.properties["Fuentes"]);
+        const r = await notion("PATCH", `pages/${id}`, { properties: {
+          Seguimiento: { rich_text: rt(s.seguimiento) },
+          Estado: { select: { name: "Seguimiento listo" } },
+          Fuentes: { rich_text: rt(`${prev} · SEGUIMIENTO PREPARADO ${hoy()}${s.nota ? ` (${s.nota})` : ""}`) },
+        } });
+        if (!r.error) n++;
+      }
+      await rename(path.join(dir, f), path.join(dir, f.replace(/\.json$/, ".importado.json")));
+    }
+    return n;
+  }
+  const promptTendencias = async () => ({ texto: `MODO AUTOMÁTICO (rutina semanal). Armá el informe de tendencias de esta semana siguiendo tus pasos y guardalo en salidas/${hoy()}-tendencias.md. No preguntes nada. Respondé con las 5 ideas para Pam en 5 líneas.`, meta: {} });
+  const promptBlog = async () => ({ texto: `MODO AUTOMÁTICO (rutina mensual). Elegí el tema del artículo de este mes y escribilo completo siguiendo tus pasos (no esperes OK del tema). Guardá todo en salidas/${hoy().slice(0, 7)}-slug/. No subas nada a la web. Respondé con el título y la palabra clave.`, meta: {} });
+  const promptCobros = async () => ({ texto: `MODO AUTOMÁTICO (rutina semanal). Revisá datos/cobros.csv: armá salidas/estado-${hoy().slice(0, 7)}.md y los recordatorios de lo que vence en los próximos 3 días o ya venció en salidas/recordatorios-${hoy()}.md. Si la planilla está vacía, decilo y no inventes nada. Respondé con el resumen en 3 líneas.`, meta: {} });
 
   // ---------- Importar lo producido a Notion ----------
   async function importarProspectos() {
@@ -158,9 +202,11 @@ No uses Notion: la app lo carga sola. Respondé con la tabla de la semana.`,
     const agent = agents.find((a) => a.id === rut.agente);
     if (!agent || running.has(agent.id)) return { ok: false, texto: "El agente ya está trabajando." };
     const cfg = await loadCfg();
-    const p = rut.agente === "prospectos" ? await promptProspeccion(cfg) : rut.agente === "diagnostico" ? await promptDiagnostico() : await promptContenido();
+    const PROMPTS = { prospectos: () => promptProspeccion(cfg), diagnostico: promptDiagnostico, contenido: promptContenido, seguimientos: promptSeguimientos, tendencias: promptTendencias, blog: promptBlog, cobros: promptCobros };
+    if (!PROMPTS[rut.agente]) return { ok: false, texto: "Esta rutina no tiene instrucciones." };
+    const p = await PROMPTS[rut.agente]();
     state.ultima[rut.id] = hoy(); await saveState();
-    if (!p) { registrar(rut, true, "No había prospectos nuevos para diagnosticar."); return { ok: true, texto: "Nada para hacer hoy." }; }
+    if (!p) { registrar(rut, true, rut.agente === "seguimientos" ? "Nadie necesita seguimiento hoy." : "No había prospectos nuevos para diagnosticar."); return { ok: true, texto: "Nada para hacer hoy." }; }
     running.add(agent.id);
     const chat = await loadChat(agent.id);
     chat.messages.push({ de: "vos", texto: `🤖 Rutina automática: ${rut.nombre}${p.meta?.rubro ? ` (${p.meta.rubro}, ${p.meta.zona})` : p.meta?.negocio ? ` (${p.meta.negocio})` : ""}`, fecha: new Date().toISOString(), auto: true });
@@ -170,6 +216,7 @@ No uses Notion: la app lo carga sola. Respondé con la tabla de la semana.`,
     let extra = "";
     if (r.ok && rut.agente === "prospectos") extra = `\n\n📥 ${await importarProspectos()} prospectos nuevos cargados en "Para aprobar".`;
     if (r.ok && rut.agente === "contenido") extra = `\n\n📥 ${await importarContenido()} piezas cargadas en "Contenido".`;
+    if (r.ok && rut.agente === "seguimientos") extra = `\n\n📥 ${await importarSeguimientos(p.meta)} seguimientos listos en "Para aprobar".`;
     if (r.ok && rut.agente === "diagnostico") extra = (await marcarDiagnostico(p.meta)) ? `\n\n📄 Diagnóstico de ${p.meta.negocio} listo en "Diagnósticos".` : "\n\n⚠️ No encontré el PDF del diagnóstico.";
     const chat2 = await loadChat(agent.id);
     chat2.messages.push({ de: "agente", texto: r.text + extra, error: !r.ok, fecha: new Date().toISOString(), auto: true });
@@ -188,6 +235,7 @@ No uses Notion: la app lo carga sola. Respondé con la tabla de la semana.`,
     const cfg = await loadCfg(), now = new Date(), hhmm = now.toTimeString().slice(0, 5);
     for (const rut of cfg.rutinas) {
       if (!rut.activa || !rut.dias.includes(now.getDay()) || state.ultima[rut.id] === hoy()) continue;
+      if (rut.mensual && (state.ultima[rut.id] || "").slice(0, 7) === hoy().slice(0, 7)) continue; // una vez por mes
       if (hhmm >= rut.hora) correr(rut).catch((e) => log("[piloto]", e.message));
     }
   }
@@ -197,6 +245,7 @@ No uses Notion: la app lo carga sola. Respondé con la tabla de la semana.`,
       const c = new Date(now); c.setDate(now.getDate() + i); c.setHours(h, m, 0, 0);
       if (!rut.dias.includes(c.getDay())) continue;
       if (i === 0 && state.ultima[rut.id] === hoy()) continue; // ya corrió hoy
+      if (rut.mensual && (state.ultima[rut.id] || "").slice(0, 7) === hoy(c).slice(0, 7)) continue; // ya corrió este mes
       return (c < now ? now : c).toISOString(); // si hoy ya pasó la hora y no corrió, corre ahora
     }
     return null;

@@ -12,6 +12,15 @@ const LOOKS = {
   contenido:   { name: "Pam",    skin: "#F0C7A4", hair: "#A0603A", hairStyle: "long",  shirt: "#E7A7B5", pants: "#3D4A5C", shoes: "#5A2A1A", extras: ["earrings"] },
   reportes:    { name: "Oscar",  skin: "#C68E62", hair: "#1A1410", hairStyle: "short", shirt: "#5B7FA6", pants: "#2A2F36", shoes: "#1A1A1A", extras: ["tie"], tie: "#1E2A3A" },
   vos:         { name: "Vos",    skin: "#E6B994", hair: "#3A2A1E", hairStyle: "side",  shirt: "#F2F2F2", pants: "#20262C", shoes: "#111111", extras: ["tie"], tie: "#1E2F55" },
+  seguimientos:       { name: "Andy",    skin: "#EDC6A6", hair: "#8A5A35", hairStyle: "side",  shirt: "#F3B6C3", pants: "#3B4A5C", shoes: "#5A3A22", extras: ["tie"], tie: "#B03A48" },
+  mockups:            { name: "Darryl",  skin: "#6B4226", hair: "#141010", hairStyle: "bald",  shirt: "#6E8B5A", pants: "#2F3A45", shoes: "#2A1A10", extras: [], scale: 1.1 },
+  casos:              { name: "Holly",   skin: "#F2D3B8", hair: "#E0B86A", hairStyle: "long",  shirt: "#9EC3D9", pants: "#3D4A5C", shoes: "#5A2A1A", extras: ["earrings"] },
+  "contenido-clientes": { name: "Kelly", skin: "#B47A55", hair: "#141010", hairStyle: "long",  shirt: "#E05C8A", pants: "#2C2C3A", shoes: "#1A1A1A", extras: ["earrings"] },
+  onboarding:         { name: "Erin",    skin: "#F3D2BC", hair: "#C1572C", hairStyle: "long",  shirt: "#F2E2A0", pants: "#4A5A6B", shoes: "#7A4A2A", extras: [], scale: 0.95 },
+  comunidad:          { name: "Phyllis", skin: "#F0CDB0", hair: "#9A8F86", hairStyle: "bun",   shirt: "#B07CC6", pants: "#4A4458", shoes: "#3A2618", extras: ["glasses"] },
+  cobros:             { name: "Kevin",   skin: "#EDC3A0", hair: "#3A2A1E", hairStyle: "bald",  shirt: "#B9C9D9", pants: "#2E3440", shoes: "#1A1A1A", extras: ["tie"], tie: "#5B6B7B", scale: 1.15 },
+  blog:               { name: "Ryan",    skin: "#E9C2A2", hair: "#2B1D14", hairStyle: "short", shirt: "#2D2D2D", pants: "#1E2228", shoes: "#F2F2F2", extras: [] },
+  tendencias:         { name: "Creed",   skin: "#EBC9AC", hair: "#D8D8D8", hairStyle: "side",  shirt: "#7A7F6A", pants: "#3A3A33", shoes: "#2A1A10", extras: ["tie"], tie: "#3A3A3A", scale: 0.95 },
 };
 // frases de cada personaje cuando están sin trabajar
 const QUIPS = {
@@ -21,17 +30,38 @@ const QUIPS = {
   contenido: ["🎨 Dibujando ideas", "📸 ¿Foto para el feed?", "💛 ¡Qué lindo quedó!", "☎️ Küme, buen día"],
   reportes: ["🤓 En realidad…", "📊 Los números no mienten", "🧾 Cierra perfecto", "🍷 Esto merece un brindis"],
   vos: ["😏 Eso dijo ella", "☕ Mejor Jefe del Mundo", "🎬 ¿Hacemos una reunión?", "📧 Leyendo mails"],
+  seguimientos: ["🎵 (canta a capela)", "🐕 Modo Nard Dog", "📞 Insisto, pero con onda", "🎓 ¿Te conté que fui a Cornell?"],
+  mockups: ["🎹 Tengo un tema nuevo", "🛠️ Lo armo en un toque", "📦 Saludos desde el depósito", "😎 Esto queda joya"],
+  casos: ["😊 ¡Qué lindo caso!", "🎤 Contame cómo te fue", "🧩 Otra historia para la web", "🎶 Hoy está todo bien"],
+  "contenido-clientes": ["💅 Chisme del día", "📱 ¿Viste el último reel?", "✨ Esto es tendencia", "🙄 Obvio que sí"],
+  onboarding: ["☎️ Küme, ¿en qué te ayudo?", "🌻 ¡Bienvenido al equipo!", "📋 Lista lista", "🙂 ¡Qué emoción!"],
+  comunidad: ["🧶 Tejiendo respuestas", "💐 Qué amable ese comentario", "😌 Con calma se responde mejor"],
+  cobros: ["🍪 ¿Quedó algo de la torta?", "🧮 Los números… a ver", "🌶️ Hoy traje chili", "😅 Cobrar también es marketing"],
+  blog: ["🚀 Tengo una idea de startup", "📝 Escribiendo el post", "☕ Cold brew, obvio", "📈 SEO es el futuro"],
+  tendencias: ["🕵️ No preguntes de dónde lo saqué", "🔭 Vi algo raro en internet", "🌱 Tendencia detectada", "🍄 Esto lo sabía hace años"],
 };
 
 // ---------- Plano de la oficina ----------
 const CZ = -2.2; // pasillo central
+// Tres filas de escritorios: fondo (z -5.5), medio (z 1.8) y frente (z 5.8). Columnas en x.
+const CZ2 = 3.5; // segundo pasillo, entre la fila del medio y la del frente
 const DESKS = {
-  prospectos:  { x: -8.5, z: -5.5, row: "back",  sector: "Prospección" },
-  diagnostico: { x: -4.0, z: -5.5, row: "back",  sector: "Diagnósticos" },
-  propuestas:  { x:  0.5, z: -5.5, row: "back",  sector: "Propuestas" },
-  contenido:   { x: -8.5, z:  1.8, row: "front", sector: "Estudio de contenido" },
-  reportes:    { x: -3.5, z:  1.8, row: "front", sector: "Métricas" },
+  tendencias:   { x: -17.5, z: -5.5, row: "back",  sector: "Tendencias" },
+  blog:         { x: -13.0, z: -5.5, row: "back",  sector: "Blog" },
+  prospectos:   { x:  -8.5, z: -5.5, row: "back",  sector: "Prospección" },
+  diagnostico:  { x:  -4.0, z: -5.5, row: "back",  sector: "Diagnósticos" },
+  propuestas:   { x:   0.5, z: -5.5, row: "back",  sector: "Propuestas" },
+  cobros:       { x: -17.5, z:  1.8, row: "mid",   sector: "Cobros" },
+  onboarding:   { x: -13.0, z:  1.8, row: "mid",   sector: "Recepción" },
+  contenido:    { x:  -8.5, z:  1.8, row: "mid",   sector: "Estudio de contenido" },
+  reportes:     { x:  -4.0, z:  1.8, row: "mid",   sector: "Métricas" },
+  seguimientos: { x:   0.5, z:  1.8, row: "mid",   sector: "Seguimientos" },
+  comunidad:    { x: -17.5, z:  5.8, row: "front", sector: "Comunidad" },
+  casos:        { x: -13.0, z:  5.8, row: "front", sector: "Casos de éxito" },
+  "contenido-clientes": { x: -8.5, z: 5.8, row: "front", sector: "Contenido clientes" },
+  mockups:      { x:  -4.0, z:  5.8, row: "front", sector: "Taller de mockups" },
 };
+const RUG = { prospectos: "#CFE0D2", diagnostico: "#EAD9B4", propuestas: "#E9DDD0", contenido: "#F0CDBA", reportes: "#D3DDE6", seguimientos: "#F3D6DC", mockups: "#D7E3CC", casos: "#D6E6EF", "contenido-clientes": "#F2D0DE", onboarding: "#F4EBC4", comunidad: "#E3D6EC", cobros: "#DCE3EA", blog: "#E2E2DA", tendencias: "#DCDCCC" };
 const SPOTS = {
   cafe:     { pos: [7.0, 5.9],  face: 0,  door: [7, CZ], inner: [[7, 1.0]],  say: ["☕ Un cafecito", "☕ ¿Alguien quiere?", "☕"] },
   agua:     { pos: [5.6, 5.4],  face: 0,  door: [6, CZ], inner: [[6, 1.0]],  say: ["💧 Hidratación", "💧"] },
@@ -39,12 +69,14 @@ const SPOTS = {
   ventana:  { pos: [-1.8, -7.2], face: Math.PI, door: [-1.8, CZ], inner: [], say: ["☀️ Qué lindo día", "🌇", "🤔 Pensando ideas"] },
   impresora:{ pos: [3.0, -6.1], face: Math.PI, door: [3, CZ], inner: [], say: ["🖨️ Imprimiendo…", "🖨️ ¡Otra vez se trabó!"] },
   bandeja:  { pos: [8.5, -4.9], face: Math.PI, door: [7, CZ], inner: [[7, -3.6], [8.5, -3.9]], say: ["📄 Te lo dejo acá"] },
-  pizarra:  { pos: [-10.6, -3.4], face: -Math.PI / 2, door: [-10.6, CZ], inner: [], say: ["🗺️ Marcando zonas", "📌"] },
+  pizarra:  { pos: [-10.7, -7.1], face: Math.PI, door: [-10.7, CZ], inner: [], say: ["🗺️ Marcando zonas", "📌"] },
+  sillon:   { pos: [-19.7, 3.5], face: Math.PI / 2, door: [-19.7, CZ], inner: [], say: ["🛋️ Pausa de 5", "📖 Leyendo", "😴"] },
 };
 
 function seatOf(id) {
   const d = DESKS[id];
   if (d.row === "back") return { pos: [d.x, d.z - 0.95], door: [d.x + 1.5, CZ], inner: [[d.x + 1.5, d.z - 0.95]] };
+  if (d.row === "front") return { pos: [d.x, d.z - 0.95], door: [d.x + 2.2, CZ], inner: [[d.x + 2.2, CZ2], [d.x, CZ2]] };
   return { pos: [d.x, d.z - 0.95], door: [d.x, CZ], inner: [] };
 }
 
@@ -107,6 +139,7 @@ function buildPerson(look) {
   if (L.hairStyle === "curly") { box(0.56, 0.2, 0.5, H, 0, 0.26, -0.01, head); box(0.56, 0.36, 0.14, H, 0, 0.06, -0.2, head); [-0.27, 0.27].forEach((x) => box(0.06, 0.24, 0.4, H, x, 0.12, -0.02, head)); }
   if (L.hairStyle === "long") { box(0.5, 0.14, 0.46, H, 0, 0.25, 0, head); box(0.52, 0.72, 0.14, H, 0, -0.06, -0.2, head); [-0.25, 0.25].forEach((x) => box(0.05, 0.5, 0.36, H, x, 0.02, -0.03, head)); }
   if (L.hairStyle === "bun") { box(0.5, 0.12, 0.46, H, 0, 0.25, 0, head); box(0.5, 0.26, 0.1, H, 0, 0.1, -0.2, head); box(0.22, 0.2, 0.2, H, 0, 0.4, -0.08, head); }
+  if (L.hairStyle === "bald") { [-0.24, 0.24].forEach((x) => box(0.04, 0.14, 0.3, H, x, 0.02, -0.05, head)); box(0.48, 0.14, 0.06, H, 0, 0.02, -0.21, head); }
   if (L.hairStyle === "side") { box(0.5, 0.1, 0.46, H, 0, 0.25, 0, head); [-0.25, 0.25].forEach((x) => box(0.05, 0.2, 0.36, H, x, 0.08, -0.03, head)); box(0.5, 0.22, 0.08, H, 0, 0.08, -0.2, head); }
   // accesorios
   if (X.has("glasses")) { [-0.1, 0.1].forEach((x) => box(0.13, 0.11, 0.02, "#111", x, 0.03, 0.225, head, { roughness: 0.3 })); box(0.08, 0.02, 0.02, "#111", 0, 0.05, 0.225, head); }
@@ -134,8 +167,8 @@ export function createOffice(el, opts = {}) {
   scene.background = new THREE.Color(night ? "#18241E" : "#E7DFCB");
 
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 200);
-  const target = new THREE.Vector3(0, 0, -0.5);
-  let zoom = 1, VIEW = 10.5;
+  const target = new THREE.Vector3(-4.5, 0, -0.2);
+  let zoom = 1, VIEW = 12.5;
   function placeCamera() {
     camera.position.set(target.x + 22, 20, target.z + 22);
     camera.lookAt(target);
@@ -154,7 +187,7 @@ export function createOffice(el, opts = {}) {
   const sun = new THREE.DirectionalLight(night ? 0xbcd0ff : 0xfff1d6, night ? 0.55 : 1.5);
   sun.position.set(12, 22, 8); sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
-  Object.assign(sun.shadow.camera, { left: -18, right: 18, top: 18, bottom: -18, near: 1, far: 60 });
+  Object.assign(sun.shadow.camera, { left: -26, right: 26, top: 26, bottom: -26, near: 1, far: 80 });
   sun.shadow.bias = -0.0005;
   scene.add(sun);
 
@@ -167,18 +200,18 @@ export function createOffice(el, opts = {}) {
     c.strokeStyle = "rgba(0,0,0,.06)"; c.lineWidth = 2;
     for (let i = 0; i <= n; i++) { c.beginPath(); c.moveTo(i * s, 0); c.lineTo(i * s, h); c.stroke(); c.beginPath(); c.moveTo(0, i * s); c.lineTo(w, i * s); c.stroke(); }
   });
-  floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping; floorTex.repeat.set(3, 2);
-  const floor = new THREE.Mesh(new THREE.BoxGeometry(24, 0.3, 16), new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.95 }));
-  floor.position.set(0, -0.15, 0); floor.receiveShadow = true; scene.add(floor);
-  box(24.3, 0.3, 0.3, "#1B3A2D", 0, -0.15, 8.15, scene); box(0.3, 0.3, 16.3, "#1B3A2D", 12.15, -0.15, 0, scene);
+  floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping; floorTex.repeat.set(4, 2);
+  const floor = new THREE.Mesh(new THREE.BoxGeometry(33, 0.3, 16), new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.95 }));
+  floor.position.set(-4.5, -0.15, 0); floor.receiveShadow = true; scene.add(floor);
+  box(33.3, 0.3, 0.3, "#1B3A2D", -4.5, -0.15, 8.15, scene); box(0.3, 0.3, 16.3, "#1B3A2D", 12.15, -0.15, 0, scene);
 
   const wallCol = night ? "#3B4A41" : "#F1E9D6";
-  box(24.4, 3.4, 0.3, wallCol, 0, 1.7, -8.15, scene);
-  box(0.3, 3.4, 16.3, wallCol, -12.15, 1.7, 0, scene);
-  box(24.4, 0.18, 0.34, "#1B3A2D", 0, 0.09, -8.1, scene); box(0.34, 0.18, 16.3, "#1B3A2D", -12.1, 0.09, 0, scene);
+  box(33.4, 3.4, 0.3, wallCol, -4.5, 1.7, -8.15, scene);
+  box(0.3, 3.4, 16.3, wallCol, -21.15, 1.7, 0, scene);
+  box(33.4, 0.18, 0.34, "#1B3A2D", -4.5, 0.09, -8.1, scene); box(0.34, 0.18, 16.3, "#1B3A2D", -21.1, 0.09, 0, scene);
   // ventanas
   const glass = new THREE.MeshStandardMaterial({ color: night ? "#22365A" : "#BFE0EA", emissive: night ? "#0E1A33" : "#8FC6D8", emissiveIntensity: night ? 0.6 : 0.35, roughness: 0.2 });
-  [-6.2, -1.8, 2.6].forEach((x) => {
+  [-15.2, -6.2, -1.8, 2.6].forEach((x) => {
     const w = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.6, 0.05), glass); w.position.set(x, 1.95, -7.98); scene.add(w);
     box(2.75, 0.08, 0.1, "#1B3A2D", x, 2.78, -7.96, scene); box(2.75, 0.08, 0.1, "#1B3A2D", x, 1.12, -7.96, scene);
     box(0.06, 1.7, 0.08, "#1B3A2D", x, 1.95, -7.95, scene);
@@ -190,7 +223,7 @@ export function createOffice(el, opts = {}) {
     c.fillStyle = "#C4973A"; c.font = "500 34px 'DM Sans', sans-serif"; c.fillText("RAÍZ · EQUILIBRIO · RESULTADOS", 380, 128);
   });
   const logo = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5), new THREE.MeshStandardMaterial({ map: logoTex, roughness: 1 }));
-  logo.rotation.y = Math.PI / 2; logo.position.set(-11.98, 2.2, 3.4); scene.add(logo);
+  logo.rotation.y = Math.PI / 2; logo.position.set(-20.98, 2.2, -2.4); scene.add(logo);
   // pizarra con mapa (Prospección)
   const mapTex = canvasTex(512, 320, (c, w, h) => {
     c.fillStyle = "#FBFAF5"; c.fillRect(0, 0, w, h);
@@ -200,8 +233,8 @@ export function createOffice(el, opts = {}) {
     c.fillStyle = "#1B3A2D"; c.font = "bold 30px sans-serif"; c.fillText("ZONAS", 18, 300);
   });
   const board = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.6), new THREE.MeshStandardMaterial({ map: mapTex, roughness: 0.9 }));
-  board.rotation.y = Math.PI / 2; board.position.set(-11.9, 1.9, -3.4); scene.add(board);
-  box(0.05, 1.75, 2.75, "#1B3A2D", -11.96, 1.9, -3.4, scene);
+  board.position.set(-10.7, 1.9, -7.9); scene.add(board);
+  box(2.75, 1.75, 0.05, "#1B3A2D", -10.7, 1.9, -7.96, scene);
 
   // ---------- Muebles ----------
   const clickables = [];
@@ -223,7 +256,7 @@ export function createOffice(el, opts = {}) {
     const d = DESKS[id];
     const g = new THREE.Group(); g.position.set(d.x, 0, d.z); scene.add(g);
     // alfombra del sector
-    const rug = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.02, 3.4), mat({ prospectos: "#CFE0D2", diagnostico: "#EAD9B4", propuestas: "#E9DDD0", contenido: "#F0CDBA", reportes: "#D3DDE6" }[id]));
+    const rug = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.02, 3.4), mat(RUG[id] || "#E2E2DA"));
     rug.position.set(0, 0.01, -0.5); rug.receiveShadow = true; g.add(rug);
     const top = box(2.3, 0.1, 1.1, "#B98A5E", 0, 0.78, 0, g);
     [[-1.05, -0.45], [1.05, -0.45], [-1.05, 0.45], [1.05, 0.45]].forEach(([x, z]) => box(0.08, 0.74, 0.08, "#7A5638", x, 0.37, z, g));
@@ -305,10 +338,10 @@ export function createOffice(el, opts = {}) {
   const table = new THREE.Group(); table.position.set(9.5, 0, 3.5); scene.add(table);
   cyl(0.85, 0.85, 0.08, "#B98A5E", 0, 0.76, 0, table, 24); cyl(0.07, 0.07, 0.74, "#333", 0, 0.37, 0, table);
   [[0, -1.05], [1.05, 0], [-1.05, 0.2]].forEach(([x, z]) => cyl(0.25, 0.25, 0.5, "#2D5A42", x, 0.25, z, table));
-  plant(11.3, 1.6, 1.2); plant(-11.2, 7.2, 1.3); plant(-11.2, -7.3, 1.0); plant(-6.2, 5.6, 0.9);
-  // sillón de espera
-  box(2.4, 0.45, 0.9, "#2D5A42", -1.5, 0.3, 6.6, scene); box(2.4, 0.6, 0.25, "#2D5A42", -1.5, 0.75, 7.05, scene);
-  box(1.1, 0.05, 0.6, "#B98A5E", -1.5, 0.45, 5.5, scene); [[-0.45, -0.22], [0.45, -0.22], [-0.45, 0.22], [0.45, 0.22]].forEach(([x, z]) => box(0.05, 0.42, 0.05, "#7A5638", -1.5 + x, 0.21, 5.5 + z, scene));
+  plant(11.3, 1.6, 1.2); plant(-20.3, 7.2, 1.3); plant(-15.3, -7.3, 1.0); plant(-20.3, -7.3, 1.1); plant(2.6, 7.2, 1.0);
+  // sillón de pausa contra la pared izquierda
+  box(0.9, 0.45, 2.4, "#2D5A42", -20.4, 0.3, 3.5, scene); box(0.25, 0.6, 2.4, "#2D5A42", -20.85, 0.75, 3.5, scene);
+  [2.2, 4.8].forEach((z) => box(0.9, 0.62, 0.3, "#24493A", -20.4, 0.4, z, scene));
 
   // ---------- Personas ----------
   const people = {};
@@ -355,6 +388,7 @@ export function createOffice(el, opts = {}) {
   const signs = Object.entries(DESKS).map(([id, d]) => ({ v: new THREE.Vector3(d.x, 0.05, d.z + (d.row === "back" ? 1.25 : 1.4)), el: mkLabel("of-sign", d.sector) }));
   signs.push({ v: new THREE.Vector3(8.4, 0.05, -3.4), el: mkLabel("of-sign", "Tu oficina") });
   signs.push({ v: new THREE.Vector3(8.6, 0.05, 5.3), el: mkLabel("of-sign", "Cocina") });
+  signs.push({ v: new THREE.Vector3(-19.9, 0.05, 5.2), el: mkLabel("of-sign", "Pausa") });
   const inboxBadge = mkLabel("of-inbox", "📥 <b>0</b> para aprobar");
   inboxBadge.onclick = () => opts.onInbox && opts.onInbox();
 
@@ -371,7 +405,7 @@ export function createOffice(el, opts = {}) {
   const others = (id) => Object.keys(people).filter((k) => k !== id && k !== "vos");
   function idleAction(p) {
     if (p.id === "vos") { if (Math.random() < 0.4) say("vos", pick(QUIPS.vos)); p.timer = rnd(10, 18); return; }
-    const opts2 = ["cafe", "agua", "ventana", "visita", "visita", "mesa", "frase", "frase"];
+    const opts2 = ["cafe", "agua", "ventana", "visita", "visita", "mesa", "sillon", "frase", "frase"];
     if (["propuestas", "diagnostico", "reportes"].includes(p.id)) opts2.push("impresora", "impresora");
     if (p.id === "prospectos") opts2.push("pizarra", "pizarra");
     const a = pick(opts2);
@@ -503,7 +537,7 @@ export function createOffice(el, opts = {}) {
         const k = (camera.right - camera.left) / W();
         // derecha de pantalla = (1,0,-1)/√2 ; arriba de pantalla en el piso = (-1,0,-1)/√2
         const rx = -dx * k, uy = dy * k * 1.4;
-        target.x = THREE.MathUtils.clamp(down.tx + (rx - uy) / Math.SQRT2, -10, 10);
+        target.x = THREE.MathUtils.clamp(down.tx + (rx - uy) / Math.SQRT2, -19, 10);
         target.z = THREE.MathUtils.clamp(down.tz + (-rx - uy) / Math.SQRT2, -7, 7);
         placeCamera();
       }

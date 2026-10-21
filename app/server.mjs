@@ -55,6 +55,8 @@ function runClaude(agent, message, sessionId) {
     "--output-format", "json",
     "--permission-mode", "acceptEdits",
     "--allowedTools", "Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Bash(python generar_pdf.py:*),Bash(python render_piezas.py:*),Bash(python revisar_web.py:*),Bash(python pagespeed.py:*)",
+    // pueden leer y escribir en todo el equipo (Kume/) y leer la web de Küme (para el blog)
+    "--add-dir", path.resolve(DIR, ".."), "--add-dir", path.resolve(DIR, "../../web"),
   ];
   if (sessionId) args.push("--resume", sessionId);
   return new Promise((resolve) => {
@@ -100,7 +102,7 @@ function mapProspecto(pg) {
     negocio: txt(pr["Negocio"]), rubro: pr["Rubro"]?.select?.name || "", zona: txt(pr["Zona"]),
     web: pr["Web"]?.url || "", instagram: pr["Instagram"]?.url || "",
     puntaje: pr["Puntaje"]?.select?.name || "", estado: pr["Estado"]?.select?.name || "",
-    oportunidad: txt(pr["Oportunidad"]), mensaje: txt(pr["Mensaje propuesto"]),
+    oportunidad: txt(pr["Oportunidad"]), mensaje: txt(pr["Mensaje propuesto"]), seguimiento: txt(pr["Seguimiento"]), fuentes: txt(pr["Fuentes"]),
     servicios: (pr["Servicio sugerido"]?.multi_select || []).map((s) => s.name),
   };
 }
@@ -197,7 +199,7 @@ const server = http.createServer(async (req, res) => {
 
     if ((m = p.match(/^\/api\/prospectos\/([\w-]+)$/)) && req.method === "PATCH") {
       const { estado } = await readBody(req);
-      const permitidos = ["Aprobado", "Contactado", "Respondió", "Consulta agendada", "Descartado", "Mensaje listo"];
+      const permitidos = ["Aprobado", "Contactado", "Respondió", "Consulta agendada", "Descartado", "Mensaje listo", "Seguimiento listo"];
       if (!permitidos.includes(estado)) return json(res, 400, { error: "Estado no válido" });
       const r = await notion("PATCH", `pages/${m[1]}`, { properties: { Estado: { select: { name: estado } } } });
       return json(res, r.error ? 500 : 200, r.error ? { error: r.error } : { ok: true });
@@ -213,6 +215,19 @@ const server = http.createServer(async (req, res) => {
     }
     if ((m = p.match(/^\/api\/rutinas\/([\w-]+)\/correr$/)) && req.method === "POST") return json(res, 200, await piloto.correrAhora(m[1]));
     if (p === "/api/reportes") return json(res, 200, await listReportes());
+    // Entregables de cualquier agente: lo último que dejó en salidas/
+    if ((m = p.match(/^\/api\/salidas\/([\w-]+)$/)) && agents.some((a) => a.id === m[1])) {
+      const base = salidasDe(m[1]), out = [];
+      async function walk(dir, rel = "", depth = 0) {
+        for (const f of await readdir(dir).catch(() => [])) {
+          const full = path.join(dir, f), st = await stat(full), r = rel ? `${rel}/${f}` : f;
+          if (st.isDirectory()) { if (depth < 2) await walk(full, r, depth + 1); }
+          else if (/\.(md|html|pdf|png|csv|json)$/i.test(f) && !/importado/.test(f)) out.push({ ruta: r, fecha: st.mtime });
+        }
+      }
+      await walk(base);
+      return json(res, 200, out.sort((a, b) => b.fecha - a.fecha).slice(0, 60));
+    }
     if (p === "/api/diagnosticos") {
       const base = salidasDe("diagnostico");
       const out = [];

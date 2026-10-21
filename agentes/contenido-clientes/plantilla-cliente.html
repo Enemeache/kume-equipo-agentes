@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Plantilla carrusel para clientes</title>
+<!-- 1) Cambiá la fuente de Google Fonts por la del cliente -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  /* 2) VARIABLES DE MARCA DEL CLIENTE: tomalas de clientes/<cliente>/marca.md */
+  :root {
+    --fondo: #FFF7EE;      /* color de fondo principal */
+    --primario: #D9534F;   /* color fuerte de la marca */
+    --secundario: #2E2A26; /* texto y detalles */
+    --acento: #F2B544;     /* destacados */
+    --fuente: "Poppins", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #777; display: flex; flex-direction: column; gap: 40px; padding: 40px; align-items: center; }
+  .slide { width: 1080px; height: 1350px; position: relative; overflow: hidden; background: var(--fondo); color: var(--secundario); font-family: var(--fuente); padding: 110px 100px; display: flex; flex-direction: column; justify-content: center; }
+  .slide.fuerte { background: var(--primario); color: #fff; }
+  .kicker { font-size: 28px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; color: var(--acento); margin-bottom: 30px; }
+  h1 { font-size: 104px; line-height: 1.02; font-weight: 800; }
+  h2 { font-size: 78px; line-height: 1.05; font-weight: 800; }
+  p { font-size: 40px; line-height: 1.45; margin-top: 36px; }
+  .num { font-size: 180px; font-weight: 800; color: var(--acento); line-height: .9; }
+  .foto { position: absolute; inset: 0; background: var(--secundario); opacity: .12; display: grid; place-items: center; font-size: 34px; }
+  /* 3) LOGO DEL CLIENTE en todas las slides */
+  .logo { position: absolute; bottom: 60px; left: 100px; height: 80px; }
+  .contador { position: absolute; bottom: 74px; right: 100px; font-size: 28px; font-weight: 600; opacity: .7; }
+</style>
+</head>
+<body>
+<!-- Portada -->
+<section class="slide fuerte">
+  <div class="kicker">Categoría</div>
+  <h1>Gancho que frena el scroll</h1>
+  <p>Subtítulo con la promesa concreta.</p>
+  <img class="logo" src="../logo.png" alt="logo del cliente">
+</section>
+<!-- Interior -->
+<section class="slide">
+  <div class="num">1</div>
+  <h2>Idea principal</h2>
+  <p>Explicación corta, máximo 25 palabras.</p>
+  <img class="logo" src="../logo.png" alt="logo del cliente"><div class="contador">1/5</div>
+</section>
+<!-- Slide con espacio para foto real del cliente -->
+<section class="slide">
+  <div class="foto">📸 A producir: foto del producto estrella</div>
+  <h2 style="position:relative">Texto sobre la foto</h2>
+  <img class="logo" src="../logo.png" alt="logo del cliente"><div class="contador">2/5</div>
+</section>
+<!-- Cierre -->
+<section class="slide fuerte">
+  <h2>Llamado a la acción claro</h2>
+  <p>Guardalo · Escribinos · Reservá</p>
+  <img class="logo" src="../logo.png" alt="logo del cliente">
+</section>
+</body>
+</html>

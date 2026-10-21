@@ -11,6 +11,15 @@ Demo pública: **https://kume-website.vercel.app/hq/**
 | **Jim** | Propuestas comerciales 100% a medida (HTML + PDF) | `agentes/propuestas/` |
 | **Pam** | Calendario, textos y diseño del Instagram de Küme | `agentes/contenido/` |
 | **Oscar** | Reporte mensual de métricas por cliente | `agentes/reportes/` |
+| **Andy** | Segundo mensaje a quien no respondió | `agentes/seguimientos/` |
+| **Darryl** | Maquetas de web, feed o menú para vender | `agentes/mockups/` |
+| **Holly** | Testimonio, caso de éxito y brief para Pam | `agentes/casos/` |
+| **Kelly** | Calendario y piezas de cada cliente de redes | `agentes/contenido-clientes/` |
+| **Erin** | Bienvenida, accesos, brief y fichas del cliente nuevo | `agentes/onboarding/` |
+| **Phyllis** | Respuestas a reseñas, comentarios y DMs | `agentes/comunidad/` |
+| **Kevin** | Planilla de cobros y recordatorios | `agentes/cobros/` |
+| **Ryan** | Un artículo por mes para la web | `agentes/blog/` |
+| **Creed** | Informe semanal de tendencias y competencia | `agentes/tendencias/` |
 
 Regla de oro: **ningún agente publica ni envía nada sin aprobación de Ignacio o Delfi.**
 

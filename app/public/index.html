@@ -151,6 +151,7 @@
     <button data-view="propuestas">Propuestas <span class="count" id="c-prop" hidden>0</span></button>
     <button data-view="contenido">Contenido <span class="count" id="c-cont" hidden>0</span></button>
     <button data-view="reportes">Reportes</button>
+    <button data-view="entregables">📂 Entregables</button>
     <button data-view="piloto">🤖 Piloto automático <span class="count" id="c-piloto" hidden>ON</span></button>
   </nav>
   <div class="side-title">El equipo</div>
@@ -195,6 +196,13 @@
     <div id="cont-msg"></div>
     <div class="tabs" id="tabs-cont"></div>
     <div id="contenido"></div>
+  </section>
+
+  <!-- ENTREGABLES -->
+  <section class="view" id="v-entregables">
+    <div class="head"><div><div class="kicker">Todo el equipo</div><h1>Entregables</h1><p>Lo último que dejó cada agente en su carpeta.</p></div>
+      <select id="ent-agente" onchange="loadEntregables()" style="padding:9px 12px;border-radius:8px;border:1px solid rgba(27,58,45,.25);font-family:inherit"></select></div>
+    <table><thead><tr><th>Archivo</th><th>Fecha</th></tr></thead><tbody id="entregables"></tbody></table>
   </section>
 
   <!-- PILOTO AUTOMÁTICO -->
@@ -247,6 +255,15 @@ function show(v) {
   if (v === "reportes") loadReportes();
   if (v === "diagnosticos") loadDiagnosticos();
   if (v === "piloto") loadPiloto();
+  if (v === "entregables") loadEntregables();
+}
+
+// ---------- Entregables ----------
+async function loadEntregables() {
+  const sel = $("#ent-agente");
+  if (!sel.options.length) sel.innerHTML = AGENTS.map((a) => `<option value="${a.id}">${esc(a.nombre)} · ${esc(a.rol)}</option>`).join("");
+  const id = sel.value, list = await (await fetch("/api/salidas/" + id)).json();
+  $("#entregables").innerHTML = list.length ? list.map((f) => `<tr><td><a href="/files/${id}/${f.ruta.split("/").map(encodeURIComponent).join("/")}" target="_blank">${esc(f.ruta)}</a></td><td>${new Date(f.fecha).toLocaleString("es-AR")}</td></tr>`).join("") : `<tr><td colspan="2" class="empty">Todavía no dejó nada.</td></tr>`;
 }
 
 // ---------- Piloto automático ----------
@@ -336,7 +353,7 @@ async function resetChat() {
 }
 
 // ---------- Prospectos (Notion) ----------
-const ESTADOS = ["Mensaje listo", "Aprobado", "Contactado", "Respondió", "Consulta agendada", "Descartado"];
+const ESTADOS = ["Mensaje listo", "Seguimiento listo", "Aprobado", "Contactado", "Respondió", "Consulta agendada", "Descartado"];
 async function loadProspectos() {
   const r = await (await fetch("/api/prospectos")).json();
   if (r.error) {
@@ -345,7 +362,7 @@ async function loadProspectos() {
       : `<div class="notice"><b>Notion respondió:</b> ${esc(r.error)}. Revisá que la integración tenga acceso a la página "Küme — Equipo de agentes".</div>`;
   } else $("#notion-msg").innerHTML = "";
   PROS = r.items || [];
-  const listos = PROS.filter((p) => p.estado === "Mensaje listo").length;
+  const listos = PROS.filter((p) => p.estado === "Mensaje listo" || p.estado === "Seguimiento listo").length;
   $("#s-listos").textContent = r.error ? "–" : listos;
   PEND.pros = r.error ? 0 : listos; updateInbox();
   $("#c-aprobar").hidden = !listos; $("#c-aprobar").textContent = listos;
@@ -365,7 +382,7 @@ function renderProspectos() {
         <div class="meta" style="margin-top:8px">${p.instagram ? `<a href="${esc(p.instagram)}" target="_blank">Instagram ↗</a> ` : ""}${p.web ? `<a href="${esc(p.web)}" target="_blank">Web ↗</a> ` : ""}<a href="${esc(p.url)}" target="_blank">Ficha en Notion ↗</a></div>
       </div>
       <div>
-        ${p.mensaje ? `<div class="msg">${esc(p.mensaje)}</div>` : `<div class="empty">Sin mensaje.</div>`}
+        ${p.estado === "Seguimiento listo" && p.seguimiento ? `<div class="meta"><b>2º mensaje de Andy</b> (el primero ya se mandó)</div><div class="msg">${esc(p.seguimiento)}</div>` : p.mensaje ? `<div class="msg">${esc(p.mensaje)}</div>` : `<div class="empty">Sin mensaje.</div>`}
         <div class="actions">${acciones(p)}</div>
       </div>
     </div>`).join("") : `<div class="empty">No hay prospectos en "${filtro}".</div>`;
@@ -376,6 +393,7 @@ function acciones(p) {
   const diag = `<button class="btn ghost" onclick="pedirDiagnostico('${p.id}')">Diagnóstico (Angela)</button>`;
   switch (p.estado) {
     case "Mensaje listo": return b("Aprobado", "Aprobar", "btn gold") + copiar + b("Descartado", "Descartar", "btn red");
+    case "Seguimiento listo": return `<button class="btn ghost" onclick="navigator.clipboard.writeText(PROS.find(x=>x.id==='${p.id}').seguimiento);this.textContent='Copiado ✓'">Copiar 2º mensaje</button>` + b("Contactado", "Ya lo envié", "btn gold") + b("Descartado", "Descartar", "btn red");
     case "Aprobado": return copiar + b("Contactado", "Ya lo envié") + diag;
     case "Contactado": return b("Respondió", "Respondió") + diag + b("Descartado", "No respondió", "btn red");
     case "Respondió": return b("Consulta agendada", "Agendamos consulta", "btn gold") + diag;
