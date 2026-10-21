@@ -76,7 +76,7 @@
 
   // ---------- Navegación: botones y secciones nuevas ----------
   const nav = document.querySelector("aside nav");
-  const nuevos = [["hoy", "☀️ Hoy"], ["bandeja", "📥 Bandeja <span class=\"count\" id=\"c-bandeja\" hidden>0</span>"], ["feed", "📱 Feed"], ["calendario", "🗓️ Calendario"], ["embudo", "📈 Embudo"], ["uso", "⚡ Uso de Claude"]];
+  const nuevos = [["hoy", "☀️ Hoy"], ["bandeja", "📥 Bandeja <span class=\"count\" id=\"c-bandeja\" hidden>0</span>"], ["feed", "📱 Feed"], ["calendario", "🗓️ Calendario"], ["envios", "✉️ Envíos <span class=\"count\" id=\"c-envios\" hidden>0</span>"], ["embudo", "📈 Embudo"], ["uso", "⚡ Uso de Claude"]];
   nuevos.reverse().forEach(([v, label]) => {
     const b = document.createElement("button"); b.dataset.view = v; b.innerHTML = label; b.onclick = () => show(v);
     nav.insertBefore(b, nav.children[1]);
@@ -87,6 +87,7 @@
   sec("bandeja", `<div class="head"><div><div class="kicker">Todo lo pendiente en un solo lugar</div><h1>Bandeja</h1><p>Usá el teclado: <span class="kbd">A</span> aprobar · <span class="kbd">D</span> descartar · <span class="kbd">E</span> editar · <span class="kbd">→</span> siguiente</p></div><button class="btn ghost" onclick="KUMEUX.bandeja()">Actualizar</button></div><div class="bandeja-wrap" id="bandeja"></div>`);
   sec("feed", `<div class="head"><div><div class="kicker">Así va a quedar tu perfil</div><h1>Vista del feed</h1><p>Arriba lo que viene (aprobado o por aprobar), abajo lo que ya publicaste.</p></div><label style="font-size:13px"><input type="checkbox" id="feed-pend" checked> Incluir lo que falta aprobar</label></div><div id="feed"></div>`);
   sec("calendario", `<div class="head"><div><div class="kicker">Contenido de Küme</div><h1 id="cal-titulo">Calendario</h1><p>Arrastrá una pieza a otro día para cambiarle la fecha.</p></div><div style="display:flex;gap:8px"><button class="btn ghost" id="cal-prev">‹ Mes anterior</button><button class="btn ghost" id="cal-hoy">Hoy</button><button class="btn ghost" id="cal-next">Mes siguiente ›</button></div></div><div id="calendario"></div>`);
+  sec("envios", `<div class="head"><div><div class="kicker">Mails a prospectos</div><h1>Envíos</h1><p>Lo que aprobás sale solo por mail, 10 minutos después. Hasta entonces lo podés cancelar.</p></div><button class="btn ghost" onclick="KUMEUX.envios()">Actualizar</button></div><div id="envios"></div>`);
   sec("embudo", `<div class="head"><div><div class="kicker">Ventas</div><h1>Embudo</h1><p>De los negocios que encuentra Dwight a los que se vuelven clientes.</p></div></div><div id="embudo"></div>`);
   sec("uso", `<div class="head"><div><div class="kicker">Para cuidar tu plan</div><h1>Uso de Claude</h1><p>Cuánto trabajó cada agente. El costo es una referencia de cuánto pesa cada pedido.</p></div><select id="uso-rango" style="padding:9px 12px;border-radius:8px;border:1px solid rgba(27,58,45,.25)"><option value="7">Últimos 7 días</option><option value="30">Últimos 30 días</option><option value="1">Hoy</option></select></div><div id="uso"></div>`);
   document.body.insertAdjacentHTML("beforeend", `
@@ -94,7 +95,7 @@
     <div class="toasts" id="toasts"></div><div class="ficha" id="ficha"></div>
     <div class="hud-acc"><button id="btn-reunion">📣 Reunión</button><button id="btn-noche">🌙 Noche</button></div>`);
 
-  const ganchos = { hoy: pintarHoy, bandeja: () => KUMEUX.bandeja(), feed: pintarFeed, calendario: pintarCal, embudo: pintarEmbudo, uso: pintarUso };
+  const ganchos = { envios: () => KUMEUX.envios(), hoy: pintarHoy, bandeja: () => KUMEUX.bandeja(), feed: pintarFeed, calendario: pintarCal, embudo: pintarEmbudo, uso: pintarUso };
   const showOrig = show;
   window.show = show = function (v) { showOrig(v); ganchos[v] && ganchos[v](); };
 
@@ -159,8 +160,10 @@
   async function accion(k) {
     const it = B.items[B.i]; if (!it) return;
     const patch = (url, body) => fetch(url, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-    if (it.tipo === "prospecto") await patch("/api/prospectos/" + it.p.id, { estado: k === "a" ? "Aprobado" : "Descartado" });
-    if (it.tipo === "seguimiento") { if (k === "a") navigator.clipboard.writeText(it.p.seguimiento).catch(() => {}); await patch("/api/prospectos/" + it.p.id, { estado: k === "a" ? "Contactado" : "Descartado" }); }
+    let envio = null;
+    if (it.tipo === "prospecto") envio = (await (await patch("/api/prospectos/" + it.p.id, { estado: k === "a" ? "Aprobado" : "Descartado" })).json()).envio;
+    if (it.tipo === "seguimiento") { if (k === "a") navigator.clipboard.writeText(it.p.seguimiento).catch(() => {}); envio = (await (await patch("/api/prospectos/" + it.p.id, { estado: k === "a" ? "Contactado" : "Descartado" })).json()).envio; }
+    if (envio) toast(envio.encolado ? `✉️ ${it.p.negocio}: sale por mail en 10 minutos` : envio.motivo === "sin mail" ? `📋 ${it.p.negocio} no tiene mail: mandalo a mano (ya está copiado)` : `✉️ No se encoló: ${envio.motivo}`, null, () => show("envios"));
     if (it.tipo === "contenido") {
       await patch("/api/contenido/" + it.c.id, { estado: k === "a" ? "Aprobado" : "Borrador" });
       if (k === "d") { openChat("contenido").then(() => { $("#txt").value = `Cambios para "${it.c.pieza}" (${it.c.fecha}): `; $("#txt").focus(); }); }
@@ -280,6 +283,11 @@
       if (current?.id === ev.agente && $("#pasos-vivo")) { $("#pasos-vivo").innerHTML = pasos[ev.agente].slice(-6).map((t) => `<span>${H(t)}</span>`).join(""); $("#msgs").scrollTop = 1e9; }
       window.OF && OF.say(ev.agente, ev.texto, 5);
     }
+    if (ev.tipo === "envio") {
+      const t = { encolado: `✉️ En cola: ${ev.negocio}`, enviado: `✅ Mail enviado a ${ev.negocio}`, error: `⚠️ No se pudo mandar a ${ev.negocio}: ${ev.error}` }[ev.accion];
+      toast(t, null, () => show("envios")); if (ev.accion !== "encolado") avisar(t);
+      if ($("#v-envios").classList.contains("on")) KUMEUX.envios(); contarEnvios();
+    }
     if (ev.tipo === "fin") {
       delete pasos[ev.agente];
       const txt = `${ev.ok ? "✅" : "⚠️"} ${ev.nombre} terminó${ev.origen === "rutina" ? " (rutina)" : ""}${ev.archivos?.length ? ` · ${ev.archivos.length} archivo${ev.archivos.length > 1 ? "s" : ""}` : ""}`;
@@ -395,8 +403,41 @@
   let noche = null;
   $("#btn-noche").onclick = () => { if (!window.OF) return; noche = !(noche ?? OF.esNoche); OF.setNoche(noche); $("#btn-noche").textContent = noche ? "☀️ Día" : "🌙 Noche"; try { localStorage.setItem("kume-noche", noche ? "1" : "0"); } catch {} };
 
+  // ---------- 12) ENVÍOS POR MAIL ----------
+  async function contarEnvios() {
+    const e = await fetch("/api/envios").then((r) => r.json()).catch(() => null); if (!e) return;
+    $("#c-envios").hidden = !e.cola.length; $("#c-envios").textContent = e.cola.length;
+  }
+  async function envios() {
+    const e = await fetch("/api/envios").then((r) => r.json());
+    const aprob = (await datos()).pros.filter((p) => p.estado === "Aprobado");
+    const pend = aprob.filter((p) => p.email && !e.enviados.some((x) => x.id === p.id && x.tipo === "mensaje") && !e.cola.some((x) => x.id === p.id));
+    const hora = (f) => new Date(f).toLocaleString("es-AR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+    const aviso = e.activa
+      ? `<div class="tile" style="border-top-color:var(--verde)"><h3>🟢 Envío automático prendido</h3><p class="meta">${e.enviadosHoy} de ${e.maxDia} mails hoy · uno cada 2 minutos como mínimo · cada mail lleva al pie "si no te interesa, respondé no".</p></div>`
+      : `<div class="tile"><h3>⚪ Envío automático apagado</h3><p>Para prenderlo, en <code>app/.env</code> tienen que estar estas tres líneas (las completás vos, no las pegues en el chat):</p><pre style="background:var(--crema);padding:10px;border-radius:8px;margin:8px 0;font-size:12.5px">SMTP_USER=tu-mail@gmail.com
+SMTP_PASS=la contraseña de aplicación de Google
+ENVIO_AUTO=1</pre><p class="meta">La contraseña de aplicación se crea en myaccount.google.com/apppasswords (hace falta tener la verificación en 2 pasos). Después reabrí la app. ${e.smtp ? "El mail ya está configurado: falta ENVIO_AUTO=1." : ""}</p></div>`;
+    $("#envios").innerHTML = aviso + `
+      ${e.activa && pend.length ? `<div class="tile" style="margin-top:14px"><h3>Aprobados de antes</h3><p>${pend.length} prospecto${pend.length > 1 ? "s" : ""} ya aprobado${pend.length > 1 ? "s" : ""} con mail que todavía no salieron. No se mandan solos.</p><button class="btn gold" style="margin-top:8px" onclick="KUMEUX.mandarAprobados(${pend.length})">✉️ Mandarlos también</button></div>` : ""}
+      <div class="grid2" style="margin-top:14px">
+        <div class="tile"><h3>En cola (${e.cola.length})</h3><ul>${e.cola.map((c) => `<li><b>${H(c.negocio)}</b> · ${c.tipo === "seguimiento" ? "2º mensaje" : "1er mensaje"}${c.adjunto ? " + diagnóstico" : ""}<br><span class="meta">${H(c.para)} · sale ${c.sale > Date.now() ? "en " + Math.ceil((c.sale - Date.now()) / 60e3) + " min" : "en breve"}</span> <button class="btn red" style="padding:3px 10px;font-size:11px" onclick="KUMEUX.cancelarEnvio('${c.id}')">Cancelar</button></li>`).join("") || `<li class="meta">Nada en cola.</li>`}</ul></div>
+        <div class="tile"><h3>Enviados (${e.enviados.length})</h3><ul>${e.enviados.slice(0, 15).map((x) => `<li><b>${H(x.negocio)}</b> · ${x.tipo === "seguimiento" ? "2º" : "1er"} mensaje<br><span class="meta">${H(x.para)} · ${hora(x.fecha)}</span></li>`).join("") || `<li class="meta">Todavía no salió ninguno.</li>`}</ul></div>
+        <div class="tile"><h3>Sin mail (${aprob.filter((p) => !p.email).length})</h3><p class="meta">Aprobados que hay que mandar a mano por Instagram o WhatsApp.</p><ul>${aprob.filter((p) => !p.email).slice(0, 12).map((p) => `<li><b>${H(p.negocio)}</b> ${p.instagram ? `· <a href="${H(p.instagram)}" target="_blank">Instagram ↗</a>` : ""}</li>`).join("") || `<li class="meta">Ninguno.</li>`}</ul></div>
+        ${e.errores.length ? `<div class="tile" style="border-top-color:#A33"><h3>Errores</h3><ul>${e.errores.slice(0, 8).map((x) => `<li><b>${H(x.negocio)}</b><br><span class="meta">${H(x.error)} · ${hora(x.fecha)}</span></li>`).join("")}</ul></div>` : ""}
+      </div>`;
+    contarEnvios();
+  }
+
   // ---------- Arranque ----------
   window.KUMEUX = {
+    envios,
+    async cancelarEnvio(id) { await fetch("/api/envios/" + id, { method: "DELETE" }); toast("🛑 Envío cancelado", null); envios(); },
+    async mandarAprobados(n) {
+      if (!confirm(`¿Mandar el mail a los ${n} prospectos que ya estaban aprobados? Salen de a uno, con 10 minutos para cancelar.`)) return;
+      const r = await (await fetch("/api/envios/aprobados", { method: "POST" })).json();
+      toast(r.error ? "⚠️ " + r.error : `✉️ ${r.encolados} en cola`, null); envios();
+    },
     bandeja, accion, guardarTexto, abrirEditor, cerrarEditor, mostrarFicha,
     editar(v) { B.editando = v; pintarBandeja(); },
     mover(d) { B.i = Math.max(0, Math.min(B.items.length, B.i + d)); B.editando = false; pintarBandeja(); },
@@ -415,7 +456,7 @@
       if (c?.carpeta && !card.querySelector(".btn-editar-diseno")) btn.insertAdjacentHTML("afterend", `<button class="btn ghost btn-editar-diseno" onclick="KUMEUX.abrirEditor('${H(c.carpeta)}')">🎨 Editar diseño</button>`);
     });
   };
-  datos().then(contar);
+  datos().then(contar); contarEnvios();
   setInterval(refrescarContadores, 60000);
   // el panel "Hoy" se abre solo la primera vez de cada día
   try { if (localStorage.getItem("kume-hoy") !== hoyISO()) { localStorage.setItem("kume-hoy", hoyISO()); setTimeout(() => show("hoy"), 600); } } catch {}

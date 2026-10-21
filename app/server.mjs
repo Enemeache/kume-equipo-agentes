@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { createPiloto } from "./piloto.mjs";
 import { zip } from "./zip.mjs";
 import { iniciarMovil } from "./movil.mjs";
+import { crearCola } from "./cola.mjs";
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const PORT = 4747;
@@ -173,7 +174,7 @@ function mapProspecto(pg) {
   return {
     id: pg.id, url: pg.url,
     negocio: txt(pr["Negocio"]), rubro: pr["Rubro"]?.select?.name || "", zona: txt(pr["Zona"]),
-    web: pr["Web"]?.url || "", instagram: pr["Instagram"]?.url || "",
+    web: pr["Web"]?.url || "", instagram: pr["Instagram"]?.url || "", email: pr["Email público"]?.email || "",
     puntaje: pr["Puntaje"]?.select?.name || "", estado: pr["Estado"]?.select?.name || "",
     oportunidad: txt(pr["Oportunidad"]), mensaje: txt(pr["Mensaje propuesto"]), seguimiento: txt(pr["Seguimiento"]), fuentes: txt(pr["Fuentes"]),
     servicios: (pr["Servicio sugerido"]?.multi_select || []).map((s) => s.name),
@@ -276,11 +277,32 @@ const server = http.createServer(async (req, res) => {
       const { estado } = await readBody(req);
       const permitidos = ["Aprobado", "Contactado", "Respondió", "Consulta agendada", "Descartado", "Mensaje listo", "Seguimiento listo", "Cliente"];
       if (!permitidos.includes(estado)) return json(res, 400, { error: "Estado no válido" });
+      const antes = await notion("GET", `pages/${m[1]}`);
       const r = await notion("PATCH", `pages/${m[1]}`, { properties: { Estado: { select: { name: estado } } } });
-      return json(res, r.error ? 500 : 200, r.error ? { error: r.error } : { ok: true });
+      if (r.error) return json(res, 500, { error: r.error });
+      // aprobar el 1er mensaje o el seguimiento lo pone en la cola de mails (si el envío automático está prendido)
+      let envio = null;
+      if (!antes.error) {
+        const pr = mapProspecto(antes);
+        if (pr.estado === "Mensaje listo" && estado === "Aprobado") envio = await cola.encolar(pr, "mensaje");
+        if (pr.estado === "Seguimiento listo" && estado === "Contactado") envio = await cola.encolar(pr, "seguimiento");
+      }
+      return json(res, 200, { ok: true, envio });
     }
 
     if (p === "/api/propuestas") return json(res, 200, await listPropuestas());
+
+    // ---------- Cola de mails ----------
+    if (p === "/api/envios" && req.method === "GET") return json(res, 200, cola.estado());
+    if ((m = p.match(/^\/api\/envios\/([\w-]+)$/)) && req.method === "DELETE") return json(res, 200, { ok: await cola.cancelar(m[1]) });
+    if (p === "/api/envios/aprobados" && req.method === "POST") {
+      // los que ya estaban en "Aprobado" antes de prender el envío: solo se mandan si tocás este botón
+      const r = await notion("POST", `data_sources/${PROSPECTOS_DS}/query`, { filter: { property: "Estado", select: { equals: "Aprobado" } }, page_size: 100 });
+      if (r.error) return json(res, 500, { error: r.error });
+      const out = { encolados: 0, sinMail: 0 };
+      for (const pg of r.results) { const x = await cola.encolar(mapProspecto(pg), "mensaje"); if (x.encolado) out.encolados++; else if (x.motivo === "sin mail") out.sinMail++; }
+      return json(res, 200, out);
+    }
 
     // ---------- Eventos en vivo ----------
     if (p === "/api/eventos") {
@@ -429,6 +451,7 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
+const cola = crearCola({ DATA, notion, agentDir, agents, emitir });
 const piloto = createPiloto({ DIR, DATA, agents, agentDir, runClaude, notion, running, loadChat, saveChat });
 piloto.iniciar();
 

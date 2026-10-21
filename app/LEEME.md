@@ -20,6 +20,28 @@ Se abre en su propia ventana en `http://localhost:4747`. Solo funciona en esta c
 
 > ⚠️ El `.env` tiene una clave: no lo compartas ni lo muestres al compartir pantalla.
 
+## Mails automáticos a prospectos
+Cuando aprobás un mensaje (o el 2º mensaje de Andy) y el prospecto tiene **Email público** en Notion, sale solo por mail.
+1. Activá la verificación en 2 pasos de tu Gmail y creá una contraseña de aplicación en https://myaccount.google.com/apppasswords
+2. En `app/.env` agregá (completalo vos, no lo pegues en ningún chat):
+   ```
+   SMTP_USER=tu-mail@gmail.com
+   SMTP_PASS=la contraseña de aplicación
+   ENVIO_AUTO=1
+   ```
+   Opcional: `ENVIO_MAX_DIA=20` (tope de mails por día).
+3. Reabrí la app. En ✉️ Envíos tiene que decir "Envío automático prendido".
+
+Cómo se cuida:
+- Solo sale lo que aprobaste vos.
+- Cada mail espera 10 minutos y lo podés cancelar.
+- Sale uno cada 2 minutos como mínimo, con un tope diario.
+- Nunca se manda dos veces lo mismo.
+- Si tiene diagnóstico de Angela, va adjunto.
+- Al pie va "si no te interesa, respondé no".
+- Los que ya estaban aprobados antes de prenderlo no salen solos: hay un botón aparte.
+- Los que no tienen mail quedan en la lista para mandarlos a mano por Instagram o WhatsApp. Esos no se automatizan, por las reglas de esas plataformas.
+
 ## Aprobar desde el celu (solo en tu WiFi)
 1. En `app/.env` agregá una línea `MOVIL_PIN=` seguida de 6 números o más (inventalos vos).
 2. Reabrí la app. En ☀️ Hoy aparece la dirección para el celu (algo como `http://192.168.1.5:4748`).
