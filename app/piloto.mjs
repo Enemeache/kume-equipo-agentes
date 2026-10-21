@@ -212,14 +212,14 @@ No uses Notion: la app lo carga sola. Respondé con la tabla de la semana.`,
     chat.messages.push({ de: "vos", texto: `🤖 Rutina automática: ${rut.nombre}${p.meta?.rubro ? ` (${p.meta.rubro}, ${p.meta.zona})` : p.meta?.negocio ? ` (${p.meta.negocio})` : ""}`, fecha: new Date().toISOString(), auto: true });
     await saveChat(agent.id, chat);
     let r;
-    try { r = await runClaude(agent, p.texto, null); } finally { running.delete(agent.id); }
+    try { r = await runClaude(agent, p.texto, null, "rutina"); } finally { running.delete(agent.id); }
     let extra = "";
     if (r.ok && rut.agente === "prospectos") extra = `\n\n📥 ${await importarProspectos()} prospectos nuevos cargados en "Para aprobar".`;
     if (r.ok && rut.agente === "contenido") extra = `\n\n📥 ${await importarContenido()} piezas cargadas en "Contenido".`;
     if (r.ok && rut.agente === "seguimientos") extra = `\n\n📥 ${await importarSeguimientos(p.meta)} seguimientos listos en "Para aprobar".`;
     if (r.ok && rut.agente === "diagnostico") extra = (await marcarDiagnostico(p.meta)) ? `\n\n📄 Diagnóstico de ${p.meta.negocio} listo en "Diagnósticos".` : "\n\n⚠️ No encontré el PDF del diagnóstico.";
     const chat2 = await loadChat(agent.id);
-    chat2.messages.push({ de: "agente", texto: r.text + extra, error: !r.ok, fecha: new Date().toISOString(), auto: true });
+    chat2.messages.push({ de: "agente", texto: r.text + extra, error: !r.ok, archivos: r.archivos || [], fecha: new Date().toISOString(), auto: true });
     await saveChat(agent.id, chat2);
     registrar(rut, r.ok, (r.ok ? "" : "Error: ") + (r.text || "").slice(0, 280) + extra);
     log(`[piloto] ${rut.id} (${motivo}) → ${r.ok ? "ok" : "error"}`);

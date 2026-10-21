@@ -7,6 +7,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPiloto } from "./piloto.mjs";
 import { zip } from "./zip.mjs";
+import { iniciarMovil } from "./movil.mjs";
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const PORT = 4747;
@@ -28,7 +29,7 @@ const agents = JSON.parse(await readFile(path.join(DIR, "agents.json"), "utf8"))
 const agentDir = (a) => path.resolve(DIR, a.carpeta);
 await mkdir(path.join(DATA, "chats"), { recursive: true });
 
-const MIME = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".json": "application/json", ".pdf": "application/pdf", ".png": "image/png", ".md": "text/plain; charset=utf-8" };
+const MIME = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".json": "application/json", ".pdf": "application/pdf", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".md": "text/plain; charset=utf-8" };
 
 const json = (res, code, body) => { res.writeHead(code, { "Content-Type": "application/json; charset=utf-8" }); res.end(JSON.stringify(body)); };
 const readBody = (req) => new Promise((ok) => { let b = ""; req.on("data", (c) => (b += c)); req.on("end", () => { try { ok(JSON.parse(b || "{}")); } catch { ok({}); } }); });
@@ -49,34 +50,106 @@ async function loadChat(id) {
 const saveChat = (id, chat) => writeFile(chatFile(id), JSON.stringify(chat, null, 2));
 const running = new Set();
 
-function runClaude(agent, message, sessionId) {
+// ---------- Eventos en vivo (Server-Sent Events) para la app ----------
+const oyentes = new Set();
+function emitir(ev) {
+  const data = `data: ${JSON.stringify({ ...ev, fecha: new Date().toISOString() })}\n\n`;
+  for (const res of oyentes) { try { res.write(data); } catch {} }
+}
+
+// Traduce lo que hace el agente a una frase entendible
+function describir(tool, input = {}) {
+  const base = (f) => String(f || "").split(/[\/]/).pop();
+  switch (tool) {
+    case "WebSearch": return `🔎 Buscando "${String(input.query || "").slice(0, 60)}"`;
+    case "WebFetch": try { return `🌐 Leyendo ${new URL(input.url).hostname}`; } catch { return "🌐 Leyendo una página"; }
+    case "Read": return `📖 Leyendo ${base(input.file_path)}`;
+    case "Write": return `✍️ Escribiendo ${base(input.file_path)}`;
+    case "Edit": return `✏️ Corrigiendo ${base(input.file_path)}`;
+    case "Glob": case "Grep": return "🗂️ Revisando archivos";
+    case "Bash": {
+      const c = String(input.command || "");
+      if (c.includes("generar_pdf")) return "📄 Armando el PDF";
+      if (c.includes("render_piezas")) return "🎨 Exportando las imágenes";
+      if (c.includes("revisar_web")) return "📱 Abriendo la web como un celular";
+      if (c.includes("pagespeed")) return "⏱️ Midiendo la velocidad de la web";
+      return "⚙️ Corriendo una herramienta";
+    }
+    default: return `⚙️ ${tool}`;
+  }
+}
+
+// Archivos que el agente creó o cambió durante el pedido
+async function archivosNuevos(agent, desde) {
+  const base = path.join(agentDir(agent), "salidas"), out = [];
+  async function walk(dir, rel = "", depth = 0) {
+    for (const f of await readdir(dir).catch(() => [])) {
+      const full = path.join(dir, f), st = await stat(full).catch(() => null); if (!st) continue;
+      const r = rel ? `${rel}/${f}` : f;
+      if (st.isDirectory()) { if (depth < 2) await walk(full, r, depth + 1); }
+      else if (st.mtimeMs >= desde && /\.(md|html|pdf|png|csv|json)$/i.test(f) && !/importado/.test(f)) out.push(r);
+    }
+  }
+  await walk(base);
+  // si hay muchas PNG de un mismo carrusel, mostramos solo la primera
+  const vistos = new Set();
+  return out.sort().filter((r) => { const k = r.replace(/slide-\d+\.png$/, "slide"); if (/slide-\d+\.png$/.test(r)) { if (vistos.has(k)) return false; vistos.add(k); } return true; }).slice(0, 12);
+}
+
+// Registro de uso (para el medidor)
+const usoFile = path.join(DATA, "uso.json");
+async function registrarUso(entry) {
+  let uso = []; try { uso = JSON.parse(await readFile(usoFile, "utf8")); } catch {}
+  uso.unshift(entry); await writeFile(usoFile, JSON.stringify(uso.slice(0, 2000)));
+}
+
+function runClaude(agent, message, sessionId, origen = "chat") {
   const args = [
     "-p", message,
-    "--output-format", "json",
+    "--output-format", "stream-json", "--verbose",
     "--permission-mode", "acceptEdits",
     "--allowedTools", "Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Bash(python generar_pdf.py:*),Bash(python render_piezas.py:*),Bash(python revisar_web.py:*),Bash(python pagespeed.py:*)",
     // pueden leer y escribir en todo el equipo (Kume/) y leer la web de Küme (para el blog)
     "--add-dir", path.resolve(DIR, ".."), "--add-dir", path.resolve(DIR, "../../web"),
   ];
   if (sessionId) args.push("--resume", sessionId);
+  const t0 = Date.now();
+  emitir({ tipo: "inicio", agente: agent.id, nombre: agent.nombre, origen });
   return new Promise((resolve) => {
     // Cada agente corre como un Claude Code normal: sin variables heredadas de otra sesión de Claude.
     const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^(CLAUDE|ANTHROPIC_BASE_URL)/.test(k)));
     const p = spawn("claude", args, { cwd: agentDir(agent), windowsHide: true, env });
-    let out = "", err = "";
-    p.stdout.on("data", (d) => (out += d));
+    let buf = "", err = "", final = null, ultimo = "";
+    p.stdout.on("data", (d) => {
+      buf += d; let i;
+      while ((i = buf.indexOf("\n")) >= 0) {
+        const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+        if (!line) continue;
+        let ev; try { ev = JSON.parse(line); } catch { continue; }
+        if (ev.type === "assistant") {
+          for (const c of ev.message?.content || []) {
+            if (c.type === "tool_use") { const txt = describir(c.name, c.input); if (txt !== ultimo) { ultimo = txt; emitir({ tipo: "progreso", agente: agent.id, texto: txt }); } }
+          }
+        }
+        if (ev.type === "result") final = ev;
+      }
+    });
     p.stderr.on("data", (d) => (err += d));
     p.on("error", (e) => resolve({ ok: false, text: `No pude abrir Claude Code: ${e.message}` }));
-    p.on("close", () => {
-      try {
-        const r = JSON.parse(out.trim().split(/\r?\n/).pop());
-        if (/not logged in|invalid api key|please run \/login/i.test(r.result || "")) {
-          return resolve({ ok: false, text: "Claude Code no tiene sesión iniciada en esta computadora. Abrí una terminal, escribí `claude` y después `/login`. Es una sola vez." });
-        }
-        resolve({ ok: !r.is_error, text: r.result || "(sin respuesta)", sessionId: r.session_id });
-      } catch {
-        resolve({ ok: false, text: `Error al correr el agente.\n${(err || out).slice(-800)}` });
-      }
+    p.on("close", async () => {
+      if (!final && buf.trim()) { try { final = JSON.parse(buf.trim()); } catch {} }
+      const archivos = await archivosNuevos(agent, t0 - 2000);
+      let r;
+      if (!final) r = { ok: false, text: `Error al correr el agente.\n${(err || buf).slice(-800)}` };
+      else if (/not logged in|invalid api key|please run \/login/i.test(final.result || "")) r = { ok: false, text: "Claude Code no tiene sesión iniciada en esta computadora. Abrí una terminal, escribí `claude` y después `/login`. Es una sola vez." };
+      else if (/session limit|usage limit|hit your/i.test(final.result || "")) r = { ok: false, text: `Se terminó el uso de Claude por ahora: ${final.result}`, limite: true };
+      else r = { ok: !final.is_error, text: final.result || "(sin respuesta)", sessionId: final.session_id };
+      r.archivos = archivos;
+      const u = final?.usage || {};
+      registrarUso({ fecha: new Date().toISOString(), agente: agent.id, origen, segundos: Math.round((Date.now() - t0) / 1000), costo: final?.total_cost_usd || 0,
+        entrada: (u.input_tokens || 0) + (u.cache_read_input_tokens || 0) + (u.cache_creation_input_tokens || 0), salida: u.output_tokens || 0, ok: r.ok }).catch(() => {});
+      emitir({ tipo: "fin", agente: agent.id, nombre: agent.nombre, ok: r.ok, origen, archivos, resumen: String(r.text).slice(0, 140) });
+      resolve(r);
     });
   });
 }
@@ -157,6 +230,7 @@ async function listReportes() {
 }
 
 // ---------- Router ----------
+let MOVIL = null;
 const server = http.createServer(async (req, res) => {
   const u = new URL(req.url, `http://localhost:${PORT}`);
   const p = decodeURIComponent(u.pathname);
@@ -168,6 +242,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     let m;
+    if (p === "/api/movil") return json(res, 200, MOVIL ? { activo: true, urls: MOVIL.ips().map((i) => `http://${i}:${MOVIL.PORT}`) } : { activo: false });
     if ((m = p.match(/^\/api\/chat\/([\w-]+)$/))) {
       const agent = agents.find((a) => a.id === m[1]);
       if (!agent) return json(res, 404, { error: "Agente no encontrado" });
@@ -184,7 +259,7 @@ const server = http.createServer(async (req, res) => {
         try {
           const r = await runClaude(agent, message, chat.sessionId);
           if (r.sessionId) chat.sessionId = r.sessionId;
-          chat.messages.push({ de: "agente", texto: r.text, error: !r.ok, fecha: new Date().toISOString() });
+          chat.messages.push({ de: "agente", texto: r.text, error: !r.ok, archivos: r.archivos || [], fecha: new Date().toISOString() });
           await saveChat(agent.id, chat);
           return json(res, 200, chat);
         } finally { running.delete(agent.id); }
@@ -199,13 +274,66 @@ const server = http.createServer(async (req, res) => {
 
     if ((m = p.match(/^\/api\/prospectos\/([\w-]+)$/)) && req.method === "PATCH") {
       const { estado } = await readBody(req);
-      const permitidos = ["Aprobado", "Contactado", "Respondió", "Consulta agendada", "Descartado", "Mensaje listo", "Seguimiento listo"];
+      const permitidos = ["Aprobado", "Contactado", "Respondió", "Consulta agendada", "Descartado", "Mensaje listo", "Seguimiento listo", "Cliente"];
       if (!permitidos.includes(estado)) return json(res, 400, { error: "Estado no válido" });
       const r = await notion("PATCH", `pages/${m[1]}`, { properties: { Estado: { select: { name: estado } } } });
       return json(res, r.error ? 500 : 200, r.error ? { error: r.error } : { ok: true });
     }
 
     if (p === "/api/propuestas") return json(res, 200, await listPropuestas());
+
+    // ---------- Eventos en vivo ----------
+    if (p === "/api/eventos") {
+      res.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" });
+      res.write(": hola\n\n"); oyentes.add(res);
+      const ping = setInterval(() => { try { res.write(": ping\n\n"); } catch {} }, 25000);
+      req.on("close", () => { clearInterval(ping); oyentes.delete(res); });
+      return;
+    }
+    // ---------- Medidor de uso ----------
+    if (p === "/api/uso") { try { return json(res, 200, JSON.parse(await readFile(path.join(DATA, "uso.json"), "utf8"))); } catch { return json(res, 200, []); } }
+
+    // ---------- Editar textos de prospectos y contenido ----------
+    if ((m = p.match(/^\/api\/prospectos\/([\w-]+)\/texto$/)) && req.method === "PATCH") {
+      const { campo, texto } = await readBody(req);
+      const prop = { mensaje: "Mensaje propuesto", seguimiento: "Seguimiento" }[campo];
+      if (!prop) return json(res, 400, { error: "Campo no válido" });
+      const r = await notion("PATCH", `pages/${m[1]}`, { properties: { [prop]: { rich_text: [{ text: { content: String(texto).slice(0, 1990) } }] } } });
+      return json(res, r.error ? 500 : 200, r.error ? { error: r.error } : { ok: true });
+    }
+    if ((m = p.match(/^\/api\/contenido\/([\w-]+)\/campos$/)) && req.method === "PATCH") {
+      const b = await readBody(req), props = {};
+      if (typeof b.caption === "string") props.Caption = { rich_text: [{ text: { content: b.caption.slice(0, 1990) } }] };
+      if (typeof b.hashtags === "string") props.Hashtags = { rich_text: [{ text: { content: b.hashtags.slice(0, 1990) } }] };
+      if (/^\d{4}-\d{2}-\d{2}$/.test(b.fecha || "")) props.Fecha = { date: { start: b.fecha } };
+      const r = await notion("PATCH", `pages/${m[1]}`, { properties: props });
+      return json(res, r.error ? 500 : 200, r.error ? { error: r.error } : { ok: true });
+    }
+    // Guardar el diseño editado en la app y volver a exportar las imágenes
+    if ((m = p.match(/^\/api\/contenido-guardar\/([^/]+)$/)) && req.method === "POST") {
+      const base = salidasDe("contenido"), dir = path.resolve(base, m[1]);
+      if (!dir.startsWith(base + path.sep) || !existsSync(path.join(dir, "piezas.html"))) return json(res, 404, { error: "No encontré la pieza" });
+      const { html } = await readBody(req);
+      if (!html || !/class="slide/.test(html)) return json(res, 400, { error: "El diseño vino vacío" });
+      const orig = path.join(dir, "piezas.html");
+      await writeFile(path.join(dir, "piezas.anterior.html"), await readFile(orig));
+      await writeFile(orig, html);
+      const ok = await new Promise((resolve) => {
+        const pr = spawn("python", ["render_piezas.py", orig], { cwd: agentDir(agents.find((a) => a.id === "contenido")), windowsHide: true });
+        let e = ""; pr.stderr.on("data", (d) => (e += d)); pr.on("close", (code) => resolve(code === 0 ? true : e.slice(-400)));
+      });
+      return json(res, ok === true ? 200 : 500, ok === true ? { ok: true } : { error: "No pude exportar las imágenes: " + ok });
+    }
+    // Últimos posts publicados en @kume.agencia (copia guardada en data/ig/)
+    if (p === "/api/feed-real") {
+      const fs = (await readdir(path.join(DATA, "ig")).catch(() => [])).filter((f) => /\.(jpg|png|webp)$/i.test(f)).sort();
+      return json(res, 200, fs.map((f) => `/data-ig/${encodeURIComponent(f)}`));
+    }
+    if ((m = p.match(/^\/data-ig\/([^/]+)$/))) {
+      const base = path.join(DATA, "ig"), file = path.resolve(base, m[1]);
+      if (!file.startsWith(base + path.sep)) { res.writeHead(403); return res.end(); }
+      return sendFile(res, file);
+    }
 
     // ---------- Piloto automático ----------
     if (p === "/api/rutinas") return json(res, 200, await piloto.listar());
@@ -272,9 +400,16 @@ const server = http.createServer(async (req, res) => {
     }
 
     // Archivos de salida de cualquier agente: /files/<agente>/<ruta>
+    // los diseños abiertos desde /files/contenido/<carpeta>/ piden ../../assets/ → /files/assets/
+    if ((m = p.match(/^\/files\/assets\/(.+)$/))) {
+      const base = path.join(agentDir(agents.find((a) => a.id === "contenido")), "assets"), file = path.resolve(base, m[1]);
+      if (!file.startsWith(base)) { res.writeHead(403); return res.end(); }
+      return sendFile(res, file);
+    }
     if ((m = p.match(/^\/files\/([\w-]+)\/(.+)$/)) && agents.some((a) => a.id === m[1])) {
-      const base = salidasDe(m[1]);
-      const file = path.resolve(base, m[2]);
+      // los diseños usan ../../assets/ → se sirven desde la carpeta del agente
+      const base = m[2].startsWith("assets/") ? path.join(agentDir(agents.find((a) => a.id === m[1])), "assets") : salidasDe(m[1]);
+      const file = path.resolve(base, m[2].replace(/^assets\//, ""));
       if (!file.startsWith(base)) { res.writeHead(403); return res.end(); }
       return sendFile(res, file);
     }
@@ -298,4 +433,4 @@ const piloto = createPiloto({ DIR, DATA, agents, agentDir, runClaude, notion, ru
 piloto.iniciar();
 
 server.requestTimeout = 0; // los agentes pueden tardar varios minutos
-server.listen(PORT, "127.0.0.1", () => console.log(`Küme HQ en http://localhost:${PORT}`));
+server.listen(PORT, "127.0.0.1", () => { console.log(`Küme HQ en http://localhost:${PORT}`); MOVIL = iniciarMovil({ DIR, PORT_PRINCIPAL: PORT }); });

@@ -20,6 +20,18 @@ Se abre en su propia ventana en `http://localhost:4747`. Solo funciona en esta c
 
 > ⚠️ El `.env` tiene una clave: no lo compartas ni lo muestres al compartir pantalla.
 
+## Aprobar desde el celu (solo en tu WiFi)
+1. En `app/.env` agregá una línea `MOVIL_PIN=` seguida de 6 números o más (inventalos vos).
+2. Reabrí la app. En ☀️ Hoy aparece la dirección para el celu (algo como `http://192.168.1.5:4748`).
+3. La primera vez, Windows puede preguntar si Node.js puede usar la red: elegí **solo redes privadas**.
+4. En el celu, conectado al mismo WiFi, abrí esa dirección y poné el PIN.
+
+Desde el celu solo se puede ver y aprobar o descartar lo pendiente. El chat con los agentes queda solo en la compu.
+Fuera de tu WiFi no funciona, y después de 5 PIN mal se bloquea 10 minutos.
+
+## Atajos de la Bandeja
+`A` aprobar · `D` descartar o pedir cambios · `E` editar el texto · `→` / `←` siguiente / anterior.
+
 ## Sumar un agente nuevo
 1. Crealo como los otros (Paso 4/5 de la guía): carpeta en `agentes/<nombre>/` con su `CLAUDE.md`.
 2. Agregalo a `agents.json` con nombre, rol, descripción, carpeta, avatar (SVG en `public/avatars/`) y atajos.

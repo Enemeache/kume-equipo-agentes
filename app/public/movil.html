@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1B3A2D">
+<title>Küme HQ · celu</title>
+<link rel="icon" href="avatars/kume.png">
+<style>
+  :root{--verde:#1B3A2D;--verde2:#2D5A42;--crema:#F5EFE0;--crema2:#E9E0CB;--dorado:#C4973A}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--crema);color:var(--verde);min-height:100vh;padding:16px 16px 90px}
+  header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  header img{width:40px;height:40px;border-radius:50%;background:#fff}
+  header b{font-size:18px}header span{font-size:12px;opacity:.7;display:block}
+  .card{background:#fff;border-radius:16px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.07)}
+  .tipo{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--dorado);font-weight:600}
+  h2{font-size:22px;margin:4px 0 6px}
+  .meta{font-size:12.5px;opacity:.75;margin-bottom:8px}.meta a{color:var(--verde2)}
+  .msg{white-space:pre-wrap;background:var(--crema);border-radius:10px;padding:12px;font-size:14px;line-height:1.5}
+  .imgs{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;margin:8px 0}
+  .imgs img{width:78%;flex:none;border-radius:8px;scroll-snap-align:center}
+  .acc{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(245,239,224,.96);border-top:1px solid var(--crema2)}
+  button{border:0;border-radius:12px;padding:14px 10px;font-size:15px;font-weight:600;font-family:inherit}
+  .si{background:var(--dorado);color:var(--verde)}.no{background:#fff;color:#A33;border:1px solid #E5C5C5}.salto{background:#fff;color:var(--verde);border:1px solid var(--crema2)}
+  .prog{font-size:12px;opacity:.7;margin-bottom:8px}
+  .login{max-width:320px;margin:20vh auto 0;text-align:center}
+  .login input{width:100%;font-size:28px;letter-spacing:.4em;text-align:center;padding:12px;border-radius:12px;border:1px solid var(--crema2);margin:16px 0}
+  .login button{width:100%;background:var(--verde);color:var(--crema)}
+  .err{color:#A33;font-size:13px;min-height:18px}
+  .vacio{text-align:center;padding:60px 10px}.vacio div{font-size:48px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let ITEMS = [], I = 0;
+
+function login(msg = "") {
+  $("#app").innerHTML = `<div class="login"><img src="avatars/kume.png" width="72" style="border-radius:50%"><h2>Küme HQ</h2><p class="meta">Ingresá el PIN de la compu</p>
+    <input id="pin" inputmode="numeric" autocomplete="one-time-code" maxlength="12"><div class="err">${esc(msg)}</div><button onclick="entrar()">Entrar</button></div>`;
+  $("#pin").focus(); $("#pin").onkeydown = (e) => e.key === "Enter" && entrar();
+}
+async function entrar() {
+  const r = await fetch("/m/login", { method: "POST", body: JSON.stringify({ pin: $("#pin").value }) });
+  if (r.ok) cargar(); else login((await r.json()).error);
+}
+async function api(url, opt) { const r = await fetch(url, opt); if (r.status === 401) { login(); throw 0; } return r.json(); }
+async function cargar() {
+  const [p, c] = await Promise.all([api("/api/prospectos"), api("/api/contenido")]);
+  const pros = p.items || [], cont = c.items || [];
+  ITEMS = [
+    ...pros.filter((x) => x.estado === "Mensaje listo").map((x) => ({ tipo: "prospecto", x })),
+    ...pros.filter((x) => x.estado === "Seguimiento listo").map((x) => ({ tipo: "seguimiento", x })),
+    ...cont.filter((x) => x.estado === "Para aprobar").map((x) => ({ tipo: "contenido", x })),
+  ];
+  I = 0; pintar();
+}
+function pintar() {
+  const head = `<header><img src="avatars/kume.png"><div><b>Küme HQ</b><span>Bandeja · solo en tu WiFi</span></div></header>`;
+  if (I >= ITEMS.length) { $("#app").innerHTML = head + `<div class="vacio"><div>🎉</div><h2>Nada pendiente</h2><p class="meta">Cuando el equipo deje algo, aparece acá.</p><button class="salto" onclick="cargar()">Actualizar</button></div>`; return; }
+  const it = ITEMS[I], x = it.x;
+  let cuerpo, si, no;
+  if (it.tipo === "contenido") {
+    cuerpo = `<div class="tipo">Contenido · Pam · ${esc(x.fecha)}</div><h2>${esc(x.pieza)}</h2>
+      ${x.imagenes.length ? `<div class="imgs">${x.imagenes.map((s) => `<img src="${s}" loading="lazy" alt="">`).join("")}</div>` : `<div class="msg">${esc(x.guion)}</div>`}
+      <div class="msg" style="margin-top:8px">${esc(x.caption)}\n\n${esc(x.hashtags)}</div>`;
+    si = ["Aprobado", "✅ Aprobar"]; no = ["Borrador", "✏️ Cambios"];
+  } else {
+    const seg = it.tipo === "seguimiento";
+    cuerpo = `<div class="tipo">${seg ? "2º mensaje · Andy" : "Prospecto · Dwight"}</div><h2>${esc(x.negocio)}</h2>
+      <div class="meta">${esc(x.rubro)} · ${esc(x.zona)} ${x.instagram ? `· <a href="${esc(x.instagram)}" target="_blank">Instagram</a>` : ""}</div>
+      <p class="meta">${esc(x.oportunidad)}</p><div class="msg">${esc(seg ? x.seguimiento : x.mensaje)}</div>`;
+    si = seg ? ["Contactado", "📋 Copiar y enviado"] : ["Aprobado", "✅ Aprobar"]; no = ["Descartado", "🗑️ Descartar"];
+  }
+  $("#app").innerHTML = head + `<div class="prog">${I + 1} de ${ITEMS.length}</div><div class="card">${cuerpo}</div>
+    <div class="acc"><button class="no" onclick="hacer('${no[0]}')">${no[1]}</button><button class="salto" onclick="I++;pintar()">Saltar</button><button class="si" onclick="hacer('${si[0]}')">${si[1]}</button></div>`;
+  scrollTo(0, 0);
+}
+async function hacer(estado) {
+  const it = ITEMS[I];
+  if (it.tipo === "seguimiento" && estado === "Contactado") navigator.clipboard?.writeText(it.x.seguimiento).catch(() => {});
+  const url = (it.tipo === "contenido" ? "/api/contenido/" : "/api/prospectos/") + it.x.id;
+  const r = await api(url, { method: "PATCH", body: JSON.stringify({ estado }) });
+  if (r.error) return alert(r.error);
+  ITEMS.splice(I, 1); pintar();
+}
+cargar().catch(() => {});
+</script>
+</body>
+</html>

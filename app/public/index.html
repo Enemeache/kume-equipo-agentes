@@ -384,7 +384,7 @@ async function resetChat() {
 }
 
 // ---------- Prospectos (Notion) ----------
-const ESTADOS = ["Mensaje listo", "Seguimiento listo", "Aprobado", "Contactado", "Respondió", "Consulta agendada", "Descartado"];
+const ESTADOS = ["Mensaje listo", "Seguimiento listo", "Aprobado", "Contactado", "Respondió", "Consulta agendada", "Cliente", "Descartado"];
 async function loadProspectos() {
   const r = await (await fetch("/api/prospectos")).json();
   if (r.error) {
@@ -428,7 +428,8 @@ function acciones(p) {
     case "Aprobado": return copiar + b("Contactado", "Ya lo envié") + diag;
     case "Contactado": return b("Respondió", "Respondió") + diag + b("Descartado", "No respondió", "btn red");
     case "Respondió": return b("Consulta agendada", "Agendamos consulta", "btn gold") + diag;
-    case "Consulta agendada": return `<button class="btn" onclick="pedirPropuesta('${p.id}')">Pasarle a Jim</button>`;
+    case "Consulta agendada": return `<button class="btn" onclick="pedirPropuesta('${p.id}')">Pasarle a Jim</button>` + b("Cliente", "🎉 ¡Cerramos!", "btn gold");
+    case "Cliente": return `<span class="pill gold">Cliente 🎉</span>`;
     default: return b("Mensaje listo", "Recuperar", "btn ghost");
   }
 }
@@ -578,6 +579,7 @@ async function loadReportes() {
 
 loadAgents().then(() => window.startOffice && window.startOffice()); loadProspectos(); loadPropuestas(); loadContenido();
 </script>
+<script src="mejoras.js"></script>
 <script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
 <script type="module">
   import { createOffice } from "./oficina3d.js";
@@ -587,11 +589,13 @@ loadAgents().then(() => window.startOffice && window.startOffice()); loadProspec
     const of = createOffice(document.getElementById("scene"), {
       agents: AGENTS.map((a) => ({ id: a.id, nombre: a.nombre, rol: a.rol })),
       onAgent: (id) => openChat(id),
-      onInbox: () => show("aprobar"),
+      onInbox: () => show("bandeja"),
+      onHover: (id, x, y) => window.KUMEUX && KUMEUX.mostrarFicha(id, x, y),
       shiftPx: () => (innerWidth > 820 ? 130 : 0),
     });
     window.OF = of;
     window.onOfficeReady(of);
+    window.KUMEUX && KUMEUX.alListarOficina(of);
   }
   window.startOffice = start;
   start();

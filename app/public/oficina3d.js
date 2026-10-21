@@ -183,7 +183,7 @@ export function createOffice(el, opts = {}) {
     camera.updateProjectionMatrix();
   }
 
-  scene.add(new THREE.HemisphereLight(0xffffff, night ? 0x223028 : 0xb9a98a, night ? 0.55 : 0.95));
+  const hemi = new THREE.HemisphereLight(0xffffff, night ? 0x223028 : 0xb9a98a, night ? 0.55 : 0.95); scene.add(hemi);
   const sun = new THREE.DirectionalLight(night ? 0xbcd0ff : 0xfff1d6, night ? 0.55 : 1.5);
   sun.position.set(12, 22, 8); sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
@@ -544,6 +544,7 @@ export function createOffice(el, opts = {}) {
       return;
     }
     const u = hit(e); const id = u?.agentId && u.agentId !== "vos" ? u.agentId : null;
+    if (id !== hoverId) opts.onHover && opts.onHover(id, e.clientX, e.clientY);
     hoverId = id; cv.style.cursor = id || u?.inbox ? "pointer" : "grab";
   });
   cv.addEventListener("pointerup", (e) => {
@@ -570,5 +571,27 @@ export function createOffice(el, opts = {}) {
     r.render(s, c); const url = r.domElement.toDataURL("image/png"); r.dispose(); return url;
   }
 
-  return { setBusy, setInbox, say, portrait, people };
+  // ---------- Día / noche ----------
+  function setNoche(n) {
+    scene.background.set(n ? "#18241E" : "#E7DFCB");
+    hemi.intensity = n ? 0.55 : 0.95; hemi.groundColor.set(n ? 0x223028 : 0xb9a98a);
+    sun.color.set(n ? 0xbcd0ff : 0xfff1d6); sun.intensity = n ? 0.55 : 1.5;
+    glass.color.set(n ? "#22365A" : "#BFE0EA"); glass.emissive.set(n ? "#0E1A33" : "#8FC6D8"); glass.emissiveIntensity = n ? 0.6 : 0.35;
+    return n;
+  }
+  // ---------- Reunión: todos al espacio libre junto a la cocina ----------
+  function reunion(segundos = 14) {
+    const ids = Object.keys(people).filter((k) => k !== "vos");
+    const centro = [3.2, 5.6];
+    ids.forEach((id, i) => {
+      const p = people[id]; if (p.busy) return;
+      const ang = (i / ids.length) * Math.PI * 2, r = 1.6 + (i % 2) * 0.8;
+      const pos = [centro[0] + Math.cos(ang) * r, centro[1] + Math.sin(ang) * r * 0.7];
+      const spot = { pos, face: Math.atan2(centro[0] - pos[0], centro[1] - pos[1]), door: [pos[0], CZ], inner: [[pos[0], CZ2]] };
+      SPOTS["r_" + id] = spot;
+      setTimeout(() => go(p, spot, "r_" + id, () => { p.wantYaw = spot.face; p.state = "stay"; p.stay = segundos; if (Math.random() < 0.5) say(id, pick(["📣 ¡Reunión!", "📝 Anoto", "👍", "🙋 Tengo una idea", "☕ ¿Traigo café?"]), 3); }), i * 250);
+    });
+    say("vos", "📣 ¡Reunión de equipo!", 3);
+  }
+  return { setBusy, setInbox, say, portrait, people, setNoche, reunion, esNoche: night };
 }
