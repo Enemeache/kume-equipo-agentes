@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Carrusel — tu bio de Instagram no dice qué vendés (estilo feed Küme)</title>
+<link rel="stylesheet" href="../../assets/estilo-ig.css">
+<script src="../../assets/garabatos.js"></script>
+<style>
+  /* perfil inventado dentro del celu (bio genérica, no es una cuenta real) */
+  .perfil { position: absolute; inset: 0; background: #fff; color: #222; padding: 70px 26px 0; font-family: "Poppins", sans-serif; }
+  .perfil .avatar { width: 96px; height: 96px; border-radius: 50%; background: #E3A83A; margin: 0 auto 18px; }
+  .perfil .nombre { text-align: center; font-weight: 700; font-size: 26px; }
+  .perfil .bio { text-align: center; font-size: 21px; line-height: 1.4; color: #555; margin-top: 10px; }
+  .perfil .link { text-align: center; font-size: 19px; color: #3a6ea5; margin-top: 10px; }
+  .perfil .grilla { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 34px -26px 0; }
+  .perfil .grilla span { aspect-ratio: 1; background: #D9D3C7; }
+  .error404 { background: #F4F1EC; color: #10241B; display: grid; place-items: center; text-align: center; font-family: "Fredoka", sans-serif; }
+  .error404 b { display: block; font-size: 150px; line-height: 1; }
+  .error404 span { font-family: "Poppins", sans-serif; font-size: 28px; color: #6B6B6B; }
+</style>
+</head>
+<body>
+
+<!-- 1 · PORTADA (estilo foto) -->
+<section class="slide foto" data-foto="../../assets/fotos/escritorio-laptop.jpg">
+  <div class="pre" style="top:150px">Leyeron tu bio y…</div>
+  <div class="titulo" style="top:230px">ni idea <em>qué vendés.</em></div>
+  <div class="celu" style="left:390px;top:480px;width:300px;height:600px;transform:rotate(4deg)"><div class="perfil"><div class="avatar"></div><div class="nombre">Juli ✨</div><div class="bio">Apasionada por lo que hago 💛<br>Soñar · Crear · Brillar</div><div class="link">🔗 mi-link/…</div><div class="grilla"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
+  <span class="garabato" data-g="exclamacion" style="left:150px;top:520px;width:160px;transform:rotate(-14deg)"></span>
+  <span class="garabato" data-g="espiral" style="left:780px;top:880px;width:180px"></span>
+  <span class="garabato" data-g="destellos" style="left:800px;top:500px;width:140px"></span>
+  <div class="desliza">Deslizá →</div>
+  <img class="logo-chico" src="../../assets/logo-crema.png" alt="küme agencia creativa">
+</section>
+
+<!-- 2 · ERROR 1 (estilo claro) -->
+<section class="slide claro">
+  <img class="logo-verde" src="../../assets/palabra-verde.png" alt="küme">
+  <img class="ojitos" src="../../assets/logo-ojos.png" alt="" style="left:455px;top:250px">
+  <div class="etiqueta" style="top:410px">Error 1</div>
+  <div class="titulo-verde" style="top:470px;font-size:84px">“Apasionada por lo que hago”</div>
+  <div style="left:0;right:0;top:770px;text-align:center"><span class="pildora" style="transform:rotate(-3deg)">¿y entonces?</span></div>
+  <div class="texto-gris" style="top:930px">Lindo, pero no dice nada. <b>Primera línea: qué hacés y para quién.</b></div>
+  <div class="desliza">Deslizá →</div><div class="contador">1/5</div>
+</section>
+
+<!-- 3 · ERROR 2 (estilo foto) -->
+<section class="slide foto" data-foto="../../assets/fotos/escritorio-planta.jpg">
+  <div class="etiqueta" style="top:150px;color:#fff">Error 2</div>
+  <div class="titulo" style="top:220px">Tu nombre no tiene <em>palabra clave</em></div>
+  <span class="garabato" data-g="subrayado" style="left:300px;top:520px;width:480px"></span>
+  <span class="garabato" data-g="hashtag" style="left:140px;top:640px;width:120px;transform:rotate(-8deg)"></span>
+  <span class="garabato" data-g="flechaCurva" style="left:760px;top:620px;width:190px;transform:scaleX(-1)"></span>
+  <div class="sub" style="top:820px">El nombre aparece en el buscador. “Juli&nbsp;✨” no&nbsp;se&nbsp;encuentra.<br><b>“Juli · Tortas en Palermo”, sí.</b></div>
+  <div class="contador">2/5</div>
+  <img class="logo-chico" src="../../assets/logo-crema.png" alt="küme agencia creativa">
+</section>
+
+<!-- 4 · ERROR 3 (estilo claro crema) -->
+<section class="slide claro crema">
+  <img class="logo-verde centro" src="../../assets/palabra-verde.png" alt="küme">
+  <img class="ojitos" src="../../assets/logo-ojos.png" alt="" style="left:455px;top:250px">
+  <div class="etiqueta" style="top:410px">Error 3</div>
+  <div class="titulo-verde" style="top:480px">No dice dónde estás</div>
+  <div style="left:0;right:0;top:770px;text-align:center"><span class="pildora" style="transform:rotate(3deg)">tu barrio</span></div>
+  <div class="texto-gris" style="top:950px">Si atendés en un barrio, ponelo. <b>Al cliente local le ahorrás la pregunta.</b></div>
+  <div class="desliza">Deslizá →</div><div class="contador">3/5</div>
+</section>
+
+<!-- 5 · ERROR 4 (estilo foto con recorte) -->
+<section class="slide foto" data-foto="../../assets/fotos/escritorio-laptop.jpg" data-focus="30% 50%">
+  <div class="etiqueta" style="top:150px;color:#fff">Error 4</div>
+  <div class="titulo" style="top:220px">El link <em>no lleva a nada</em></div>
+  <div class="recorte error404" style="left:310px;top:480px;width:460px;height:330px;transform:rotate(-3deg)"><div><b>404</b><span>acá no hay nada 🙃</span></div></div>
+  <span class="garabato" data-g="flecha" style="left:90px;top:640px;width:180px;transform:rotate(-12deg)"></span>
+  <span class="garabato" data-g="exclamacion" style="left:800px;top:450px;width:130px;transform:rotate(12deg)"></span>
+  <div class="sub" style="top:900px">Probalo vos desde el celu. <b>Que lleve directo a WhatsApp, a reservar o a comprar.</b></div>
+  <div class="contador">4/5</div>
+  <img class="logo-chico" src="../../assets/logo-crema.png" alt="küme agencia creativa">
+</section>
+
+<!-- 6 · ERROR 5 (estilo claro con píldoras) -->
+<section class="slide claro">
+  <img class="logo-verde" src="../../assets/palabra-verde.png" alt="küme">
+  <img class="ojitos" src="../../assets/logo-ojos.png" alt="" style="left:455px;top:250px">
+  <div class="etiqueta" style="top:410px">Error 5</div>
+  <div class="titulo-verde" style="top:480px">No le pedís nada a nadie</div>
+  <div style="left:0;right:0;top:740px;display:flex;flex-direction:column;align-items:center;gap:22px">
+    <span class="pildora" style="transform:rotate(-4deg) translateX(-60px)">“Pedí por DM”</span>
+    <span class="pildora" style="transform:rotate(3deg) translateX(70px)">“Reservá acá”</span>
+  </div>
+  <div class="texto-gris" style="top:1040px">Cerrá con un pedido claro. <b>Si no pedís, no te piden.</b></div>
+  <div class="desliza">Deslizá →</div><div class="contador">5/5</div>
+</section>
+
+<!-- 7 · CIERRE -->
+<section class="slide foto" data-foto="../../assets/fotos/escritorio-planta.jpg" data-focus="70% 50%">
+  <div class="pre" style="top:300px">Bio leeegendaria en 5 pasos ✨</div>
+  <div class="titulo" style="top:390px">¿Cuántas tenía <em>la tuya?</em></div>
+  <div class="sub" style="top:680px">Comentá <b>BIO</b> 👇<br>y te decimos qué cambiarle.</div>
+  <span class="garabato" data-g="flechaCurva" style="left:720px;top:820px;width:190px;transform:scaleX(-1)"></span>
+  <span class="garabato" data-g="rulo" style="left:420px;top:150px;width:240px"></span>
+  <span class="garabato" data-g="destellos" style="left:150px;top:900px;width:150px"></span>
+  <img class="logo-chico" src="../../assets/logo-crema.png" alt="küme agencia creativa" style="width:260px">
+</section>
+
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Carrusel — qué pasa cuando nos escribís (estilo feed Küme)</title>
+<link rel="stylesheet" href="../../assets/estilo-ig.css">
+<script src="../../assets/garabatos.js"></script>
+<style>
+  /* chat dibujado dentro del celu (conversación de ejemplo) */
+  .chat { position: absolute; inset: 0; background: #EFE9DE; padding: 90px 18px 0; display: flex; flex-direction: column; gap: 14px; font-family: "Poppins", sans-serif; font-size: 21px; line-height: 1.35; }
+  .chat .cab { position: absolute; top: 0; left: 0; right: 0; height: 70px; background: #1B3A2D; color: #fff; font-weight: 600; font-size: 22px; padding: 20px 22px; }
+  .chat .yo, .chat .ellos { max-width: 80%; padding: 10px 16px; border-radius: 18px; color: #222; }
+  .chat .yo { align-self: flex-end; background: #D6E9C8; border-bottom-right-radius: 4px; }
+  .chat .ellos { align-self: flex-start; background: #fff; border-bottom-left-radius: 4px; }
+  .num-grande { left: 0; right: 0; text-align: center; font-family: "Fredoka", sans-serif; font-weight: 700; font-size: 220px; line-height: 1; color: var(--dorado); }
+</style>
+</head>
+<body>
+
+<!-- 1 · PORTADA (estilo foto) -->
+<section class="slide foto" data-foto="../../assets/fotos/escritorio-laptop.jpg">
+  <div class="pre" style="top:150px">Nos escribís por WhatsApp.</div>
+  <div class="titulo" style="top:230px"><em>¿Y después?</em></div>
+  <div class="celu" style="left:390px;top:420px;width:300px;height:600px;transform:rotate(-4deg)">
+    <div class="chat"><div class="cab">küme.</div><div class="yo">Hola! Vi su perfil y quería consultar 👋</div><div class="ellos">¡Hola! ¿Cómo te va? Contanos qué necesitás 🙌</div><div class="yo">Mmm… ¿y cómo sigue esto?</div></div>
+  </div>
+  <span class="garabato" data-g="rayitos" style="left:740px;top:400px;width:150px;transform:rotate(10deg)"></span>
+  <span class="garabato" data-g="flechaCurva" style="left:120px;top:620px;width:210px"></span>
+  <span class="garabato" data-g="destellos" style="left:780px;top:900px;width:150px"></span>
+  <div class="desliza">Deslizá →</div>
+  <img class="logo-chico" src="../../assets/logo-crema.png" alt="küme agencia creativa">
+</section>
+
+<!-- 2 · PASO 1 (estilo claro) -->
+<section class="slide claro">
+  <img class="logo-verde" src="../../assets/palabra-verde.png" alt="küme">
+  <img class="ojitos" src="../../assets/logo-ojos.png" alt="" style="left:455px;top:280px">
+  <div class="etiqueta" style="top:440px">Paso 1</div>
+  <div class="titulo-verde" style="top:510px">Primero, charlamos</div>
+  <div style="left:0;right:0;top:790px;text-align:center"><span class="pildora" style="transform:rotate(-3deg)">gratis</span></div>
+  <div class="texto-gris" style="top:950px">Por WhatsApp o videollamada. <b>Nos contás qué te pasa, sin compromiso.</b></div>
+  <div class="desliza">Deslizá →</div><div class="contador">1/6</div>
+</section>
+
+<!-- 3 · PASO 2 (estilo foto) -->
+<section class="slide foto" data-foto="../../assets/fotos/escritorio-planta.jpg">
+  <div class="etiqueta" style="top:150px;color:#fff">Paso 2</div>
+  <div class="titulo" style="top:220px">Después, el <em>diagnóstico</em></div>
+  <span class="garabato" data-g="subrayado" style="left:300px;top:440px;width:480px"></span>
+  <div class="recorte" style="left:410px;top:520px;width:260px;height:260px;transform:rotate(-5deg);display:grid;place-items:center;font-size:150px">🔍</div>
+  <span class="garabato" data-g="flecha" style="left:150px;top:610px;width:190px;transform:rotate(-10deg)"></span>
+  <span class="garabato" data-g="destellos" style="left:720px;top:500px;width:140px"></span>
+  <div class="sub" style="top:880px">Modo detective: miramos tu negocio, tu cliente real y <b>dónde estás parado hoy.</b></div>
+  <div class="contador">2/6</div>
+  <img class="logo-chico" src="../../assets/logo-crema.png" alt="küme agencia creativa">
+</section>
+
+<!-- 4 · PASO 3 (estilo claro crema) -->
+<section class="slide claro crema">
+  <img class="logo-verde centro" src="../../assets/palabra-verde.png" alt="küme">
+  <img class="ojitos" src="../../assets/logo-ojos.png" alt="" style="left:455px;top:250px">
+  <div class="etiqueta" style="top:410px">Paso 3</div>
+  <div class="titulo-verde" style="top:480px">Te proponemos algo concreto</div>
+  <div style="left:0;right:0;top:740px;display:flex;flex-direction:column;align-items:center;gap:22px">
+    <span class="pildora" style="transform:rotate(-4deg) translateX(-60px)">qué hacemos</span>
+    <span class="pildora" style="transform:rotate(3deg) translateX(70px)">cuánto sale</span>
+  </div>
+  <div class="texto-gris" style="top:1050px"><b>Sin humo ni letra chica.</b></div>
+  <div class="desliza">Deslizá →</div><div class="contador">3/6</div>
+</section>
+
+<!-- 5 · PASO 4 (estilo foto con recorte) -->
+<section class="slide foto" data-foto="../../assets/fotos/escritorio-laptop.jpg" data-focus="30% 50%">
+  <div class="etiqueta" style="top:150px;color:#fff">Paso 4</div>
+  <div class="titulo" style="top:220px">Decís que sí y <em>arrancamos</em></div>
+  <div class="recorte" style="left:290px;top:500px;width:500px;height:340px;transform:rotate(3deg)"><img src="../../assets/fotos/escritorio-planta.jpg" alt=""></div>
+  <span class="garabato" data-g="destello" style="left:800px;top:450px;width:110px"></span>
+  <span class="garabato" data-g="espiral" style="left:100px;top:620px;width:160px"></span>
+  <div class="sub" style="top:900px"><b>En menos de una semana</b> ya estamos laburando, con estrategia y métricas claras.</div>
+  <div class="contador">4/6</div>
+  <img class="logo-chico" src="../../assets/logo-crema.png" alt="küme agencia creativa">
+</section>
+
+<!-- 6 · PASO 5 (estilo claro con píldoras) -->
+<section class="slide claro">
+  <img class="logo-verde" src="../../assets/palabra-verde.png" alt="küme">
+  <img class="ojitos" src="../../assets/logo-ojos.png" alt="" style="left:455px;top:230px">
+  <div class="etiqueta" style="top:390px">Paso 5</div>
+  <div style="left:0;right:0;top:470px;display:flex;flex-direction:column;align-items:center;gap:22px">
+    <span class="pildora" style="transform:rotate(-4deg) translateX(-80px)">hacemos</span>
+    <span class="pildora" style="transform:rotate(3deg) translateX(40px)">aprobás</span>
+    <span class="pildora" style="transform:rotate(-2deg) translateX(110px)">ajustamos</span>
+  </div>
+  <div class="texto-gris" style="top:880px">Ves todo antes de que salga. <b>Las revisiones están incluidas.</b><br>(Y si hace falta… ¡PIVOT!)</div>
+  <div class="desliza">Deslizá →</div><div class="contador">5/6</div>
+</section>
+
+<!-- 7 · PASO 6 (estilo foto) -->
+<section class="slide foto" data-foto="../../assets/fotos/lago.jpg">
+  <div class="etiqueta" style="top:150px;color:#fff">Paso 6</div>
+  <div class="titulo" style="top:220px">Y todos los meses, <em>medimos</em></div>
+  <span class="garabato" data-g="rayitos" style="left:780px;top:480px;width:140px"></span>
+  <span class="garabato" data-g="flechaCurva" style="left:140px;top:560px;width:200px"></span>
+  <div class="sub" style="top:780px">Qué funcionó, qué no y <b>qué cambiamos para el mes que viene.</b></div>
+  <div class="contador">6/6</div>
+  <img class="logo-chico" src="../../assets/logo-crema.png" alt="küme agencia creativa">
+</section>
+
+<!-- 8 · CIERRE -->
+<section class="slide foto" data-foto="../../assets/fotos/escritorio-planta.jpg" data-focus="70% 50%">
+  <div class="pre" style="top:300px">Sin call center ☕</div>
+  <div class="titulo" style="top:380px">Somos dos. <em>Hablás con nosotros.</em></div>
+  <div class="sub" style="top:740px">Escribinos <b>HOLA</b> por DM<br>y arrancamos por el paso 1.</div>
+  <span class="garabato" data-g="flechaCurva" style="left:740px;top:880px;width:190px;transform:scaleX(-1)"></span>
+  <span class="garabato" data-g="rulo" style="left:420px;top:150px;width:240px"></span>
+  <span class="garabato" data-g="corazon" style="left:150px;top:900px;width:130px;transform:rotate(-10deg)"></span>
+  <img class="logo-chico" src="../../assets/logo-crema.png" alt="küme agencia creativa" style="width:260px">
+</section>
+
+</body>
+</html>
