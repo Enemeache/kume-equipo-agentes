@@ -103,7 +103,26 @@
   .tabs button{background:none;border:1px solid rgba(27,58,45,.2);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--verde)}
   .tabs button.on{background:var(--verde);color:var(--crema)}
   .thumbs{display:flex;gap:6px;overflow-x:auto;margin-top:12px;padding-bottom:4px}
-  .thumbs img{height:120px;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+  .thumbs img{height:120px;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.12);display:block}
+  .thumb{border:0;padding:0;background:none;cursor:zoom-in;border-radius:4px;transition:transform .15s}
+  .thumb:hover{transform:translateY(-2px)}
+  /* Visor de vista previa (como en Instagram) */
+  .visor{position:fixed;inset:0;z-index:30;background:rgba(10,18,14,.88);display:none;align-items:center;justify-content:center;gap:28px;padding:24px}
+  .visor.on{display:flex}
+  .visor .marco{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.45);width:min(520px,calc((100vh - 170px) * .8),92vw)}
+  .visor .cab{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:13px;font-weight:500;color:#111}
+  .visor .cab img{width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid #eee}
+  .visor .cab span{margin-left:auto;color:#777;font-weight:400}
+  .visor .slide-img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;background:#eee;user-select:none}
+  .visor .puntos{display:flex;justify-content:center;gap:5px;padding:10px}
+  .visor .puntos i{width:6px;height:6px;border-radius:50%;background:#cfcfcf;display:block}
+  .visor .puntos i.on{background:#0095f6}
+  .visor .pie{padding:0 14px 12px;font-size:12.5px;line-height:1.45;color:#222;max-height:120px;overflow:auto;white-space:pre-wrap}
+  .visor .flecha{width:52px;height:52px;border-radius:50%;border:0;background:rgba(255,255,255,.92);font-size:24px;color:#1B3A2D;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+  .visor .flecha:disabled{opacity:.25;cursor:default}
+  .visor .acciones{position:absolute;top:18px;right:18px;display:flex;gap:8px}
+  .visor .acciones a,.visor .acciones button{background:rgba(255,255,255,.95);color:#1B3A2D;border:0;border-radius:20px;padding:8px 14px;font-size:13px;text-decoration:none;font-family:inherit}
+  @media (max-width:820px){.visor{gap:8px;padding:12px}.visor .flecha{width:40px;height:40px;font-size:18px}}
   /* Propuestas */
   table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden}
   th,td{text-align:left;padding:14px 18px;font-size:13px;border-bottom:1px solid var(--crema2)}
@@ -221,6 +240,18 @@
     <table><thead><tr><th>Cliente</th><th>Mes</th><th>Estado</th><th>Archivos</th></tr></thead><tbody id="reportes"></tbody></table>
   </section>
 </main>
+
+<div class="visor" id="visor" onclick="if(event.target===this)cerrarVista()">
+  <div class="acciones"><a id="v-descargar" download>⬇️ Descargar esta</a><a id="v-zip" download>⬇️ Todo (ZIP)</a><button onclick="cerrarVista()">✕ Cerrar</button></div>
+  <button class="flecha" id="v-prev" onclick="moverVista(-1)" aria-label="Slide anterior">‹</button>
+  <div class="marco">
+    <div class="cab"><img src="avatars/kume.png" id="v-avatar" alt=""><b>kume.agencia</b><span id="v-cont">1/7</span></div>
+    <img class="slide-img" id="v-img" alt="">
+    <div class="puntos" id="v-puntos"></div>
+    <div class="pie" id="v-pie"></div>
+  </div>
+  <button class="flecha" id="v-next" onclick="moverVista(1)" aria-label="Slide siguiente">›</button>
+</div>
 
 <div class="chat-wrap" id="chat">
   <div class="chat-head">
@@ -458,12 +489,13 @@ async function loadContenido() {
         <div class="meta">${esc(fechaLinda(c.fecha))} · ${esc(c.formato)}</div>
         <h3>${esc(c.pieza)}</h3>
         <span class="pill gold">${esc(c.pilar)}</span>
-        ${c.imagenes.length ? `<div class="thumbs">${c.imagenes.map((src, i) => `<a href="${src}" download="${esc(c.carpeta)}-${String(i + 1).padStart(2, "0")}.png" title="Descargar esta imagen"><img src="${src}" alt="Slide ${i + 1}"></a>`).join("")}</div>
+        ${c.imagenes.length ? `<div class="thumbs">${c.imagenes.map((src, i) => `<button type="button" class="thumb" onclick="abrirVista('${c.id}', ${i})" title="Ver en grande"><img src="${src}" alt="Slide ${i + 1}"></button>`).join("")}</div>
         <div class="actions" style="margin-top:10px">
           <a class="btn gold" style="text-decoration:none" href="/api/contenido-zip/${encodeURIComponent(c.carpeta)}" download>⬇️ Descargar ${c.formato === "Carrusel" ? "carrusel" : "imágenes"} (${c.imagenes.length})</a>
+          <button class="btn" onclick="abrirVista('${c.id}', 0)">👁️ Vista previa</button>
           <button class="btn ghost" onclick="abrirCarpeta('${esc(c.carpeta)}')">📂 Abrir carpeta</button>
         </div>
-        <div class="meta" style="margin-top:6px">Tocá una imagen para bajarla sola. El ZIP va a tu carpeta de Descargas.</div>` : ""}
+        <div class="meta" style="margin-top:6px">Tocá una imagen para verla en grande. El ZIP va a tu carpeta de Descargas.</div>` : ""}
         <p class="op" style="margin-top:8px;white-space:pre-wrap">${esc(c.guion)}</p>
         <div class="meta" style="margin-top:8px"><a href="${esc(c.url)}" target="_blank">Ficha en Notion ↗</a></div>
       </div>
@@ -492,6 +524,39 @@ async function setEstadoCont(id, estado) {
   if (!r.ok) return alert((await r.json()).error);
   loadContenido();
 }
+// ---------- Vista previa ----------
+let VISTA = null;
+function abrirVista(id, i) {
+  const c = CONT.find((x) => x.id === id); if (!c || !c.imagenes.length) return;
+  VISTA = { c, i };
+  $("#v-pie").innerHTML = `<b>kume.agencia</b> ${esc(c.caption)}${c.hashtags ? "<br><br>" + esc(c.hashtags) : ""}`;
+  $("#v-zip").href = `/api/contenido-zip/${encodeURIComponent(c.carpeta)}`;
+  $("#v-zip").style.display = c.imagenes.length > 1 ? "" : "none";
+  $("#visor").classList.add("on"); pintarVista();
+}
+function pintarVista() {
+  const { c, i } = VISTA, n = c.imagenes.length;
+  $("#v-img").src = c.imagenes[i];
+  $("#v-cont").textContent = `${i + 1}/${n}`;
+  $("#v-puntos").innerHTML = n > 1 ? c.imagenes.map((_, k) => `<i class="${k === i ? "on" : ""}"></i>`).join("") : "";
+  $("#v-prev").disabled = i === 0; $("#v-next").disabled = i === n - 1;
+  $("#v-descargar").href = c.imagenes[i]; $("#v-descargar").download = `${c.carpeta}-${String(i + 1).padStart(2, "0")}.png`;
+  // precarga la siguiente para que pase sin demora
+  if (i + 1 < n) new Image().src = c.imagenes[i + 1];
+}
+function moverVista(d) { if (!VISTA) return; const n = VISTA.c.imagenes.length; VISTA.i = Math.max(0, Math.min(n - 1, VISTA.i + d)); pintarVista(); }
+function cerrarVista() { $("#visor").classList.remove("on"); VISTA = null; }
+document.addEventListener("keydown", (e) => {
+  if (!VISTA) return;
+  if (e.key === "ArrowRight") moverVista(1);
+  if (e.key === "ArrowLeft") moverVista(-1);
+  if (e.key === "Escape") cerrarVista();
+});
+(() => { let x0 = null; const img = () => $("#v-img");
+  document.addEventListener("touchstart", (e) => { if (VISTA && e.target === img()) x0 = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener("touchend", (e) => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40) moverVista(dx < 0 ? 1 : -1); x0 = null; });
+})();
+
 async function abrirCarpeta(carpeta) {
   const r = await fetch(`/api/abrir-carpeta/contenido/${encodeURIComponent(carpeta)}`, { method: "POST" });
   if (!r.ok) alert((await r.json()).error);
