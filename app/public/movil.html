@@ -38,14 +38,22 @@ const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 let ITEMS = [], I = 0;
 
+let enLogin = false;
 function login(msg = "") {
-  $("#app").innerHTML = `<div class="login"><img src="avatars/kume.png" width="72" style="border-radius:50%"><h2>Küme HQ</h2><p class="meta">Ingresá el PIN de la compu</p>
-    <input id="pin" inputmode="numeric" autocomplete="one-time-code" maxlength="12"><div class="err">${esc(msg)}</div><button onclick="entrar()">Entrar</button></div>`;
-  $("#pin").focus(); $("#pin").onkeydown = (e) => e.key === "Enter" && entrar();
+  if (enLogin && !msg) return; // no redibujar mientras escribís
+  enLogin = true;
+  $("#app").innerHTML = `<form class="login" id="f-login"><img src="avatars/kume.png" width="72" style="border-radius:50%"><h2>Küme HQ</h2><p class="meta">Escaneá el QR de la compu (☀️ Hoy) o escribí el PIN que aparece ahí</p>
+    <input id="pin" type="tel" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="12" placeholder="PIN"><div class="err">${esc(msg)}</div><button type="submit">Entrar</button></form>`;
+  $("#f-login").onsubmit = (e) => { e.preventDefault(); entrar(); };
 }
 async function entrar() {
-  const r = await fetch("/m/login", { method: "POST", body: JSON.stringify({ pin: $("#pin").value }) });
-  if (r.ok) cargar(); else login((await r.json()).error);
+  const pin = ($("#pin").value || "").replace(/\D/g, "");
+  if (!pin) return login("Escribí el PIN");
+  try {
+    const r = await fetch("/m/login", { method: "POST", body: JSON.stringify({ pin }) });
+    if (r.ok) { enLogin = false; return cargar(); }
+    login((await r.json().catch(() => ({}))).error || "No se pudo entrar");
+  } catch { login("No llego a la compu. ¿Estás en el mismo WiFi y con Küme HQ abierto?"); }
 }
 async function api(url, opt) { const r = await fetch(url, opt); if (r.status === 401) { login(); throw 0; } return r.json(); }
 async function cargar() {
@@ -87,7 +95,8 @@ async function hacer(estado) {
   if (r.error) return alert(r.error);
   ITEMS.splice(I, 1); pintar();
 }
-cargar().catch(() => {});
+if (/vencido=1/.test(location.search)) { history.replaceState(null, "", "/"); login("Ese QR ya se usó o venció. Abrí ☀️ Hoy en la compu para ver uno nuevo."); }
+else cargar().catch(() => {});
 </script>
 </body>
 </html>

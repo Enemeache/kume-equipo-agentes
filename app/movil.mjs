@@ -27,6 +27,13 @@ export function iniciarMovil({ DIR, PORT_PRINCIPAL = 4747, PORT = 4748 }) {
   const PIN = process.env.MOVIL_PIN || "";
   if (!/^\d{6,}$/.test(PIN)) { if (PIN) console.log("MOVIL_PIN tiene que tener 6 dígitos o más. Modo celular apagado."); return; }
   const sesiones = new Set();
+  // enlaces de un solo uso para el QR: entran sin escribir el PIN, vencen a los 10 minutos
+  const enlaces = new Map(); // token → vence
+  const crearEnlace = () => {
+    for (const [t, v] of enlaces) if (v < Date.now()) enlaces.delete(t);
+    const t = randomBytes(24).toString("hex"); enlaces.set(t, Date.now() + 10 * 60e3); return t;
+  };
+  const nuevaSesion = () => { const tok = randomBytes(24).toString("hex"); sesiones.add(tok); return `kume_m=${tok}; HttpOnly; SameSite=Lax; Path=/; Max-Age=2592000`; };
   const intentos = new Map(); // ip → {n, hasta}
 
   const server = http.createServer(async (req, res) => {
@@ -42,6 +49,12 @@ export function iniciarMovil({ DIR, PORT_PRINCIPAL = 4747, PORT = 4748 }) {
     }
     if (u.pathname === "/avatars/kume.png") { res.writeHead(200, { "Content-Type": "image/png" }); return res.end(await readFile(path.join(DIR, "public", "avatars", "kume.png"))); }
 
+    if (u.pathname === "/m/entrar") {
+      const t = u.searchParams.get("t") || "", vence = enlaces.get(t);
+      if (vence && vence > Date.now()) { enlaces.delete(t); res.writeHead(302, { "Set-Cookie": nuevaSesion(), Location: "/" }); return res.end(); }
+      res.writeHead(302, { Location: "/?vencido=1" }); return res.end();
+    }
+
     if (u.pathname === "/m/login" && req.method === "POST") {
       const it = intentos.get(ip) || { n: 0, hasta: 0 };
       if (Date.now() < it.hasta) { res.writeHead(429, { "Content-Type": "application/json" }); return res.end(JSON.stringify({ error: "Demasiados intentos. Esperá 10 minutos." })); }
@@ -54,8 +67,7 @@ export function iniciarMovil({ DIR, PORT_PRINCIPAL = 4747, PORT = 4748 }) {
         res.writeHead(401, { "Content-Type": "application/json" }); return res.end(JSON.stringify({ error: "PIN incorrecto" }));
       }
       intentos.delete(ip);
-      const tok = randomBytes(24).toString("hex"); sesiones.add(tok);
-      res.writeHead(200, { "Content-Type": "application/json", "Set-Cookie": `kume_m=${tok}; HttpOnly; SameSite=Strict; Path=/; Max-Age=2592000` });
+      res.writeHead(200, { "Content-Type": "application/json", "Set-Cookie": nuevaSesion() });
       return res.end(JSON.stringify({ ok: true }));
     }
 
@@ -79,5 +91,5 @@ export function iniciarMovil({ DIR, PORT_PRINCIPAL = 4747, PORT = 4748 }) {
     const ips = ipsLan();
     console.log(`Modo celular (solo tu WiFi, con PIN): ${ips.map((i) => `http://${i}:${PORT}`).join("  ") || `puerto ${PORT}`}`);
   });
-  return { ips: ipsLan, PORT };
+  return { ips: ipsLan, PORT, crearEnlace };
 }

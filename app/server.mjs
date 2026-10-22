@@ -243,7 +243,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     let m;
-    if (p === "/api/movil") return json(res, 200, MOVIL ? { activo: true, pin: process.env.MOVIL_PIN, urls: MOVIL.ips().map((i) => `http://${i}:${MOVIL.PORT}`) } : { activo: false });
+    if (p === "/api/movil") return json(res, 200, MOVIL ? { activo: true, pin: process.env.MOVIL_PIN, enlace: MOVIL.crearEnlace(), urls: MOVIL.ips().map((i) => `http://${i}:${MOVIL.PORT}`) } : { activo: false });
     if ((m = p.match(/^\/api\/chat\/([\w-]+)$/))) {
       const agent = agents.find((a) => a.id === m[1]);
       if (!agent) return json(res, 404, { error: "Agente no encontrado" });
