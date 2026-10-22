@@ -18,7 +18,9 @@ export function iniciarTelegram({ DATA, agents, agentDir, PORT, suscriptores }) 
   const API = `${process.env.TELEGRAM_API || "https://api.telegram.org"}/bot${TOKEN}`; // TELEGRAM_API solo para pruebas
   const LOCAL = `http://127.0.0.1:${PORT}`;
   const archivo = path.join(DATA, "telegram.json");
-  let est = { chatId: null, codigo: null, offset: 0, avisados: [], resumenDia: null };
+  let est = { chatId: null, codigo: null, offset: 0, avisados: [], resumenDia: null, hablandoCon: null };
+  // texto de los agentes (markdown simple) → HTML de Telegram
+  const aHtml = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/`([^`\n]+)`/g, "<code>$1</code>").replace(/^#{1,3} (.+)$/gm, "<b>$1</b>");
   let bot = null; // {username}
 
   const guardar = () => writeFile(archivo, JSON.stringify(est, null, 2));
@@ -40,7 +42,12 @@ export function iniciarTelegram({ DATA, agents, agentDir, PORT, suscriptores }) 
     fila = tarea.catch(() => {});
     return tarea;
   }
-  const decir = (texto, extra = {}) => est.chatId && tg("sendMessage", { chat_id: est.chatId, text: corto(texto, 4000), parse_mode: "HTML", disable_web_page_preview: true, ...extra });
+  async function decir(texto, extra = {}) {
+    if (!est.chatId) return null;
+    const r = await tg("sendMessage", { chat_id: est.chatId, text: corto(texto, 4000), parse_mode: "HTML", disable_web_page_preview: true, ...extra });
+    // si el HTML quedó mal (por ejemplo, cortado), se manda como texto plano
+    return r || tg("sendMessage", { chat_id: est.chatId, text: corto(String(texto).replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&"), 4000), disable_web_page_preview: true, ...extra });
+  }
 
   async function mandarFotos(rutas, caption) {
     if (!est.chatId || !rutas.length) return;
@@ -112,6 +119,9 @@ export function iniciarTelegram({ DATA, agents, agentDir, PORT, suscriptores }) 
     const pros = p.items || [], cont = c.items || [];
     const cuenta = (e) => pros.filter((x) => x.estado === e).length;
     const trabajando = (Array.isArray(ag) ? ag : []).filter((a) => a.ocupado).map((a) => a.nombre);
+    const uso = await local("/api/uso"), desde = Date.now() - 24 * 3600e3, porAg = {};
+    (Array.isArray(uso) ? uso : []).filter((u) => Date.parse(u.fecha) > desde).forEach((u) => { const x = (porAg[u.agente] = porAg[u.agente] || { n: 0, rut: 0, mal: 0 }); x.n++; if (u.origen === "rutina") x.rut++; if (u.ok === false) x.mal++; });
+    const equipo = Object.entries(porAg).map(([id, x]) => `• <b>${esc(agente(id).nombre)}</b>: ${x.n} tarea${x.n > 1 ? "s" : ""}${x.rut ? ` (${x.rut} automática${x.rut > 1 ? "s" : ""})` : ""}${x.mal ? ` · ⚠️ ${x.mal} con problemas` : ""}`).join("\n");
     return decir(`☀️ <b>Resumen de Küme HQ</b>
 📥 Para aprobar: <b>${cuenta("Mensaje listo")}</b> mensajes · <b>${cuenta("Seguimiento listo")}</b> seguimientos · <b>${cont.filter((x) => x.estado === "Para aprobar").length}</b> piezas
 🎉 Respondieron: <b>${cuenta("Respondió") + cuenta("Consulta agendada")}</b> · Clientes: <b>${cuenta("Cliente")}</b>
@@ -119,11 +129,61 @@ export function iniciarTelegram({ DATA, agents, agentDir, PORT, suscriptores }) 
 ✉️ Mails: ${env.cola?.length || 0} en cola · ${env.enviadosHoy || 0} enviados hoy${env.activa ? "" : " (envío automático apagado)"}
 💻 Trabajando ahora: ${trabajando.length ? esc(trabajando.join(", ")) : "nadie"}
 
+👥 <b>Qué hizo el equipo (últimas 24 h)</b>
+${equipo || "Nadie trabajó. Prendé las rutinas en la app o pedile algo a alguien con /oficina."}
+
 /pendientes para aprobar · /oficina para ver a todos`);
   }
   async function oficina() {
-    const ag = await local("/api/agents");
-    return decir(`🏢 <b>La oficina</b>\n${(Array.isArray(ag) ? ag : []).map((a) => `${a.ocupado ? "💻" : "🟢"} <b>${esc(a.nombre)}</b> · ${esc(a.rol)}${a.ocupado ? " · <i>trabajando</i>" : ""}`).join("\n")}`);
+    const ag = await local("/api/agents"), lista = Array.isArray(ag) ? ag : [];
+    const filas = [];
+    for (let i = 0; i < lista.length; i += 2) filas.push(lista.slice(i, i + 2).map((a) => ({ text: `${a.ocupado ? "💻" : "🟢"} ${a.nombre} · ${a.rol}`, callback_data: `h:${a.id}` })));
+    return decir(`🏢 <b>La oficina</b>\n${lista.map((a) => `${a.ocupado ? "💻" : "🟢"} <b>${esc(a.nombre)}</b> · ${esc(a.rol)}${a.ocupado ? " · <i>trabajando</i>" : ""}`).join("\n")}\n\n👇 <b>¿Con quién querés hablar?</b>`, botones(filas));
+  }
+
+  // ---------- Hablar con un agente desde Telegram ----------
+  async function elegir(id) {
+    const a = agents.find((x) => x.id === id); if (!a) return;
+    est.hablandoCon = id; await guardar();
+    const atajos = (a.atajos || []).slice(0, 6).map((t, i) => [{ text: corto(t, 60), callback_data: `t:${id}:${i}` }]);
+    await decir(`💬 Ahora hablás con <b>${esc(a.nombre)}</b> (${esc(a.rol)}).\n<i>${esc(a.descripcion)}</i>\n\nEscribile lo que necesites. También le podés mandar fotos o archivos (con el pedido en el texto de la foto).\n${atajos.length ? "O tocá un pedido rápido:" : ""}\n\n/oficina para cambiar de persona · /salir para dejar de hablarle`, atajos.length ? botones(atajos) : {});
+  }
+  async function hablar(texto, adjuntos = []) {
+    const a = agents.find((x) => x.id === est.hablandoCon);
+    if (!a) return decir("¿Con quién querés hablar? Mandá /oficina y elegí a alguien.");
+    // no se espera la respuesta: el agente puede tardar minutos y el bot sigue atendiendo.
+    // El avance y el reporte final llegan por los eventos (inicio / progreso / fin).
+    local(`/api/chat/${a.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: texto, adjuntos }) })
+      .then((r) => { if (r?.error) decir(`⚠️ ${esc(r.error)}`); });
+    await decir(`📨 Se lo pasé a <b>${esc(a.nombre)}</b>${adjuntos.length ? ` con ${adjuntos.length} archivo${adjuntos.length > 1 ? "s" : ""}` : ""}. Te aviso cómo avanza.`);
+  }
+  // fotos y archivos que mandás: se bajan de Telegram y se suben a entradas/ del agente.
+  // Los álbumes llegan como varios mensajes: se juntan 2,5 segundos y se mandan en un solo pedido.
+  const albumes = new Map();
+  async function bajarArchivo(fileId, nombre) {
+    const f = await tg("getFile", { file_id: fileId });
+    if (!f?.file_path) throw new Error("Telegram no deja bajar archivos de más de 20 MB");
+    const buf = await fetch(`${API.replace("/bot", "/file/bot")}/${f.file_path}`).then((r) => r.arrayBuffer());
+    const r = await local(`/api/adjuntos/${est.hablandoCon}`, { method: "POST", headers: { "X-Nombre": encodeURIComponent(nombre || path.basename(f.file_path)) }, body: Buffer.from(buf) });
+    if (!r.ruta) throw new Error(r.error || "no se pudo guardar");
+    return r.ruta;
+  }
+  async function alArchivo(msg) {
+    if (!est.hablandoCon) return decir("Antes elegí a quién mandárselo: /oficina");
+    const foto = msg.photo?.at(-1), doc = msg.document || msg.video;
+    const fileId = foto?.file_id || doc?.file_id;
+    const nombre = foto ? `foto-${msg.message_id}.jpg` : doc.file_name || `archivo-${msg.message_id}${msg.video ? ".mp4" : ""}`;
+    const clave = msg.media_group_id || `m${msg.message_id}`;
+    const g = albumes.get(clave) || { rutas: [], texto: "", errores: [], timer: null };
+    albumes.set(clave, g);
+    if (msg.caption) g.texto = msg.caption;
+    try { g.rutas.push(await bajarArchivo(fileId, nombre)); } catch (e) { g.errores.push(`${nombre}: ${e.message}`); }
+    clearTimeout(g.timer);
+    g.timer = setTimeout(async () => {
+      albumes.delete(clave);
+      if (g.errores.length) await decir(`⚠️ No pude subir: ${esc(g.errores.join(" · "))}`);
+      if (g.rutas.length) await hablar(g.texto || "Te mandé estos archivos.", g.rutas);
+    }, 2500);
   }
 
   // ---------- Lo que hacen los agentes, en vivo ----------
@@ -152,6 +212,14 @@ export function iniciarTelegram({ DATA, agents, agentDir, PORT, suscriptores }) 
     if (ev.tipo === "fin") {
       await editarVivo(ev.agente, { icono: ev.ok ? "✅" : "⚠️", texto: ev.ok ? `<b>Terminó.</b> ${esc(corto(ev.resumen, 140))}` : `<b>No pudo terminar:</b> ${esc(corto(ev.resumen, 200))}` });
       vivos.delete(ev.agente);
+      // el reporte del agente: qué hizo, qué no y qué necesita (ver Kume/CLAUDE.md)
+      if (ev.texto) {
+        const a = agente(ev.agente), t = String(ev.texto);
+        const bloque = t.lastIndexOf("✅ Hecho");
+        const cuerpo = bloque > 0 ? t.slice(0, bloque).trim() : "", rep = bloque >= 0 ? t.slice(bloque).replace(/```/g, "").trim() : t;
+        await decir(`🗣️ <b>${esc(a.nombre)}</b> te reporta${ev.origen === "rutina" ? " (rutina automática)" : ""}:\n\n${aHtml(corto(rep, 1500))}${cuerpo ? `\n\n<blockquote expandable>${aHtml(corto(cuerpo, 2200))}</blockquote>` : ""}`,
+          botones([[{ text: `💬 Responderle a ${a.nombre}`, callback_data: `h:${a.id}` }]]));
+      }
       await mandarEntregas(ev.agente, ev.archivos || []);
       setTimeout(revisarNuevos, 15000); // lo que dejó para aprobar llega enseguida
     }
@@ -187,7 +255,10 @@ export function iniciarTelegram({ DATA, agents, agentDir, PORT, suscriptores }) 
       return;
     }
     if (chat !== est.chatId) return; // cualquier otro chat se ignora
+    if (msg.photo || msg.document || msg.video) return alArchivo(msg);
     const cmd = texto.split(/[\s@]/)[0].toLowerCase();
+    if (texto && !texto.startsWith("/")) return hablar(texto);
+    if (cmd === "/salir") { const a = agente(est.hablandoCon); est.hablandoCon = null; await guardar(); return decir(a?.nombre && a.nombre !== null ? `👋 Dejaste de hablar con ${esc(a.nombre)}. /oficina para elegir a otro.` : "No estabas hablando con nadie. /oficina para elegir."); }
     if (cmd === "/resumen" || cmd === "/start") return resumen();
     if (cmd === "/oficina") return oficina();
     if (cmd === "/pendientes") {
@@ -201,11 +272,20 @@ export function iniciarTelegram({ DATA, agents, agentDir, PORT, suscriptores }) 
       const e = await local("/api/envios");
       return decir(`✉️ <b>Mails</b> ${e.activa ? "(automático prendido)" : "(automático apagado)"}\nEn cola: ${(e.cola || []).map((c) => esc(c.negocio)).join(", ") || "nada"}\nÚltimos enviados: ${(e.enviados || []).slice(0, 5).map((c) => esc(c.negocio)).join(", ") || "ninguno"}`);
     }
-    return decir(`Comandos:\n/resumen — cómo viene todo\n/pendientes — lo que hay para aprobar, con botones\n/oficina — quién está trabajando\n/envios — mails en cola y enviados\n\nPara pedirle algo a un agente, usá la app en la compu.`);
+    return decir(`Comandos:\n/oficina — ver al equipo y elegir con quién hablar\n/resumen — cómo viene todo\n/pendientes — lo que hay para aprobar, con botones\n/envios — mails en cola y enviados\n/salir — dejar de hablarle al agente\n\n${est.hablandoCon ? `Ahora estás hablando con <b>${esc(agente(est.hablandoCon).nombre)}</b>: lo que escribas le llega.` : "Elegí a alguien en /oficina y lo que escribas le llega."}`);
   }
   async function alBoton(q) {
     if (q.message?.chat?.id !== est.chatId) return tg("answerCallbackQuery", { callback_query_id: q.id, text: "Bot privado" });
     const [acc, tipo, id] = String(q.data || "").split(":");
+    if (acc === "x") return tg("answerCallbackQuery", { callback_query_id: q.id });
+    if (acc === "h") { await tg("answerCallbackQuery", { callback_query_id: q.id, text: `Hablando con ${agente(tipo).nombre}` }); return elegir(tipo); }
+    if (acc === "t") {
+      const a = agents.find((x) => x.id === tipo), atajo = a?.atajos?.[Number(id)];
+      await tg("answerCallbackQuery", { callback_query_id: q.id });
+      if (!atajo) return;
+      est.hablandoCon = a.id; await guardar();
+      return hablar(atajo);
+    }
     const estado = { "a:p": "Aprobado", "a:s": "Contactado", "d:p": "Descartado", "a:c": "Aprobado", "d:c": "Borrador" }[`${acc}:${tipo}`];
     if (!estado || !/^[\w-]{32,36}$/.test(id || "")) return tg("answerCallbackQuery", { callback_query_id: q.id, text: "Botón no válido" });
     const url = tipo === "c" ? `/api/contenido/${id}` : `/api/prospectos/${id}`;

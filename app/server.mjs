@@ -151,7 +151,7 @@ function runClaude(agent, message, sessionId, origen = "chat") {
       const u = final?.usage || {};
       registrarUso({ fecha: new Date().toISOString(), agente: agent.id, origen, segundos: Math.round((Date.now() - t0) / 1000), costo: final?.total_cost_usd || 0,
         entrada: (u.input_tokens || 0) + (u.cache_read_input_tokens || 0) + (u.cache_creation_input_tokens || 0), salida: u.output_tokens || 0, ok: r.ok }).catch(() => {});
-      emitir({ tipo: "fin", agente: agent.id, nombre: agent.nombre, ok: r.ok, origen, archivos, resumen: String(r.text).slice(0, 140) });
+      emitir({ tipo: "fin", agente: agent.id, nombre: agent.nombre, ok: r.ok, origen, archivos, resumen: String(r.text).slice(0, 140), texto: String(r.text).slice(0, 6000) });
       resolve(r);
     });
   });
