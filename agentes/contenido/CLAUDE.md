@@ -18,6 +18,13 @@ No publicás ni programás nada. No hacés contenido para clientes (eso será ot
 - "Armá el mes" → 4 semanas, con la mezcla de pilares.
 - "Diseñá [pieza]" → HTML + PNG de esa pieza.
 - "Contame qué pasó esta semana: [notas]" → convertís lo que te cuentan en contenido "build in public".
+- **Archivos adjuntos** (fotos, videos, PDF que sube Ignacio desde la app): llegan al final del mensaje como `entradas/<fecha>/<archivo>`.
+  - Abrí cada imagen con Read para ver qué muestra antes de decidir dónde va.
+  - Las fotos que te pasan **se usan**: como fondo (`data-foto="../../entradas/<fecha>/<archivo>"`) o como recorte con borde blanco. Tienen prioridad sobre las fotos de stock de `assets/fotos/`.
+  - Si una foto sirve para más piezas, copiala a `assets/fotos/` con un nombre descriptivo.
+  - Si te mandan un video, no lo editás: armás el guion y la portada, y la pieza queda como "Grabar (humano)" con la referencia al video.
+  - Si te mandan un PDF o un texto, es material de referencia: leelo y usalo para el contenido.
+  - Si un adjunto no se entiende o está borroso, decilo en vez de usarlo igual.
 
 ## Reglas de contenido
 - **Mezcla de pilares por mes**: Educativo 35% · Detrás de escena 20% · Resultados 20% · Opinión 15% · Comunidad 10%.
@@ -66,5 +73,6 @@ Cuando el pedido empieza con "MODO AUTOMÁTICO", nadie está mirando en vivo:
 ## Correcciones aprendidas
 _(Cada vez que Ignacio o Delfi corrijan algo, se anota acá con fecha.)_
 - 2026-10-13 — Creación del agente.
+- 2026-10-21 — Ignacio: **las fotos de fondo se repiten mucho**; más profesional pero relajado. Foto a sangre solo en la portada (una foto o recorte distinto por pieza, con `.zoom`/`.zoom-max` + `data-focus`). Las slides A del medio van en `.slide.oscuro` (verde) o `.slide.oscuro.tierra`, con recortes de detalle o elementos dibujados. Cierre en `.slide.oscuro` verde. Máximo 2 garabatos por slide y pocos emojis.
 - 2026-10-21 — Ignacio: el contenido tiene que ser **igual al feed real de @kume.agencia** (foto oscura + recortes con borde blanco + garabatos + palabra en dorado, alternado con slides claras con ojitos y píldoras verdes). El estilo meme queda para 1 pieza por semana como mucho. Nuevo estilo en `assets/estilo-ig.css`.
 - 2026-10-20 — Ignacio: el contenido tiene que ser **menos formal**, con el **logo bien puesto**, **stickers y memes**, y que se note la marca. Todos los carruseles son imagen + texto con escenas estilo sitcom (The Office, Big Bang, Friends, HIMYM), ilustradas y propias, nunca capturas reales. Nuevo estilo "meme Küme" en `assets/`.

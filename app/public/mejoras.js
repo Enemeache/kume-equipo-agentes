@@ -269,7 +269,7 @@
   const iconoArchivo = (f) => /\.pdf$/i.test(f) ? "📄" : /\.html$/i.test(f) ? "🌐" : /\.csv$/i.test(f) ? "📊" : "📝";
   const tarjetas = (agente, archivos = []) => archivos.length ? `<div class="archivos">${archivos.map((f) => { const url = `/files/${agente}/${f.split("/").map(encodeURIComponent).join("/")}`; return `<a class="archivo" href="${url}" target="_blank">${/\.png$/i.test(f) ? `<img src="${url}" alt="">` : `<div class="ico">${iconoArchivo(f)}</div>`}<span>${H(f)}</span></a>`; }).join("")}</div>` : "";
   window.renderChat = renderChat = function (chat, busy) {
-    const list = chat.messages.map((m) => `<div class="bubble ${m.de} ${m.error ? "error" : ""}">${md(m.texto)}${m.de === "agente" ? tarjetas(current?.id, m.archivos) : ""}</div>`);
+    const list = chat.messages.map((m) => `<div class="bubble ${m.de} ${m.error ? "error" : ""}">${md(m.texto)}${m.de === "agente" ? tarjetas(current?.id, m.archivos) : adjuntosVos(current?.id, m.adjuntos)}</div>`);
     if (!chat.messages.length) list.push(`<div class="typing">Todavía no hablaron. Probá con uno de los atajos de abajo.</div>`);
     if (busy) list.push(`<div class="pasos" id="pasos-vivo">${(pasos[current?.id] || ["⏳ Arrancando…"]).slice(-6).map((t) => `<span>${H(t)}</span>`).join("")}</div>`);
     $("#msgs").innerHTML = list.join(""); $("#msgs").scrollTop = 1e9; $("#btn-send").disabled = !!busy;
@@ -437,9 +437,80 @@ ENVIO_AUTO=1</pre><p class="meta">La contraseña de aplicación se crea en myacc
     contarEnvios();
   }
 
+  // ---------- 13) ADJUNTAR ARCHIVOS EN EL CHAT ----------
+  // los archivos se suben a agentes/<agente>/entradas/<fecha>/ y el agente recibe las rutas
+  const esImg = (f) => /\.(png|jpe?g|webp|gif)$/i.test(f);
+  function adjuntosVos(agente, adj = []) {
+    if (!adj?.length) return "";
+    return `<div class="archivos">${adj.map((r) => { const url = `/entradas/${agente}/${r.replace(/^entradas\//, "").split("/").map(encodeURIComponent).join("/")}`; return `<a class="archivo" href="${url}" target="_blank">${esImg(r) ? `<img src="${url}" alt="">` : `<div class="ico">${/\.(mp4|mov)$/i.test(r) ? "🎬" : iconoArchivo(r)}</div>`}<span>${H(r.split("/").pop())}</span></a>`; }).join("")}</div>`;
+  }
+  const cssAdj = document.createElement("style");
+  cssAdj.textContent = `
+  .adj-bar{display:flex;flex-wrap:wrap;gap:6px;padding:0 0 8px}
+  .adj-chip{display:flex;align-items:center;gap:6px;background:var(--crema);border-radius:10px;padding:4px 8px 4px 4px;font-size:11.5px;max-width:200px}
+  .adj-chip img,.adj-chip .i{width:34px;height:34px;border-radius:6px;object-fit:cover;display:grid;place-items:center;background:#fff;flex:none}
+  .adj-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .adj-chip button{border:0;background:none;cursor:pointer;font-size:14px;color:#A33}
+  .adj-chip.subiendo{opacity:.55}
+  #btn-adj{flex:none;border:1px solid rgba(27,58,45,.25);background:#fff;border-radius:10px;width:44px;font-size:18px;cursor:pointer}
+  #chat.soltar #msgs{outline:3px dashed var(--dorado);outline-offset:-8px}`;
+  document.head.appendChild(cssAdj);
+  const form = $("#send");
+  form.insertAdjacentHTML("beforebegin", `<div class="adj-bar" id="adj-bar"></div>`);
+  form.insertAdjacentHTML("afterbegin", `<button type="button" id="btn-adj" title="Adjuntar archivos (fotos, videos, PDF…)">📎</button><input type="file" id="adj-input" multiple hidden accept="image/*,video/*,.pdf,.txt,.md,.csv,.docx,.xlsx,.svg,.ttf,.otf">`);
+  let ADJ = []; // {id, nombre, url (preview), ruta, estado}
+  function pintarAdj() {
+    $("#adj-bar").innerHTML = ADJ.map((a) => `<div class="adj-chip ${a.estado === "subiendo" ? "subiendo" : ""}" title="${H(a.nombre)}">${a.url ? `<img src="${a.url}" alt="">` : `<div class="i">${iconoArchivo(a.nombre)}</div>`}<span>${a.estado === "error" ? "⚠️ " : a.estado === "subiendo" ? "⏳ " : ""}${H(a.nombre)}</span><button type="button" onclick="KUMEUX.quitarAdj('${a.id}')">✕</button></div>`).join("");
+  }
+  async function subir(files) {
+    if (!current) return;
+    for (const f of files) {
+      const a = { id: Math.random().toString(36).slice(2), nombre: f.name || "imagen.png", url: f.type.startsWith("image/") ? URL.createObjectURL(f) : "", estado: "subiendo" };
+      ADJ.push(a); pintarAdj();
+      try {
+        const r = await fetch("/api/adjuntos/" + current.id, { method: "POST", headers: { "X-Nombre": encodeURIComponent(a.nombre) }, body: f });
+        const d = await r.json(); if (!r.ok) throw new Error(d.error);
+        a.ruta = d.ruta; a.estado = "listo";
+      } catch (e) { a.estado = "error"; toast(`⚠️ ${a.nombre}: ${e.message}`, null); }
+      pintarAdj();
+    }
+  }
+  $("#btn-adj").onclick = () => $("#adj-input").click();
+  $("#adj-input").onchange = (e) => { subir([...e.target.files]); e.target.value = ""; };
+  // arrastrar archivos sobre el chat o pegar una imagen con Ctrl+V
+  const chatEl = $("#chat");
+  chatEl.addEventListener("dragover", (e) => { if ([...e.dataTransfer.types].includes("Files")) { e.preventDefault(); chatEl.classList.add("soltar"); } });
+  chatEl.addEventListener("dragleave", (e) => { if (!chatEl.contains(e.relatedTarget)) chatEl.classList.remove("soltar"); });
+  chatEl.addEventListener("drop", (e) => { if (!e.dataTransfer.files.length) return; e.preventDefault(); e.stopPropagation(); chatEl.classList.remove("soltar"); subir([...e.dataTransfer.files]); });
+  $("#txt").addEventListener("paste", (e) => { const fs = [...(e.clipboardData?.files || [])]; if (fs.length) { e.preventDefault(); subir(fs); } });
+  // al cambiar de agente se limpian los adjuntos sin enviar
+  const openChatOrig = openChat;
+  window.openChat = openChat = async function (id) { if (current?.id !== id) { ADJ = []; pintarAdj(); } return openChatOrig(id); };
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const message = $("#txt").value.trim();
+    if (!current) return;
+    if (ADJ.some((a) => a.estado === "subiendo")) return toast("⏳ Esperá a que terminen de subir los archivos", null);
+    const adjuntos = ADJ.filter((a) => a.estado === "listo").map((a) => a.ruta);
+    if (!message && !adjuntos.length) return;
+    const agent = current;
+    $("#txt").value = ""; ADJ = []; pintarAdj();
+    const chat = await (await fetch("/api/chat/" + agent.id)).json();
+    chat.messages.push({ de: "vos", texto: message, adjuntos });
+    renderChat(chat, true);
+    LOCAL_BUSY.add(agent.id); window.OF && OF.setBusy(agent.id, true);
+    const r = await fetch("/api/chat/" + agent.id, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message, adjuntos }) });
+    const data = await r.json();
+    if (current?.id === agent.id) renderChat(data.messages ? data : { messages: [...chat.messages, { de: "agente", texto: data.error, error: true }] }, false);
+    LOCAL_BUSY.delete(agent.id); window.OF && OF.setBusy(agent.id, false);
+    loadAgents(); loadPropuestas(); loadProspectos(); loadContenido();
+  };
+
   // ---------- Arranque ----------
   window.KUMEUX = {
     envios,
+    quitarAdj(id) { ADJ = ADJ.filter((a) => a.id !== id); pintarAdj(); },
     async cancelarEnvio(id) { await fetch("/api/envios/" + id, { method: "DELETE" }); toast("🛑 Envío cancelado", null); envios(); },
     async mandarAprobados(n) {
       if (!confirm(`¿Mandar el mail a los ${n} prospectos que ya estaban aprobados? Salen de a uno, con 10 minutos para cancelar.`)) return;

@@ -30,7 +30,7 @@ const agents = JSON.parse(await readFile(path.join(DIR, "agents.json"), "utf8"))
 const agentDir = (a) => path.resolve(DIR, a.carpeta);
 await mkdir(path.join(DATA, "chats"), { recursive: true });
 
-const MIME = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".json": "application/json", ".pdf": "application/pdf", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".md": "text/plain; charset=utf-8" };
+const MIME = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".json": "application/json", ".pdf": "application/pdf", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".gif": "image/gif", ".mp4": "video/mp4", ".mov": "video/quicktime", ".md": "text/plain; charset=utf-8" };
 
 const json = (res, code, body) => { res.writeHead(code, { "Content-Type": "application/json; charset=utf-8" }); res.end(JSON.stringify(body)); };
 const readBody = (req) => new Promise((ok) => { let b = ""; req.on("data", (c) => (b += c)); req.on("end", () => { try { ok(JSON.parse(b || "{}")); } catch { ok({}); } }); });
@@ -250,12 +250,15 @@ const server = http.createServer(async (req, res) => {
       if (req.method === "GET") return json(res, 200, await loadChat(agent.id));
       if (req.method === "DELETE") { await saveChat(agent.id, { sessionId: null, messages: [] }); return json(res, 200, { ok: true }); }
       if (req.method === "POST") {
-        const { message } = await readBody(req);
-        if (!message?.trim()) return json(res, 400, { error: "Mensaje vacío" });
+        const { message: texto = "", adjuntos = [] } = await readBody(req);
+        // solo se aceptan adjuntos que ya estén en entradas/ de este agente
+        const adj = (Array.isArray(adjuntos) ? adjuntos : []).filter((r) => typeof r === "string" && /^entradas\/\d{4}-\d{2}-\d{2}\/[\w.-]+$/.test(r) && existsSync(path.join(agentDir(agent), r)));
+        if (!texto.trim() && !adj.length) return json(res, 400, { error: "Mensaje vacío" });
+        const message = (texto.trim() || "Te mandé estos archivos.") + (adj.length ? "\n\nArchivos adjuntos (los subió Ignacio, están en tu carpeta; abrilos con Read antes de usarlos):\n" + adj.map((r) => "- " + r).join("\n") : "");
         if (running.has(agent.id)) return json(res, 409, { error: `${agent.nombre} todavía está trabajando en el pedido anterior.` });
         running.add(agent.id);
         const chat = await loadChat(agent.id);
-        chat.messages.push({ de: "vos", texto: message, fecha: new Date().toISOString() });
+        chat.messages.push({ de: "vos", texto: texto.trim(), adjuntos: adj, fecha: new Date().toISOString() });
         await saveChat(agent.id, chat);
         try {
           const r = await runClaude(agent, message, chat.sessionId);
@@ -291,6 +294,28 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (p === "/api/propuestas") return json(res, 200, await listPropuestas());
+
+    // ---------- Adjuntos del chat: se guardan en agentes/<agente>/entradas/<fecha>/ ----------
+    if ((m = p.match(/^\/api\/adjuntos\/([\w-]+)$/)) && req.method === "POST" && agents.some((a) => a.id === m[1])) {
+      const nombreOrig = decodeURIComponent(req.headers["x-nombre"] || "archivo");
+      const ext = (path.extname(nombreOrig) || "").toLowerCase();
+      const OK = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".heic", ".mp4", ".mov", ".pdf", ".txt", ".md", ".csv", ".docx", ".xlsx", ".svg", ".ttf", ".otf"];
+      if (!OK.includes(ext)) return json(res, 400, { error: `No acepto archivos ${ext || "sin extensión"}` });
+      const MAX = 60 * 1024 * 1024, partes = []; let tam = 0;
+      for await (const c of req) { tam += c.length; if (tam > MAX) return json(res, 413, { error: "El archivo pasa los 60 MB" }); partes.push(c); }
+      const base = path.basename(nombreOrig, path.extname(nombreOrig)).normalize("NFD").replace(/\p{M}/gu, "").replace(/[^\w.-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || "archivo";
+      const dia = new Date().toLocaleDateString("sv-SE"), dir = path.join(agentDir(agents.find((a) => a.id === m[1])), "entradas", dia);
+      await mkdir(dir, { recursive: true });
+      let nombre = base + ext, n = 2;
+      while (existsSync(path.join(dir, nombre))) nombre = `${base}-${n++}${ext}`;
+      await writeFile(path.join(dir, nombre), Buffer.concat(partes));
+      return json(res, 200, { ruta: `entradas/${dia}/${nombre}`, nombre, tam });
+    }
+    if ((m = p.match(/^\/entradas\/([\w-]+)\/(.+)$/)) && agents.some((a) => a.id === m[1])) {
+      const base = path.join(agentDir(agents.find((a) => a.id === m[1])), "entradas"), file = path.resolve(base, m[2]);
+      if (!file.startsWith(base + path.sep)) { res.writeHead(403); return res.end(); }
+      return sendFile(res, file);
+    }
 
     // ---------- Cola de mails ----------
     if (p === "/api/envios" && req.method === "GET") return json(res, 200, cola.estado());
@@ -423,8 +448,8 @@ const server = http.createServer(async (req, res) => {
 
     // Archivos de salida de cualquier agente: /files/<agente>/<ruta>
     // los diseños abiertos desde /files/contenido/<carpeta>/ piden ../../assets/ → /files/assets/
-    if ((m = p.match(/^\/files\/assets\/(.+)$/))) {
-      const base = path.join(agentDir(agents.find((a) => a.id === "contenido")), "assets"), file = path.resolve(base, m[1]);
+    if ((m = p.match(/^\/files\/(assets|entradas)\/(.+)$/))) {
+      const base = path.join(agentDir(agents.find((a) => a.id === "contenido")), m[1]), file = path.resolve(base, m[2]);
       if (!file.startsWith(base)) { res.writeHead(403); return res.end(); }
       return sendFile(res, file);
     }
