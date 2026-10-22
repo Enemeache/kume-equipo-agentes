@@ -9,6 +9,7 @@ import { createPiloto } from "./piloto.mjs";
 import { zip } from "./zip.mjs";
 import { iniciarMovil } from "./movil.mjs";
 import { crearCola } from "./cola.mjs";
+import { iniciarTelegram } from "./telegram.mjs";
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const PORT = 4747;
@@ -52,8 +53,9 @@ const saveChat = (id, chat) => writeFile(chatFile(id), JSON.stringify(chat, null
 const running = new Set();
 
 // ---------- Eventos en vivo (Server-Sent Events) para la app ----------
-const oyentes = new Set();
+const oyentes = new Set(), suscriptores = new Set();
 function emitir(ev) {
+  for (const f of suscriptores) { try { f(ev); } catch {} }
   const data = `data: ${JSON.stringify({ ...ev, fecha: new Date().toISOString() })}\n\n`;
   for (const res of oyentes) { try { res.write(data); } catch {} }
 }
@@ -115,7 +117,7 @@ function runClaude(agent, message, sessionId, origen = "chat") {
   ];
   if (sessionId) args.push("--resume", sessionId);
   const t0 = Date.now();
-  emitir({ tipo: "inicio", agente: agent.id, nombre: agent.nombre, origen });
+  emitir({ tipo: "inicio", agente: agent.id, nombre: agent.nombre, origen, pedido: String(message).split("\n\nArchivos adjuntos")[0].slice(0, 300) });
   return new Promise((resolve) => {
     // Cada agente corre como un Claude Code normal: sin variables heredadas de otra sesión de Claude.
     const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^(CLAUDE|ANTHROPIC_BASE_URL)/.test(k)));
@@ -231,7 +233,7 @@ async function listReportes() {
 }
 
 // ---------- Router ----------
-let MOVIL = null;
+let MOVIL = null, TELEGRAM = null;
 const server = http.createServer(async (req, res) => {
   const u = new URL(req.url, `http://localhost:${PORT}`);
   const p = decodeURIComponent(u.pathname);
@@ -243,7 +245,9 @@ const server = http.createServer(async (req, res) => {
     }
 
     let m;
-    if (p === "/api/movil") return json(res, 200, MOVIL ? { activo: true, pin: process.env.MOVIL_PIN, enlace: MOVIL.crearEnlace(), urls: MOVIL.ips().map((i) => `http://${i}:${MOVIL.PORT}`) } : { activo: false });
+    if (p === "/api/telegram") return json(res, 200, TELEGRAM ? TELEGRAM.estado() : { activo: false });
+    if (p === "/api/telegram/desvincular" && req.method === "POST" && TELEGRAM) { await TELEGRAM.desvincular(); return json(res, 200, { ok: true }); }
+    if (p === "/api/movil")return json(res, 200, MOVIL ? { activo: true, pin: process.env.MOVIL_PIN, enlace: MOVIL.crearEnlace(), urls: MOVIL.ips().map((i) => `http://${i}:${MOVIL.PORT}`) } : { activo: false });
     if ((m = p.match(/^\/api\/chat\/([\w-]+)$/))) {
       const agent = agents.find((a) => a.id === m[1]);
       if (!agent) return json(res, 404, { error: "Agente no encontrado" });
@@ -481,4 +485,4 @@ const piloto = createPiloto({ DIR, DATA, agents, agentDir, runClaude, notion, ru
 piloto.iniciar();
 
 server.requestTimeout = 0; // los agentes pueden tardar varios minutos
-server.listen(PORT, "127.0.0.1", () => { console.log(`Küme HQ en http://localhost:${PORT}`); MOVIL = iniciarMovil({ DIR, PORT_PRINCIPAL: PORT }); });
+server.listen(PORT, "127.0.0.1", () => { console.log(`Küme HQ en http://localhost:${PORT}`); MOVIL = iniciarMovil({ DIR, PORT_PRINCIPAL: PORT }); TELEGRAM = iniciarTelegram({ DATA, agents, agentDir, PORT, suscriptores }); });

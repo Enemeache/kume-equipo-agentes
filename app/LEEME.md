@@ -42,6 +42,19 @@ Cómo se cuida:
 - Los que ya estaban aprobados antes de prenderlo no salen solos: hay un botón aparte.
 - Los que no tienen mail quedan en la lista para mandarlos a mano por Instagram o WhatsApp. Esos no se automatizan, por las reglas de esas plataformas.
 
+## Telegram (la oficina en tu bolsillo)
+El bot te cuenta en vivo qué está haciendo cada agente y cómo lo arma. Además te manda:
+- los carruseles terminados como álbum de fotos;
+- lo que hay para aprobar, con botones ✅ / 🗑️;
+- un resumen todos los días a las 9.
+
+1. En Telegram, hablale a **@BotFather** → `/newbot` → elegí nombre y usuario. Te da un token.
+2. Pegá el token en `app/.env` como `TELEGRAM_TOKEN=...`. No lo pegues en ningún chat.
+3. Reabrí la app y en ☀️ Hoy tocá "Abrir @tu_bot en Telegram" → Iniciar.
+
+Comandos: `/resumen`, `/pendientes`, `/oficina`, `/envios`.
+El bot solo le responde al chat que vinculaste. Funciona aunque estés fuera de tu casa, mientras la compu esté prendida con Küme HQ abierto.
+
 ## Aprobar desde el celu (solo en tu WiFi)
 1. En `app/.env` agregá una línea `MOVIL_PIN=` seguida de 6 números o más (inventalos vos).
 2. Reabrí la app. En ☀️ Hoy aparece la dirección para el celu (algo como `http://192.168.1.5:4748`).
