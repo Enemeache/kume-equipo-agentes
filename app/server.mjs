@@ -106,7 +106,7 @@ async function registrarUso(entry) {
   uso.unshift(entry); await writeFile(usoFile, JSON.stringify(uso.slice(0, 2000)));
 }
 
-function runClaude(agent, message, sessionId, origen = "chat") {
+function runClaude(agent, message, sessionId, origen = "chat", intento = 0) {
   const args = [
     "-p", message,
     "--output-format", "stream-json", "--verbose",
@@ -117,7 +117,7 @@ function runClaude(agent, message, sessionId, origen = "chat") {
   ];
   if (sessionId) args.push("--resume", sessionId);
   const t0 = Date.now();
-  emitir({ tipo: "inicio", agente: agent.id, nombre: agent.nombre, origen, pedido: String(message).split("\n\nArchivos adjuntos")[0].slice(0, 300) });
+  if (!intento) emitir({ tipo: "inicio", agente: agent.id, nombre: agent.nombre, origen, pedido: String(message).split("\n\nArchivos adjuntos")[0].slice(0, 300) });
   return new Promise((resolve) => {
     // Cada agente corre como un Claude Code normal: sin variables heredadas de otra sesión de Claude.
     const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^(CLAUDE|ANTHROPIC_BASE_URL)/.test(k)));
@@ -141,10 +141,17 @@ function runClaude(agent, message, sessionId, origen = "chat") {
     p.on("error", (e) => resolve({ ok: false, text: `No pude abrir Claude Code: ${e.message}` }));
     p.on("close", async () => {
       if (!final && buf.trim()) { try { final = JSON.parse(buf.trim()); } catch {} }
+      const sinSesion = /not logged in|invalid api key|please run \/login|oauth token|authentication/i.test((final?.result || "") + err);
+      // a veces la sesión de Claude se está renovando justo en ese momento: se reintenta una vez sin la conversación anterior
+      if (sinSesion && intento === 0) {
+        console.log(`[${agent.id}] Claude respondió sin sesión, reintento: ${String(final?.result || err).slice(0, 200)}`);
+        await new Promise((ok) => setTimeout(ok, 4000));
+        return resolve(runClaude(agent, message, null, origen, 1));
+      }
       const archivos = await archivosNuevos(agent, t0 - 2000);
       let r;
       if (!final) r = { ok: false, text: `Error al correr el agente.\n${(err || buf).slice(-800)}` };
-      else if (/not logged in|invalid api key|please run \/login/i.test(final.result || "")) r = { ok: false, text: "Claude Code no tiene sesión iniciada en esta computadora. Abrí una terminal, escribí `claude` y después `/login`. Es una sola vez." };
+      else if (sinSesion) r = { ok: false, text: `Claude Code dice que no tiene sesión (lo intenté dos veces). Respuesta de Claude: "${String(final.result || err).slice(0, 300)}". Si sigue, abrí una terminal, escribí \`claude\`, después \`/login\`, y reabrí Küme HQ.` };
       else if (/session limit|usage limit|hit your/i.test(final.result || "")) r = { ok: false, text: `Se terminó el uso de Claude por ahora: ${final.result}`, limite: true };
       else r = { ok: !final.is_error, text: final.result || "(sin respuesta)", sessionId: final.session_id };
       r.archivos = archivos;
