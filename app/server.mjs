@@ -119,8 +119,9 @@ function runClaude(agent, message, sessionId, origen = "chat", intento = 0) {
   const t0 = Date.now();
   if (!intento) emitir({ tipo: "inicio", agente: agent.id, nombre: agent.nombre, origen, pedido: String(message).split("\n\nArchivos adjuntos")[0].slice(0, 300) });
   return new Promise((resolve) => {
-    // Cada agente corre como un Claude Code normal: sin variables heredadas de otra sesión de Claude.
-    const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^(CLAUDE|ANTHROPIC_BASE_URL)/.test(k)));
+    // Cada agente corre como un Claude Code normal, con el login de Ignacio: sin variables heredadas de otra
+    // sesión de Claude ni claves de API sueltas de Windows (una ANTHROPIC_API_KEY vieja pisa el login).
+    const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^(CLAUDE|ANTHROPIC_)/.test(k)));
     const p = spawn("claude", args, { cwd: agentDir(agent), windowsHide: true, env });
     let buf = "", err = "", final = null, ultimo = "";
     p.stdout.on("data", (d) => {
