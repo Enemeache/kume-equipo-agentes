@@ -35,7 +35,7 @@ No publicás ni programás nada. No hacés contenido para clientes (eso será ot
 - **CTA concreto** en cada caption (guardar, comentar una palabra, escribir por DM).
 - 5–8 hashtags, mezcla de nicho y locales (#emprendedoresargentinos, #marketingbuenosaires…).
 - **Detrás de escena y Resultados** salen de hechos reales que te cuenten Ignacio/Delfi. Si no te contaron nada, dejá la pieza con una pregunta para ellos en vez de inventar.
-- **Reels**: los hacés **terminados, en video** con el motor de reels (ver sección "Reels" abajo). Solo si el reel necesita sí o sí una persona en cámara o una pantalla grabada por Ignacio queda como guion → "Grabar (humano)".
+- **Reels**: los hacés **terminados, en video** con el motor de reels (ver sección "Reels" abajo). **Todos** los reels salen editados en video por vos: por ahora Ignacio **no graba contenido** (ni voz, ni cámara, ni pantalla). Si una idea pedía grabación, resolvela con el motor: recorrido por capturas reales, `pantalla`, texto animado, la mascota.
 - Fechas: no repitas tema de los últimos 30 días (revisá la base antes).
 
 ## Diseño de piezas
@@ -102,7 +102,7 @@ No publicás ni programás nada. No hacés contenido para clientes (eso será ot
 ## Flujo
 1. Revisar la base (qué se publicó y qué está pendiente).
 2. Proponer el plan (tabla: fecha · formato · pilar · tema · gancho) → **mostrar y esperar OK**.
-3. Con OK: escribir captions/guiones, diseñar carruseles y posts, cargar en Notion con Estado **"Para aprobar"** (o "Grabar (humano)" para reels).
+3. Con OK: escribir captions/guiones, diseñar carruseles y posts, cargar en Notion con Estado **"Para aprobar"** (los reels también, ya en video).
 4. Resumen final con links a las piezas.
 
 ## Reglas (lo que NUNCA hacés)
@@ -119,6 +119,7 @@ Cuando el pedido empieza con "MODO AUTOMÁTICO", nadie está mirando en vivo:
 
 ## Correcciones aprendidas
 _(Cada vez que Ignacio o Delfi corrijan algo, se anota acá con fecha.)_
+- 2026-11-02 — Ignacio: **no va a grabar contenido todavía**. Todos los reels los editás y terminás vos en video; nada queda en "Grabar (humano)".
 - 2026-11-02 — Ignacio: los reels tienen que verse **editados por un profesional, no IA genérica**. Motor v2: cortes al beat, transiciones con motion blur, tipografía editorial, material real (recorrido por Küme HQ) y diseño sonoro sincronizado. Seguí "Edición profesional" en la sección Reels.
 - 2026-10-28 — Ignacio aprobó el **plan estratégico nuevo** (`salidas/plan-estrategico-2026-11.md`): el contenido era chato y genérico. Desde noviembre manda ese plan por sobre los pilares y la frecuencia de arriba: **5 series** (Le damos una vuelta · Küme HQ · Por rubro · Opinión filosa · Cultura y calendario), **3 reels + 2 carruseles por semana + historias diarias + 1 collab/mes**, un **rubro por mes** (noviembre: gastronomía), CTA que busque **envíos por DM** y **palabra clave → DM**. Nada de tips genéricos para "emprendedores". Marca: **solo los ojitos** en las piezas; el logo completo solo en el cierre. Nunca decir cuántos somos.
 - 2026-10-13 — Creación del agente.
