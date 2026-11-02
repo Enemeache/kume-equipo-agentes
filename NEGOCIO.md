@@ -5,7 +5,9 @@
 
 ## Quiénes somos
 - **Küme** (se pronuncia "KU-me"): palabra mapuche que significa *buen vivir, equilibrio, armonía*.
-- Agencia de marketing de Argentina (Buenos Aires). Somos **dos personas: Ignacio y Delfi**. Eso es una ventaja, no una debilidad: el cliente habla directo con los fundadores.
+- Agencia creativa de marketing de Argentina (Buenos Aires). Detrás están Ignacio y Delfi, y el cliente habla directo con ellos.
+- **En todo lo público (redes, videos, web, mensajes a prospectos) hablamos como agencia: "nosotros", "en Küme", "escribinos". Nunca decimos cuántas personas somos ni "somos dos".** (Pedido de Ignacio, 27/10/2026.)
+- Trabajamos con un equipo de 14 agentes de IA (Küme HQ); eso sí se puede contar.
 - Instagram: `@kume.agencia`
 - Web: https://kume-website.vercel.app/
 - Promesa: **"Hacemos que tu negocio tenga algo real para decir — y la presencia digital para decirlo bien."**
@@ -66,7 +68,7 @@ Küme es como un consultor de ~32 años que salió de una agencia grande para ha
 |---|---|
 | "Hacemos que tu marca tenga algo real para decir" | "Potenciamos tu presencia digital" |
 | "No vendemos seguidores. Construimos comunidad." | "Aumentamos tu engagement y reach orgánico" |
-| "Somos dos personas, no una empresa de 50." | "Equipo multidisciplinario" |
+| "En Küme hablás directo con quien hace tu marca." | "Equipo multidisciplinario" |
 | "Te damos feedback honesto" | "ROI garantizado" |
 
 ## Identidad visual (resumen)

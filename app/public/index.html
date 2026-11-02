@@ -247,6 +247,7 @@
   <div class="marco">
     <div class="cab"><img src="avatars/kume.png" id="v-avatar" alt=""><b>kume.agencia</b><span id="v-cont">1/7</span></div>
     <img class="slide-img" id="v-img" alt="">
+    <video class="slide-img" id="v-video" style="display:none;aspect-ratio:9/16;max-height:calc(100vh - 220px);object-fit:contain;background:#000" controls loop playsinline></video>
     <div class="puntos" id="v-puntos"></div>
     <div class="pie" id="v-pie"></div>
   </div>
@@ -536,17 +537,20 @@ function abrirVista(id, i) {
   $("#visor").classList.add("on"); pintarVista();
 }
 function pintarVista() {
-  const { c, i } = VISTA, n = c.imagenes.length;
-  $("#v-img").src = c.imagenes[i];
+  const { c, i } = VISTA, n = c.video ? 1 : c.imagenes.length;
+  // los reels se ven como video (con sonido); el resto, imagen por imagen
+  $("#v-img").style.display = c.video ? "none" : ""; $("#v-video").style.display = c.video ? "" : "none";
+  if (c.video) { if (!$("#v-video").src.endsWith(c.video)) { $("#v-video").src = c.video; $("#v-video").play().catch(() => {}); } }
+  else $("#v-img").src = c.imagenes[i];
   $("#v-cont").textContent = `${i + 1}/${n}`;
   $("#v-puntos").innerHTML = n > 1 ? c.imagenes.map((_, k) => `<i class="${k === i ? "on" : ""}"></i>`).join("") : "";
   $("#v-prev").disabled = i === 0; $("#v-next").disabled = i === n - 1;
-  $("#v-descargar").href = c.imagenes[i]; $("#v-descargar").download = `${c.carpeta}-${String(i + 1).padStart(2, "0")}.png`;
+  $("#v-descargar").href = c.video || c.imagenes[i]; $("#v-descargar").download = c.video ? `${c.carpeta}.mp4` : `${c.carpeta}-${String(i + 1).padStart(2, "0")}.png`;
   // precarga la siguiente para que pase sin demora
   if (i + 1 < n) new Image().src = c.imagenes[i + 1];
 }
 function moverVista(d) { if (!VISTA) return; const n = VISTA.c.imagenes.length; VISTA.i = Math.max(0, Math.min(n - 1, VISTA.i + d)); pintarVista(); }
-function cerrarVista() { $("#visor").classList.remove("on"); VISTA = null; }
+function cerrarVista() { $("#visor").classList.remove("on"); VISTA = null; $("#v-video").pause(); $("#v-video").removeAttribute("src"); }
 document.addEventListener("keydown", (e) => {
   if (!VISTA) return;
   if (e.key === "ArrowRight") moverVista(1);

@@ -11,3 +11,7 @@ __pycache__/
 Thumbs.db
 desktop.ini
 agentes/*/entradas/
+*.mp4
+*.wav
+_cuadros/
+muestras/

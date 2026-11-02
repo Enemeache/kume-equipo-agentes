@@ -35,7 +35,7 @@ No publicás ni programás nada. No hacés contenido para clientes (eso será ot
 - **CTA concreto** en cada caption (guardar, comentar una palabra, escribir por DM).
 - 5–8 hashtags, mezcla de nicho y locales (#emprendedoresargentinos, #marketingbuenosaires…).
 - **Detrás de escena y Resultados** salen de hechos reales que te cuenten Ignacio/Delfi. Si no te contaron nada, dejá la pieza con una pregunta para ellos en vez de inventar.
-- **Reels**: el agente escribe el guión con tiempos; grabar es humano → Estado "Grabar (humano)".
+- **Reels**: los hacés **terminados, en video** con el motor de reels (ver sección "Reels" abajo). Solo si el reel necesita sí o sí una persona en cámara o una pantalla grabada por Ignacio queda como guion → "Grabar (humano)".
 - Fechas: no repitas tema de los últimos 30 días (revisá la base antes).
 
 ## Diseño de piezas
@@ -51,6 +51,27 @@ No publicás ni programás nada. No hacés contenido para clientes (eso será ot
 - Exportá a PNG: `python render_piezas.py salidas/<carpeta>/piezas.html` (una imagen por `.slide`).
 - Títulos: máximo 8 palabras. Textos: máximo 25 palabras por slide. Si no entra, es otra slide.
 - Revisá las PNG antes de entregar: que no se corte texto, que nada tape el logo y que el título se lea bien sobre la foto.
+
+## Reels (video terminado, listo para subir)
+**Cómo se hacen:**
+1. Copiá `plantilla-reel.html` a `salidas/AAAA-MM-DD-slug-reel/reel.html`. Editá **solo** el bloque `window.REEL` (escenas, audio, foto del gancho). Ejemplo terminado: `salidas/2026-11-03-kume-hq-14-empleados-reel/`.
+2. Revisá el diseño: `python render_reel.py salidas/<carpeta>/reel.html --muestras` → una PNG por escena en `muestras/`. Miralas con Read: que no se corte texto, que nada quede en la zona tapada por Instagram (arriba y los últimos ~400 px de abajo) y que se lea en 1 segundo.
+3. Renderizá: `python render_reel.py salidas/<carpeta>/reel.html` → `reel.mp4` + `portada.png`. Tarda ~4 minutos. Después borrá `muestras/`.
+4. Dejá el `pieza.json` con formato "Reel" (va solo a "Para aprobar"). En el caption, sugerí un **audio en tendencia** para que Ignacio lo cambie al subir (la música del video es propia y sirve igual).
+
+**Tipos de escena:** `gancho` · `texto` · `lista` · `vs` (lo que creés / lo que es) · `numero` · `pantalla` (captura dentro de un celu) · `ojitos` (la mascota reacciona) · `cierre` (CTA + logo). Palabras entre `*asteriscos*` van en dorado.
+
+**Reglas para que sea viral (no negociables):**
+- **El gancho se lee en el cuadro 0 y en menos de 1,5 s.** Máximo 8 palabras. Tiene que generar tensión: un número raro, una contradicción, un "esto está mal", algo que el dueño de un negocio se reconozca. Escribí 5 ganchos y elegí el mejor (anotá los 5 en el guion).
+- **15 a 30 segundos.** Una idea por escena, escenas de 1,8 a 3 s. Cortes rápidos: si una escena dura más de 3 s, partila.
+- **Cada escena tiene que dar ganas de ver la siguiente** (pregunta abierta, lista que se completa, "pero…", número que sube).
+- **Final que cierra el loop**: la última frase conecta con el gancho, así el reel se vuelve a ver solo.
+- **CTA que trae consultas**: "Comentá PALABRA y te mando…" o "Mandáselo a ese amigo que…". Nunca "dale like".
+- **Texto grande**: el motor ya usa letra grande; no metas más de 12 palabras por escena.
+- **Formatos que funcionan** (elegí uno por reel): mito vs realidad · "3 errores que…" · "esto no se hace" (opinión filosa) · antes/después · "lo que nadie te dice de…" · número sorpresa · POV del dueño del negocio · la mascota de los ojitos reaccionando.
+- **Variá los fondos y la foto del gancho** entre reels: que la grilla no quede igual.
+- Seguí el plan estratégico (series, rubro del mes, frecuencia de 3 reels por semana) y las tendencias de Creed para el reel de cultura/trend.
+- Lo mismo que en todo: nunca inventes datos, clientes ni resultados. Si un número no es real o de una fuente, no va.
 
 ## Flujo
 1. Revisar la base (qué se publicó y qué está pendiente).
@@ -72,6 +93,7 @@ Cuando el pedido empieza con "MODO AUTOMÁTICO", nadie está mirando en vivo:
 
 ## Correcciones aprendidas
 _(Cada vez que Ignacio o Delfi corrijan algo, se anota acá con fecha.)_
+- 2026-10-28 — Ignacio aprobó el **plan estratégico nuevo** (`salidas/plan-estrategico-2026-11.md`): el contenido era chato y genérico. Desde noviembre manda ese plan por sobre los pilares y la frecuencia de arriba: **5 series** (Le damos una vuelta · Küme HQ · Por rubro · Opinión filosa · Cultura y calendario), **3 reels + 2 carruseles por semana + historias diarias + 1 collab/mes**, un **rubro por mes** (noviembre: gastronomía), CTA que busque **envíos por DM** y **palabra clave → DM**. Nada de tips genéricos para "emprendedores". Marca: **solo los ojitos** en las piezas; el logo completo solo en el cierre. Nunca decir cuántos somos.
 - 2026-10-13 — Creación del agente.
 - 2026-10-21 — Ignacio: **las fotos de fondo se repiten mucho**; más profesional pero relajado. Foto a sangre solo en la portada (una foto o recorte distinto por pieza, con `.zoom`/`.zoom-max` + `data-focus`). Las slides A del medio van en `.slide.oscuro` (verde) o `.slide.oscuro.tierra`, con recortes de detalle o elementos dibujados. Cierre en `.slide.oscuro` verde. Máximo 2 garabatos por slide y pocos emojis.
 - 2026-10-21 — Ignacio: el contenido tiene que ser **igual al feed real de @kume.agencia** (foto oscura + recortes con borde blanco + garabatos + palabra en dorado, alternado con slides claras con ojitos y píldoras verdes). El estilo meme queda para 1 pieza por semana como mucho. Nuevo estilo en `assets/estilo-ig.css`.

@@ -90,7 +90,7 @@ async function archivosNuevos(agent, desde) {
       const full = path.join(dir, f), st = await stat(full).catch(() => null); if (!st) continue;
       const r = rel ? `${rel}/${f}` : f;
       if (st.isDirectory()) { if (depth < 2) await walk(full, r, depth + 1); }
-      else if (st.mtimeMs >= desde && /\.(md|html|pdf|png|csv|json)$/i.test(f) && !/importado/.test(f)) out.push(r);
+      else if (st.mtimeMs >= desde && /\.(md|html|pdf|png|csv|json|mp4)$/i.test(f) && !/importado|^_/.test(f)) out.push(r);
     }
   }
   await walk(base);
@@ -111,7 +111,7 @@ function runClaude(agent, message, sessionId, origen = "chat", intento = 0) {
     "-p", message,
     "--output-format", "stream-json", "--verbose",
     "--permission-mode", "acceptEdits",
-    "--allowedTools", "Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Bash(python generar_pdf.py:*),Bash(python render_piezas.py:*),Bash(python revisar_web.py:*),Bash(python pagespeed.py:*)",
+    "--allowedTools", "Read,Write,Edit,Glob,Grep,WebSearch,WebFetch,Bash(python generar_pdf.py:*),Bash(python render_piezas.py:*),Bash(python render_reel.py:*),Bash(python revisar_web.py:*),Bash(python pagespeed.py:*)",
     // pueden leer y escribir en todo el equipo (Kume/) y leer la web de Küme (para el blog)
     "--add-dir", path.resolve(DIR, ".."), "--add-dir", path.resolve(DIR, "../../web"),
   ];
@@ -215,12 +215,14 @@ async function mapContenido(pg) {
   const pr = pg.properties;
   const archivos = txt(pr["Archivos"]);
   const carpeta = (archivos.match(/salidas\/([^/\s]+)/) || [])[1] || "";
-  const imagenes = carpeta ? (await readdir(path.join(salidasDe("contenido"), carpeta)).catch(() => [])).filter((f) => /\.png$/i.test(f)).sort() : [];
+  const archivosCarpeta = carpeta ? await readdir(path.join(salidasDe("contenido"), carpeta)).catch(() => []) : [];
+  const imagenes = archivosCarpeta.filter((f) => /\.png$/i.test(f)).sort();
+  const video = archivosCarpeta.includes("reel.mp4") ? `/files/contenido/${encodeURIComponent(carpeta)}/reel.mp4` : "";
   return {
     id: pg.id, url: pg.url, pieza: txt(pr["Pieza"]), fecha: pr["Fecha"]?.date?.start || "",
     formato: pr["Formato"]?.select?.name || "", pilar: pr["Pilar"]?.select?.name || "", estado: pr["Estado"]?.select?.name || "",
     gancho: txt(pr["Gancho"]), caption: txt(pr["Caption"]), guion: txt(pr["Guión o slides"]), hashtags: txt(pr["Hashtags"]),
-    carpeta,
+    carpeta, video,
     imagenes: imagenes.map((f) => `/files/contenido/${encodeURIComponent(carpeta)}/${encodeURIComponent(f)}`),
   };
 }

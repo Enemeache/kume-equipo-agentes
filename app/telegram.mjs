@@ -66,6 +66,13 @@ export function iniciarTelegram({ DATA, agents, agentDir, PORT, suscriptores }) 
       } else { fd.append("media", JSON.stringify(media)); await tg("sendMediaGroup", fd, true); }
     }
   }
+  async function mandarVideo(ruta, caption) {
+    if (!est.chatId || !existsSync(ruta)) return;
+    const fd = new FormData(); fd.append("chat_id", est.chatId); fd.append("supports_streaming", "true");
+    fd.append("video", new Blob([await readFile(ruta)], { type: "video/mp4" }), path.basename(ruta));
+    if (caption) { fd.append("caption", corto(caption, 1000)); fd.append("parse_mode", "HTML"); }
+    await tg("sendVideo", fd, true);
+  }
   async function mandarDoc(ruta, caption) {
     if (!est.chatId || !existsSync(ruta)) return;
     const fd = new FormData(); fd.append("chat_id", est.chatId);
@@ -89,9 +96,11 @@ export function iniciarTelegram({ DATA, agents, agentDir, PORT, suscriptores }) 
   }
   async function tarjetaContenido(c) {
     const dir = c.carpeta ? path.join(agentDir(agente("contenido")), "salidas", c.carpeta) : null;
-    const slides = dir ? await slidesDe(dir) : [];
-    if (slides.length) await mandarFotos(slides, `🎨 <b>${esc(c.pieza)}</b> · ${esc(c.formato)} · ${esc(c.fecha)}`);
-    await decir(`🎨 <b>Pam: pieza para aprobar</b>\n<b>${esc(c.pieza)}</b> · ${esc(c.formato)} · ${esc(c.fecha)} · ${esc(c.pilar)}\n${slides.length ? "" : `\n<b>Guion:</b>\n${esc(corto(c.guion, 1500))}\n`}\n<b>Caption:</b>\n${esc(corto(c.caption, 1800))}\n\n${esc(c.hashtags)}`,
+    const reel = dir && existsSync(path.join(dir, "reel.mp4")) ? path.join(dir, "reel.mp4") : null;
+    const slides = dir && !reel ? await slidesDe(dir) : [];
+    if (reel) await mandarVideo(reel, `🎬 <b>${esc(c.pieza)}</b> · Reel · ${esc(c.fecha)}`);
+    else if (slides.length) await mandarFotos(slides, `🎨 <b>${esc(c.pieza)}</b> · ${esc(c.formato)} · ${esc(c.fecha)}`);
+    await decir(`🎨 <b>Pam: pieza para aprobar</b>\n<b>${esc(c.pieza)}</b> · ${esc(c.formato)} · ${esc(c.fecha)} · ${esc(c.pilar)}\n${slides.length || reel ? "" : `\n<b>Guion:</b>\n${esc(corto(c.guion, 1500))}\n`}\n<b>Caption:</b>\n${esc(corto(c.caption, 1800))}\n\n${esc(c.hashtags)}`,
       botones([[{ text: "✅ Aprobar", callback_data: `a:c:${c.id}` }, { text: "✏️ Pedir cambios", callback_data: `d:c:${c.id}` }]]));
   }
   async function pendientes() {
@@ -233,12 +242,14 @@ ${equipo || "Nadie trabajó. Prendé las rutinas en la app o pedile algo a algui
     const base = path.join(agentDir(agente(id)), "salidas"), carpetas = new Set();
     for (const r of archivos.slice(0, 12)) {
       const full = path.join(base, r);
+      if (/\.mp4$/i.test(r)) { await mandarVideo(full, `🎬 ${esc(agente(id).nombre)}: <b>${esc(path.basename(path.dirname(full)))}</b>`); carpetas.add(path.dirname(full)); continue; }
+      if (/\.png$/i.test(r) && existsSync(path.join(path.dirname(full), "reel.mp4"))) continue; // la portada del reel no hace falta
       if (/\.png$/i.test(r)) {
         const dir = path.dirname(full); if (carpetas.has(dir)) continue; carpetas.add(dir);
         if (carpetas.size > 3) continue;
         const slides = await slidesDe(dir);
         await mandarFotos(slides.length ? slides : [full], `🖼️ ${esc(agente(id).nombre)}: <b>${esc(path.basename(dir))}</b>`);
-      } else if (/\.pdf$/i.test(r)) await mandarDoc(full, `📄 ${esc(agente(id).nombre)}: ${esc(r)}`);
+      } else if (/\.(pdf|html|zip)$/i.test(r)) await mandarDoc(full, `📄 ${esc(agente(id).nombre)}: ${esc(r)}`);
     }
   }
 

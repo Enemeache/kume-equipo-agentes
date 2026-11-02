@@ -1,0 +1,51 @@
+/* Estilo de los reels de Küme (mismo lenguaje que el feed: Poppins en negrita, palabra en dorado,
+   fondos verde / crema / tierra o foto oscura con grano, ojitos como mascota). 1080×1920. */
+:root{--verde:#1B3A2D;--verde2:#2D5A42;--dorado:#E3A83A;--crema:#F4F1EC;--tierra:#3A2A20;--blanco:#fff}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#000}
+#lienzo{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:'Poppins',sans-serif}
+.esc{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.fondo-verde{background:radial-gradient(ellipse at 50% 35%,#24503D,var(--verde) 70%)}
+.fondo-tierra{background:radial-gradient(ellipse at 50% 35%,#4A3628,var(--tierra) 70%)}
+.fondo-crema{background:var(--crema);color:var(--verde)}
+.fondo-negro{background:#0B0F0D}
+.fondo-foto{background:#000}
+.foto{position:absolute;inset:-2%;background-size:cover;background-position:center;filter:brightness(.45) contrast(1.05) saturate(.9)}
+/* zona segura: Instagram tapa arriba (~220px) y abajo (~420px) */
+.caja{position:relative;width:920px;max-height:1260px;margin-top:-140px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:34px;color:var(--blanco)}
+.fondo-crema .caja{color:var(--verde)}
+.titulo{font-weight:800;font-size:104px;line-height:1.06;letter-spacing:-.02em}
+.titulo.grande{font-size:122px}
+.titulo.chico{font-size:78px}
+.fondo-crema .titulo{font-family:'Fredoka',sans-serif;font-weight:700}
+.w{display:inline-block;will-change:transform}
+.oro{color:var(--dorado)}
+.fondo-crema .oro{color:#fff;background:var(--verde2);padding:0 .2em .04em;border-radius:.2em;display:inline-block;transform:rotate(-2deg);box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.fondo-crema .oro .w{color:#fff}
+.pre{font-size:40px;font-style:italic;font-weight:500;opacity:.85}
+.sub{font-size:48px;font-weight:500;line-height:1.3;opacity:.92}
+.items{display:flex;flex-direction:column;gap:26px;width:100%;text-align:left}
+.item{display:flex;gap:24px;align-items:center;font-size:56px;font-weight:700;line-height:1.15}
+.item .n{flex:none;width:86px;height:86px;border-radius:50%;background:var(--dorado);color:var(--verde);display:grid;place-items:center;font-size:48px;font-weight:800}
+.fondo-crema .item .n{background:var(--verde2);color:#fff}
+.tipo-vs .caja{gap:0;max-height:none;margin-top:-160px}
+.mitad{width:1080px;padding:70px 80px;display:flex;flex-direction:column;align-items:center;gap:22px}
+.mitad.arriba{background:var(--verde);color:#fff}
+.mitad.arriba .titulo{font-family:'Poppins',sans-serif;font-weight:800}
+.mitad.arriba .oro{background:none;color:var(--dorado);transform:none;padding:0}
+.mitad.abajo{background:var(--crema);color:var(--verde)}
+.etq{font-size:36px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:10px 26px;border-radius:40px}
+.etq.mal{background:#C44536;color:#fff}.etq.bien{background:var(--verde2);color:#fff}
+.numero{font-size:300px;font-weight:800;line-height:1;color:var(--dorado);letter-spacing:-.04em}
+.celu{width:600px;height:1080px;border-radius:70px;border:16px solid #fff;overflow:hidden;background:#111;box-shadow:0 40px 80px rgba(0,0,0,.45)}
+.pant{width:100%;height:100%;overflow:hidden}.pant img{width:100%;display:block}
+.tipo-pantalla .caja{gap:30px;margin-top:-60px}
+.mascota{width:520px;filter:drop-shadow(0 20px 40px rgba(0,0,0,.35))}
+.mascota.chica{width:260px}
+.logo-cierre{width:420px;margin-top:30px}
+#capa{position:absolute;inset:0;pointer-events:none}
+#grano{position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:overlay;opacity:.28}
+#vineta{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,.45))}
+#flash{position:absolute;inset:0;background:#fff;opacity:0}
+#barra{position:absolute;top:0;left:0;height:10px;background:var(--dorado);width:0}
+#marca{position:absolute;top:110px;right:70px;width:150px;opacity:.9}

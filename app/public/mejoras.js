@@ -148,7 +148,7 @@
       const c = it.c;
       cuerpo = `<div class="bandeja-tipo">Contenido · Pam · ${H(fechaLinda(c.fecha))} · ${H(c.formato)}</div>
         <h2 style="font-size:32px;margin:4px 0">${H(c.pieza)}</h2>
-        ${c.imagenes.length ? `<div class="bandeja-prev">${c.imagenes.map((src, k) => `<img src="${src}" onclick="abrirVista('${c.id}', ${k})" alt="">`).join("")}</div>` : `<p class="op">${H(c.guion)}</p>`}
+        ${c.video ? `<div class="bandeja-prev"><video src="${c.video}" controls loop playsinline preload="metadata" poster="${c.imagenes[0] || ""}" style="height:420px;border-radius:8px;background:#000"></video></div>` : c.imagenes.length ? `<div class="bandeja-prev">${c.imagenes.map((src, k) => `<img src="${src}" onclick="abrirVista('${c.id}', ${k})" alt="">`).join("")}</div>` : `<p class="op">${H(c.guion)}</p>`}
         ${B.editando ? `<textarea class="editarea" id="b-txt">${H(c.caption)}</textarea><textarea class="editarea" id="b-tags" style="min-height:60px;margin-top:8px">${H(c.hashtags)}</textarea>` : `<div class="msg" style="background:var(--crema)">${H(c.caption)}\n\n${H(c.hashtags)}</div>`}`;
       acc = B.editando
         ? `<button class="btn gold" onclick="KUMEUX.guardarTexto()">💾 Guardar caption</button><button class="btn ghost" onclick="KUMEUX.editar(false)">Cancelar</button>`
@@ -198,7 +198,7 @@
     const vienen = d.cont.filter((c) => ["Aprobado", "Programado", "Grabar (humano)"].concat(conPend ? ["Para aprobar"] : []).includes(c.estado))
       .sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
     const celda = (c) => c.imagenes.length
-      ? `<div class="p" onclick="abrirVista('${c.id}',0)"><img src="${c.imagenes[0]}" alt=""><span class="tag">${H(c.estado === "Para aprobar" ? "por aprobar" : c.estado.toLowerCase())} · ${H((c.fecha || "").slice(5).split("-").reverse().join("/"))}</span></div>`
+      ? `<div class="p" onclick="abrirVista('${c.id}',0)"><img src="${c.imagenes[0]}" alt="">${c.video ? `<span class="tag real" style="left:auto;right:6px">▶ reel</span>` : ""}<span class="tag">${H(c.estado === "Para aprobar" ? "por aprobar" : c.estado.toLowerCase())} · ${H((c.fecha || "").slice(5).split("-").reverse().join("/"))}</span></div>`
       : `<div class="p"><div class="reel">🎬 ${H(c.formato)}<br>${H(c.pieza)}</div><span class="tag">${H((c.fecha || "").slice(5).split("-").reverse().join("/"))}</span></div>`;
     $("#feed").innerHTML = `<div class="feed-head"><img src="avatars/kume.png" alt=""><div><b>kume.agencia</b><div class="meta" style="margin:2px 0 0">${vienen.length} piezas que vienen · ${real.length} últimas publicadas</div></div></div>
       <div class="feed">${vienen.map(celda).join("")}${real.map((src) => `<div class="p"><img src="${src}" alt=""><span class="tag real">publicado</span></div>`).join("")}</div>`;
@@ -267,7 +267,7 @@
   // ---------- 5) PROGRESO EN VIVO + archivos en el chat ----------
   const pasos = {}; // agente → [textos]
   const iconoArchivo = (f) => /\.pdf$/i.test(f) ? "📄" : /\.html$/i.test(f) ? "🌐" : /\.csv$/i.test(f) ? "📊" : "📝";
-  const tarjetas = (agente, archivos = []) => archivos.length ? `<div class="archivos">${archivos.map((f) => { const url = `/files/${agente}/${f.split("/").map(encodeURIComponent).join("/")}`; return `<a class="archivo" href="${url}" target="_blank">${/\.png$/i.test(f) ? `<img src="${url}" alt="">` : `<div class="ico">${iconoArchivo(f)}</div>`}<span>${H(f)}</span></a>`; }).join("")}</div>` : "";
+  const tarjetas = (agente, archivos = []) => archivos.length ? `<div class="archivos">${archivos.map((f) => { const url = `/files/${agente}/${f.split("/").map(encodeURIComponent).join("/")}`; return `<a class="archivo" href="${url}" target="_blank">${/\.png$/i.test(f) ? `<img src="${url}" alt="">` : /\.mp4$/i.test(f) ? `<video src="${url}" muted loop autoplay playsinline style="width:100%;height:150px;object-fit:cover;background:#000"></video>` : `<div class="ico">${iconoArchivo(f)}</div>`}<span>${H(f)}</span></a>`; }).join("")}</div>` : "";
   window.renderChat = renderChat = function (chat, busy) {
     const list = chat.messages.map((m) => `<div class="bubble ${m.de} ${m.error ? "error" : ""}">${md(m.texto)}${m.de === "agente" ? tarjetas(current?.id, m.archivos) : adjuntosVos(current?.id, m.adjuntos)}</div>`);
     if (!chat.messages.length) list.push(`<div class="typing">Todavía no hablaron. Probá con uno de los atajos de abajo.</div>`);

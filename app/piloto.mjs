@@ -1,6 +1,7 @@
 // Piloto automático de Küme HQ: corre las rutinas de los agentes en su horario
 // y carga lo que producen en Notion. Nunca envía ni publica nada.
 import { readFile, writeFile, readdir, rename, stat } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import path from "node:path";
 
 const PROSPECTOS_DS = "634cf749-0bd2-4a14-85d9-e1860b74b3a8";
@@ -83,9 +84,10 @@ Guardá todo en salidas/${slug}/ (hallazgos.md, diagnostico.html y diagnostico.p
     const tend = (await readdir(salidas("tendencias")).catch(() => [])).filter((f) => /tendencias\.md$/.test(f)).sort().pop();
     return {
       texto: `MODO AUTOMÁTICO (rutina semanal, nadie está mirando en vivo: no esperes OK del plan, seguí directo; Ignacio aprueba cada pieza después).
-Armá la semana que arranca el lunes ${hoy(lunes)}: 4 piezas (2 carruseles, 1 reel, 1 post único) respetando los pilares.
-No repitas temas de estas piezas recientes: ${recientes.join(" | ") || "(ninguna)"}.${tend ? `\nLeé las ideas de Creed en ../tendencias/salidas/${tend} y usá las que sirvan.` : ""}
-Tono cercano y canchero. Diseñá los 2 carruseles y el post único IGUAL al feed real de @kume.agencia: copiá plantilla-carrusel.html y alterná slides "foto" (foto oscura con grano, recortes con borde blanco, garabatos blancos, título blanco con palabra dorada, logo chico) y slides "claro" (ojitos, título verde redondeado, píldoras verdes). El estilo meme ilustrado, como mucho en 1 pieza. Exportá las PNG (python render_piezas.py ...). Cada pieza va en salidas/AAAA-MM-DD-slug/ y dentro de cada carpeta dejá un pieza.json con este formato exacto:
+Armá la semana que arranca el lunes ${hoy(lunes)} siguiendo el plan estratégico (salidas/plan-estrategico-2026-11.md): 3 reels + 2 carruseles.
+No repitas temas de estas piezas recientes: ${recientes.join(" | ") || "(ninguna)"}.${tend ? `\nLeé las ideas de Creed en ../tendencias/salidas/${tend} y usá las que sirvan (sobre todo para el reel de cultura/trend).` : ""}
+REELS: hacelos terminados en video con el motor de reels (sección "Reels" de tu CLAUDE.md): copiá plantilla-reel.html a salidas/AAAA-MM-DD-slug-reel/reel.html, escribí las escenas, revisá con python render_reel.py <ruta> --muestras y después renderizá con python render_reel.py <ruta>. Gancho en el primer segundo, 15 a 30 s, una idea por escena. Solo si el reel necesita sí o sí una persona o una pantalla grabada por Ignacio, dejalo como guion (formato "Reel" y la palabra GRABAR al principio del guion).
+CARRUSELES: IGUAL al feed real de @kume.agencia: copiá plantilla-carrusel.html y alterná slides "foto" (foto oscura con grano, recortes con borde blanco, garabatos blancos, título blanco con palabra dorada) y slides "claro" (ojitos, título verde redondeado, píldoras verdes). Exportá las PNG (python render_piezas.py ...). Cada pieza va en salidas/AAAA-MM-DD-slug/ y dentro de cada carpeta dejá un pieza.json con este formato exacto:
 {"pieza":"","fecha":"AAAA-MM-DD","formato":"${FORMATOS.join("|")}","pilar":"${PILARES.join("|")}","gancho":"","caption":"","guion":"","hashtags":""}
 Los hechos de "Detrás de escena" o "Resultados" que no conozcas van como pregunta para Ignacio dentro del guion: no inventes.
 No uses Notion: la app lo carga sola. Respondé con la tabla de la semana.`,
@@ -176,7 +178,8 @@ No uses Notion: la app lo carga sola. Respondé con la tabla de la semana.`,
         Pieza: { title: rt(c.pieza) },
         Formato: { select: { name: oneOf(c.formato, FORMATOS, "Carrusel") } },
         Pilar: { select: { name: oneOf(c.pilar, PILARES, "Educativo") } },
-        Estado: { select: { name: /reel/i.test(c.formato) ? "Grabar (humano)" : "Para aprobar" } },
+        // un reel con video renderizado se aprueba como cualquier pieza; si es solo guion, lo graba Ignacio
+        Estado: { select: { name: /reel/i.test(c.formato) && !existsSync(path.join(base, d, "reel.mp4")) ? "Grabar (humano)" : "Para aprobar" } },
         Gancho: { rich_text: rt(c.gancho) }, Caption: { rich_text: rt(c.caption) },
         "Guión o slides": { rich_text: rt(c.guion) }, Hashtags: { rich_text: rt(c.hashtags) },
         Archivos: { rich_text: rt(`Kume/agentes/contenido/salidas/${d}/`) },
