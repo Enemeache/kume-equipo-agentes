@@ -5,42 +5,52 @@
 <title>Reel Küme</title>
 <!-- Copiá este archivo a salidas/AAAA-MM-DD-slug-reel/reel.html y editá SOLO el bloque REEL de abajo.
      Después: python render_reel.py salidas/AAAA-MM-DD-slug-reel/reel.html  → reel.mp4 + portada.png -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,500;0,700;0,800;1,500&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../assets/reel-motor.css">
 </head>
 <body>
-<div id="lienzo">
-  <div id="capa"><canvas id="grano"></canvas><div id="vineta"></div><div id="flash"></div><div id="barra"></div><img id="marca" src="../../assets/logo-ojos.png" alt=""></div>
-</div>
+<div id="lienzo"></div>
 <script>
 // =====================================================================================
 // EL REEL. Tipos de escena:
-//   gancho   → la primera, se ve desde el cuadro 0 (frena el scroll). texto, pre (opcional), sub (opcional)
-//   texto    → una idea por escena, entra palabra por palabra. texto, pre, sub
-//   lista    → titulo + items (2 a 4), entran de a uno
-//   vs       → izq / der (arriba lo que creés, abajo lo que es). etiqueta_izq / etiqueta_der opcionales
-//   numero   → valor (número que cuenta), sufijo ("%", "hs", "+"), texto
-//   pantalla → img (captura vertical, se desplaza dentro de un celu) + texto
-//   ojitos   → la mascota reacciona (parpadea, mira) + texto
-//   cierre   → CTA final, con el logo completo (el único lugar donde va)
-// Palabras entre *asteriscos* van en dorado. "\n" corta la línea.
+//   gancho    → la primera, legible desde el cuadro 0 (frena el scroll). texto, pre (rótulo chico arriba)
+//   texto     → una idea por escena, entra palabra por palabra. texto, pre, sub
+//   lista     → titulo + items (2 a 4): entran de a uno y el anterior se apaga
+//   vs        → izq (se tacha) / der. etiqueta_izq / etiqueta_der opcionales
+//   numero    → valor (odómetro gigante), sufijo ("%", "hs", "+"), texto
+//   recorrido → img (captura real, ej. Küme HQ) + paradas [{x, y, z, nombre, rol}]: la cámara vuela de una a otra.
+//               x / y = punto de la imagen (0 a 1), z = zoom (2 a 3). titulo opcional arriba.
+//   pantalla  → img (captura vertical, se desplaza dentro de un celu en 3D) + texto
+//   ojitos    → la mascota reacciona (parpadea, mira) + texto
+//   cierre    → CTA: la palabra entre *asteriscos* se tipea como un comentario. Lleva el logo (el único lugar donde va).
+// Palabras entre *asteriscos* = acento dorado (serif itálica con trazo a mano; en fondo crema, resaltado verde).
+// "\n" corta la línea: cada línea se ajusta sola al ancho, así que escribí líneas cortas (2 a 4 palabras).
 // fondo (opcional): "verde" | "crema" | "tierra" | "negro" | "foto:../../ruta/a/foto.jpg"
-// dur: segundos de la escena (gancho 1.5–2.5 · texto 1.8–3 · lista 4–6 · cierre 2.5–3.5)
-// audio: "beat" (con ritmo, para reels de cultura/trend/opinión) | "suave" (Küme HQ, detrás de escena) | "ninguno"
+// trans (opcional, cómo ENTRA la escena): "empuje" | "lateral" | "zoom" | "mascara" | "corte". Si no ponés, rota solo.
+// dur: segundos (se ajustan al beat). gancho 2 · texto 2–2.5 · lista 4.5–5.5 · recorrido 1.4 por parada · cierre 3–3.5
+// audio: "beat" (120 bpm, cultura/trend/opinión) | "suave" (96 bpm, Küme HQ, detrás de escena) | "ninguno"
+// serie (opcional): texto del rótulo de cada escena si no tiene pre (ej. "Küme HQ").
 // =====================================================================================
 window.REEL = {
   audio: "beat",
+  serie: "Küme HQ",
   ojitos: "../../assets/logo-ojos.png",
   logo: "../../assets/palabra-crema.png",
   foto_gancho: "../../assets/fotos/escritorio-laptop.jpg",
   escenas: [
-    { tipo: "gancho", pre: "Küme HQ 👀", texto: "Esta agencia tiene\n*14 empleados*\nque nunca duermen.", dur: 2.2 },
-    { tipo: "texto", texto: "No son personas.\nSon *agentes de IA*.", dur: 2 },
-    { tipo: "lista", titulo: "Cada uno tiene *su puesto*", items: ["Dwight busca clientes", "Pam diseña el contenido", "Jim arma propuestas", "Andy hace el seguimiento"], dur: 5 },
-    { tipo: "numero", valor: 14, texto: "agentes trabajando\n*mientras dormís*", dur: 2.4 },
-    { tipo: "vs", etiqueta_izq: "Lo que pensás", izq: "La IA hace todo sola", etiqueta_der: "Lo que pasa", der: "Nada sale *sin nuestro ok*", dur: 3.2 },
-    { tipo: "ojitos", texto: "¿Querés ver\ncómo es *por dentro*?", dur: 2.2 },
-    { tipo: "cierre", texto: "Comentá *OFICINA*", sub: "y te mostramos cómo trabaja", dur: 3 },
+    { tipo: "gancho", pre: "Küme HQ", texto: "Esta agencia\ntiene *14 empleados*\nque nunca\nduermen.", dur: 2 },
+    { tipo: "texto", texto: "No son\npersonas.\nSon *agentes de IA*.", dur: 2 },
+    { tipo: "recorrido", img: "../../assets/capturas/kume-hq-oficina.png", titulo: "Cada uno\ntiene *su puesto*", dur: 6,
+      paradas: [
+        { x: .585, y: .335, z: 2.4, nombre: "Dwight", rol: "busca clientes" },
+        { x: .472, y: .445, z: 2.4, nombre: "Pam", rol: "diseña el contenido" },
+        { x: .727, y: .47, z: 2.4, nombre: "Jim", rol: "arma propuestas" },
+        { x: .615, y: .585, z: 2.4, nombre: "Andy", rol: "hace el seguimiento" },
+      ] },
+    { tipo: "numero", valor: 14, texto: "agentes trabajando\n*mientras dormís*", dur: 2.5 },
+    { tipo: "vs", etiqueta_izq: "Lo que pensás", izq: "La IA hace\ntodo sola", etiqueta_der: "Lo que pasa", der: "Nada sale\n*sin nuestro ok*", dur: 3 },
+    { tipo: "ojitos", texto: "¿Querés ver\ncómo es *por dentro*?", dur: 2 },
+    { tipo: "cierre", texto: "Comentá\n*OFICINA*", sub: "y te mostramos cómo trabaja", dur: 3.5 },
   ],
 };
 </script>

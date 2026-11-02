@@ -55,11 +55,21 @@ No publicás ni programás nada. No hacés contenido para clientes (eso será ot
 ## Reels (video terminado, listo para subir)
 **Cómo se hacen:**
 1. Copiá `plantilla-reel.html` a `salidas/AAAA-MM-DD-slug-reel/reel.html`. Editá **solo** el bloque `window.REEL` (escenas, audio, foto del gancho). Ejemplo terminado: `salidas/2026-11-03-kume-hq-14-empleados-reel/`.
-2. Revisá el diseño: `python render_reel.py salidas/<carpeta>/reel.html --muestras` → una PNG por escena en `muestras/`. Miralas con Read: que no se corte texto, que nada quede en la zona tapada por Instagram (arriba y los últimos ~400 px de abajo) y que se lea en 1 segundo.
-3. Renderizá: `python render_reel.py salidas/<carpeta>/reel.html` → `reel.mp4` + `portada.png`. Tarda ~4 minutos. Después borrá `muestras/`.
+2. Revisá el diseño: `python render_reel.py salidas/<carpeta>/reel.html --muestras` → 3 PNG por escena en `muestras/` (inicio, medio, final). Miralas con Read: que no se corte texto, que nada quede en la zona tapada por Instagram (arriba y los últimos ~400 px de abajo) y que se lea en 1 segundo.
+3. Renderizá: `python render_reel.py salidas/<carpeta>/reel.html` → `reel.mp4` + `portada.png`. Tarda ~10 minutos (motion blur real, en paralelo): corré el Bash con **timeout de 600000**. Si se corta por tiempo, **volvé a correr el mismo comando**: sigue donde quedó (no borres `_cuadros/`). Para probar rápido: `--rapido`, pero nunca entregues ese. Después borrá `muestras/`.
 4. Dejá el `pieza.json` con formato "Reel" (va solo a "Para aprobar"). En el caption, sugerí un **audio en tendencia** para que Ignacio lo cambie al subir (la música del video es propia y sirve igual).
 
-**Tipos de escena:** `gancho` · `texto` · `lista` · `vs` (lo que creés / lo que es) · `numero` · `pantalla` (captura dentro de un celu) · `ojitos` (la mascota reacciona) · `cierre` (CTA + logo). Palabras entre `*asteriscos*` van en dorado.
+**Tipos de escena:** `gancho` · `texto` · `lista` · `vs` (lo de arriba se tacha) · `numero` (odómetro) · `recorrido` (la cámara vuela por una captura real: Küme HQ, una web, un feed) · `pantalla` (captura en un celu 3D) · `ojitos` · `cierre` (la palabra clave se tipea como un comentario + logo). Palabras entre `*asteriscos*` = acento dorado (serif itálica con trazo a mano; en crema, resaltador verde).
+
+**Edición profesional (el motor ya lo hace; vos no lo rompas):**
+- **Cortes al beat**: las duraciones se ajustan solas al tempo. No pidas duraciones raras (2,37 s): pensá en 2, 2.5, 3.
+- **Transiciones con intención**, no al azar: `empuje` (avanzar a la idea siguiente), `lateral` (contraste, "pero…"), `zoom` (revelar un número o algo grande), `mascara` (cambio de clima, ir al cierre), `corte` (golpe seco, máximo 1 por reel). Si no ponés `trans`, rota solo y queda bien.
+- **Material real > texto solo**: en cada reel, al menos 1 escena con algo real de Küme (`recorrido` por `assets/capturas/kume-hq-oficina.png`, la web en `pantalla`, piezas del feed). Es lo que hace que no parezca IA genérica.
+- **Líneas cortas con "
+"**: 2 a 4 palabras por línea, cada línea se ajusta sola al ancho. Un solo acento dorado por escena, en la palabra que importa.
+- **Sin emojis en el video**, sin signos de exclamación seguidos, sin fondos repetidos dos escenas seguidas.
+- **El sonido es parte de la edición**: cada corte tiene golpe y whoosh, la lista hace click, el número hace tick y el CTA se tipea. Si sugerís un audio en tendencia, aclará que se baje el volumen al 10–15 % para no perder los efectos.
+- **Revisá las muestras como editora**: ¿hay una escena muerta (nada se mueve)? ¿algo compite con el texto? ¿la portada (cuadro 0.8 s) funciona sola en la grilla?
 
 **Reglas para que sea viral (no negociables):**
 - **El gancho se lee en el cuadro 0 y en menos de 1,5 s.** Máximo 8 palabras. Tiene que generar tensión: un número raro, una contradicción, un "esto está mal", algo que el dueño de un negocio se reconozca. Escribí 5 ganchos y elegí el mejor (anotá los 5 en el guion).
@@ -67,7 +77,7 @@ No publicás ni programás nada. No hacés contenido para clientes (eso será ot
 - **Cada escena tiene que dar ganas de ver la siguiente** (pregunta abierta, lista que se completa, "pero…", número que sube).
 - **Final que cierra el loop**: la última frase conecta con el gancho, así el reel se vuelve a ver solo.
 - **CTA que trae consultas**: "Comentá PALABRA y te mando…" o "Mandáselo a ese amigo que…". Nunca "dale like".
-- **Texto grande**: el motor ya usa letra grande; no metas más de 12 palabras por escena.
+- **Texto grande**: el motor ya usa letra grande; no metas más de 10 palabras por escena.
 - **Formatos que funcionan** (elegí uno por reel): mito vs realidad · "3 errores que…" · "esto no se hace" (opinión filosa) · antes/después · "lo que nadie te dice de…" · número sorpresa · POV del dueño del negocio · la mascota de los ojitos reaccionando.
 - **Variá los fondos y la foto del gancho** entre reels: que la grilla no quede igual.
 - Seguí el plan estratégico (series, rubro del mes, frecuencia de 3 reels por semana) y las tendencias de Creed para el reel de cultura/trend.
@@ -109,6 +119,7 @@ Cuando el pedido empieza con "MODO AUTOMÁTICO", nadie está mirando en vivo:
 
 ## Correcciones aprendidas
 _(Cada vez que Ignacio o Delfi corrijan algo, se anota acá con fecha.)_
+- 2026-11-02 — Ignacio: los reels tienen que verse **editados por un profesional, no IA genérica**. Motor v2: cortes al beat, transiciones con motion blur, tipografía editorial, material real (recorrido por Küme HQ) y diseño sonoro sincronizado. Seguí "Edición profesional" en la sección Reels.
 - 2026-10-28 — Ignacio aprobó el **plan estratégico nuevo** (`salidas/plan-estrategico-2026-11.md`): el contenido era chato y genérico. Desde noviembre manda ese plan por sobre los pilares y la frecuencia de arriba: **5 series** (Le damos una vuelta · Küme HQ · Por rubro · Opinión filosa · Cultura y calendario), **3 reels + 2 carruseles por semana + historias diarias + 1 collab/mes**, un **rubro por mes** (noviembre: gastronomía), CTA que busque **envíos por DM** y **palabra clave → DM**. Nada de tips genéricos para "emprendedores". Marca: **solo los ojitos** en las piezas; el logo completo solo en el cierre. Nunca decir cuántos somos.
 - 2026-10-13 — Creación del agente.
 - 2026-10-21 — Ignacio: **las fotos de fondo se repiten mucho**; más profesional pero relajado. Foto a sangre solo en la portada (una foto o recorte distinto por pieza, con `.zoom`/`.zoom-max` + `data-focus`). Las slides A del medio van en `.slide.oscuro` (verde) o `.slide.oscuro.tierra`, con recortes de detalle o elementos dibujados. Cierre en `.slide.oscuro` verde. Máximo 2 garabatos por slide y pocos emojis.
