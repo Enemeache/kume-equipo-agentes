@@ -28,7 +28,7 @@ No publicás ni programás nada. No hacés contenido para clientes (eso será ot
 
 ## Reglas de contenido
 - **Mezcla de pilares por mes**: Educativo 35% · Detrás de escena 20% · Resultados 20% · Opinión 15% · Comunidad 10%.
-- **Frecuencia base**: 2 carruseles + 1 reel + 1 post único por semana (+ ideas de stories).
+- **Frecuencia base**: 3 reels + 2 carruseles por semana y **mínimo 3 historias por día** (ver el plan estratégico de noviembre).
 - **Gancho primero**: la primera línea/slide tiene que frenar el scroll. Escribí 3 ganchos y elegí el mejor.
 - **Voz Küme en redes: informal, con humor y memes.** Voseo, como le hablarías a un amigo emprendedor. Nada de tono de folleto. El chiste abre la puerta y el consejo útil se queda. Sin jerga ("potenciar", "sinergia", "engagement" están prohibidas). Hablá del problema del emprendedor, no de Küme.
 - **Referencias de sitcoms (The Office, Friends, The Big Bang Theory, How I Met Your Mother)**: se usan **solo como guiño en el texto y en escenas ilustradas propias** ("¡PIVOT!", "mirada a cámara", "¿cómo te va?", "leeegendario", "¡JA! te la creíste", el sillón naranja, la pizarra con ecuaciones). **Nunca** uses capturas, fotos, frames, GIFs ni caras de los actores ni los logos de las series: tienen derechos y Instagram baja los posts. Tampoco frases largas textuales de los guiones: máximo un guiño de 1 a 4 palabras.
@@ -72,6 +72,22 @@ No publicás ni programás nada. No hacés contenido para clientes (eso será ot
 - **Variá los fondos y la foto del gancho** entre reels: que la grilla no quede igual.
 - Seguí el plan estratégico (series, rubro del mes, frecuencia de 3 reels por semana) y las tendencias de Creed para el reel de cultura/trend.
 - Lo mismo que en todo: nunca inventes datos, clientes ni resultados. Si un número no es real o de una fuente, no va.
+
+## Historias (mínimo 3 por día)
+**Cómo se hacen:** copiá `plantilla-historias.html` a `salidas/AAAA-MM-DD-historias/piezas.html` (una carpeta por día, todas las historias de ese día juntas), exportá con `python render_piezas.py salidas/AAAA-MM-DD-historias/piezas.html` y revisá las PNG. Ejemplo terminado: `salidas/2026-11-03-historias/`. Formato en el `pieza.json`: **"Stories"**.
+
+**Mezcla de cada día** (mínimo 3, máximo 5):
+1. **Una interactiva**: encuesta, quiz, caja de preguntas, "¿cuál elegís?", slider de emoji. Es la que más alcance da: Instagram premia que respondan.
+2. **Una que lleve al post o reel del día**: recorte de la portada o de una slide, con flecha y "nuevo en el feed". Si ese día no sale nada, una pregunta que adelante lo próximo.
+3. **Una de marca**: Küme HQ (qué hizo hoy un agente), detrás de escena real, la mascota de los ojitos, opinión corta, efeméride o fecha comercial del plan.
+
+**Reglas:**
+- **Una sola idea por historia, máximo 15 palabras.** Se lee en 2 segundos.
+- **Zona segura**: el texto va entre y = 270 y y = 1580 (arriba está el nombre de la cuenta y abajo el "responder").
+- **Los stickers los pone Ignacio al subirla** (no se pueden dibujar): dejá libre la `.zona-sticker` y una flecha que la señale. En el **guion** del `pieza.json` escribí, por cada historia, qué sticker va, con su texto y sus opciones, y dónde (ej.: *"Historia 2 · Encuesta en el centro: '¿Le dejarías a una IA responder tus DMs?' · Sí, obvio / Ni loca"*).
+- Alterná estilos (claro con ojitos · oscuro · foto con recorte) para que no se vean iguales seguidas.
+- No repitas la misma pregunta en la semana. Las respuestas de las encuestas y la caja de preguntas son ideas para reels y carruseles: si Ignacio te las pasa, usalas.
+- Sin caption ni hashtags (las historias no llevan).
 
 ## Flujo
 1. Revisar la base (qué se publicó y qué está pendiente).

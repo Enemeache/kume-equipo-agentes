@@ -100,7 +100,7 @@ export function iniciarTelegram({ DATA, agents, agentDir, PORT, suscriptores }) 
     const slides = dir && !reel ? await slidesDe(dir) : [];
     if (reel) await mandarVideo(reel, `🎬 <b>${esc(c.pieza)}</b> · Reel · ${esc(c.fecha)}`);
     else if (slides.length) await mandarFotos(slides, `🎨 <b>${esc(c.pieza)}</b> · ${esc(c.formato)} · ${esc(c.fecha)}`);
-    await decir(`🎨 <b>Pam: pieza para aprobar</b>\n<b>${esc(c.pieza)}</b> · ${esc(c.formato)} · ${esc(c.fecha)} · ${esc(c.pilar)}\n${slides.length || reel ? "" : `\n<b>Guion:</b>\n${esc(corto(c.guion, 1500))}\n`}\n<b>Caption:</b>\n${esc(corto(c.caption, 1800))}\n\n${esc(c.hashtags)}`,
+    await decir(`🎨 <b>Pam: pieza para aprobar</b>\n<b>${esc(c.pieza)}</b> · ${esc(c.formato)} · ${esc(c.fecha)} · ${esc(c.pilar)}\n${(slides.length || reel) && !/stor/i.test(c.formato) ? "" : `\n<b>Guion:</b>\n${esc(corto(c.guion, 1500))}\n`}\n<b>Caption:</b>\n${esc(corto(c.caption, 1800))}\n\n${esc(c.hashtags)}`,
       botones([[{ text: "✅ Aprobar", callback_data: `a:c:${c.id}` }, { text: "✏️ Pedir cambios", callback_data: `d:c:${c.id}` }]]));
   }
   async function pendientes() {

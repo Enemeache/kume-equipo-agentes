@@ -81,6 +81,22 @@
       "activa": false
     },
     {
+      "id": "historias-diaria",
+      "agente": "contenido",
+      "nombre": "Historias de mañana (3 o más)",
+      "dias": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "hora": "18:00",
+      "activa": false
+    },
+    {
       "id": "seguimientos-diario",
       "agente": "seguimientos",
       "nombre": "Segundo mensaje a los que no respondieron",

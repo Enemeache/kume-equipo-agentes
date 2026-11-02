@@ -541,7 +541,7 @@ function pintarVista() {
   // los reels se ven como video (con sonido); el resto, imagen por imagen
   $("#v-img").style.display = c.video ? "none" : ""; $("#v-video").style.display = c.video ? "" : "none";
   if (c.video) { if (!$("#v-video").src.endsWith(c.video)) { $("#v-video").src = c.video; $("#v-video").play().catch(() => {}); } }
-  else $("#v-img").src = c.imagenes[i];
+  else { $("#v-img").src = c.imagenes[i]; $("#v-img").style.aspectRatio = /stor/i.test(c.formato) ? "9/16" : ""; }
   $("#v-cont").textContent = `${i + 1}/${n}`;
   $("#v-puntos").innerHTML = n > 1 ? c.imagenes.map((_, k) => `<i class="${k === i ? "on" : ""}"></i>`).join("") : "";
   $("#v-prev").disabled = i === 0; $("#v-next").disabled = i === n - 1;

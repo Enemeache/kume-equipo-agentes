@@ -49,7 +49,8 @@ export function createPiloto({ DIR, DATA, agents, agentDir, runClaude, notion, r
     const archivo = `salidas/prospectos-${hoy()}.json`;
     return {
       texto: `MODO AUTOMÁTICO (rutina diaria, nadie está mirando en vivo: no preguntes nada, decidí vos con tus reglas).
-Buscame 5 ${z.rubro} en ${z.zona}, CABA. Seguí todos tus pasos: investigá, puntuá y escribí el primer mensaje de cada uno.
+Buscame 5 ${z.rubro} en ${z.zona}, CABA. Seguí todos tus pasos: investigá a fondo con una ficha por negocio en salidas/fichas/<slug>.md, puntuá y escribí el primer mensaje de cada uno.
+El foco es vender WEBS y AUTOMATIZACIONES (sección "Qué vendemos" de tu CLAUDE.md). El mensaje tiene que sonar escrito a mano por Ignacio (sección "Cómo escribe Ignacio"): primera persona, firma "Ignacio", un dato concreto, una idea de web o automatización y una pregunta corta al final.
 NO repitas estos negocios que ya están cargados: ${existentes.join(", ") || "(ninguno)"}.
 Descartá cadenas y franquicias. Solo negocios con un canal de contacto público (Instagram, web o WhatsApp comercial).
 Al terminar, guardá el resultado en ${archivo} con este formato exacto (un array JSON, sin texto alrededor):
@@ -74,6 +75,24 @@ Instagram: ${pr["Instagram"]?.url || "—"} · Web: ${pr["Web"]?.url || "—"}
 Lo que ya vio Dwight: ${txt(pr["Oportunidad"])}
 Guardá todo en salidas/${slug}/ (hallazgos.md, diagnostico.html y diagnostico.pdf). No uses Notion. Respondé con el semáforo y las 3 mejoras en 5 líneas.`,
       meta: { pageId: cand.id, negocio, slug },
+    };
+  }
+  // historias de mañana: al menos 3, conectadas con lo que sale en el feed ese día
+  async function promptHistorias() {
+    const cont = await notionAll(CONTENIDO_DS);
+    const manana = new Date(); manana.setDate(manana.getDate() + 1); const dia = hoy(manana);
+    const delDia = cont.filter((c) => c.properties["Fecha"]?.date?.start === dia && !/stor/i.test(c.properties["Formato"]?.select?.name || ""))
+      .map((c) => { const carpeta = (txt(c.properties["Archivos"]).match(/salidas\/([^/\s]+)/) || [])[1]; return `${c.properties["Formato"]?.select?.name || ""}: "${txt(c.properties["Pieza"])}"${carpeta ? ` (carpeta salidas/${carpeta}/)` : ""}`; });
+    const ayer = cont.filter((c) => /stor/i.test(c.properties["Formato"]?.select?.name || "")).map((c) => txt(c.properties["Guión o slides"]).slice(0, 300)).slice(-3);
+    return {
+      texto: `MODO AUTOMÁTICO (rutina diaria, nadie está mirando en vivo: no esperes OK, Ignacio aprueba después).
+Armá las historias de mañana ${dia} (mínimo 3, máximo 5) siguiendo la sección "Historias" de tu CLAUDE.md.
+Lo que sale mañana en el feed: ${delDia.join(" | ") || "nada programado: usá la serie de cultura/calendario o Küme HQ"}.
+Historias de días anteriores (no repitas preguntas ni formatos seguidos): ${ayer.join(" || ") || "(ninguna)"}.
+Copiá plantilla-historias.html a salidas/${dia}-historias/piezas.html, exportá con python render_piezas.py salidas/${dia}-historias/piezas.html y revisá las PNG.
+Dejá en esa carpeta un pieza.json: {"pieza":"Historias ${dia}","fecha":"${dia}","formato":"Stories","pilar":"Comunidad","gancho":"","caption":"","guion":"","hashtags":""} donde el guion lista cada historia con el sticker a poner (tipo, texto y opciones, y dónde va) y la caption queda vacía.
+No uses Notion. Respondé con la lista de historias en 3 a 5 líneas.`,
+      meta: {},
     };
   }
   async function promptContenido() {
@@ -206,8 +225,11 @@ No uses Notion: la app lo carga sola. Respondé con la tabla de la semana.`,
     if (!agent || running.has(agent.id)) return { ok: false, texto: "El agente ya está trabajando." };
     const cfg = await loadCfg();
     const PROMPTS = { prospectos: () => promptProspeccion(cfg), diagnostico: promptDiagnostico, contenido: promptContenido, seguimientos: promptSeguimientos, tendencias: promptTendencias, blog: promptBlog, cobros: promptCobros };
-    if (!PROMPTS[rut.agente]) return { ok: false, texto: "Esta rutina no tiene instrucciones." };
-    const p = await PROMPTS[rut.agente]();
+    // rutinas con instrucciones propias (un mismo agente puede tener varias)
+    const POR_ID = { "historias-diaria": promptHistorias };
+    const armar = POR_ID[rut.id] || PROMPTS[rut.agente];
+    if (!armar) return { ok: false, texto: "Esta rutina no tiene instrucciones." };
+    const p = await armar();
     state.ultima[rut.id] = hoy(); await saveState();
     if (!p) { registrar(rut, true, rut.agente === "seguimientos" ? "Nadie necesita seguimiento hoy." : "No había prospectos nuevos para diagnosticar."); return { ok: true, texto: "Nada para hacer hoy." }; }
     running.add(agent.id);
@@ -257,7 +279,7 @@ No uses Notion: la app lo carga sola. Respondé con la tabla de la semana.`,
   async function iniciar() {
     await loadState();
     // importa lo que haya quedado sin cargar (por ejemplo si la app se cerró en el medio)
-    importarProspectos().catch(() => {}); importarContenido().catch(() => {});
+    importarProspectos().catch((e) => log("importar prospectos:", e.message)); importarContenido().catch((e) => log("importar contenido:", e.message));
     setTimeout(revisar, 20000); setInterval(revisar, 60000);
   }
 

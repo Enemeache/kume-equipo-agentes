@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Plantilla historias Küme</title>
+<link rel="stylesheet" href="../../assets/estilo-ig.css">
+<script src="../../assets/garabatos.js"></script>
+<style>
+  /* historias: 1080×1920. Instagram tapa arriba (~250 px: barra y nombre) y abajo (~340 px: responder). */
+  .slide.historia { height: 1920px; }
+  .slide.historia .logo-chico { bottom: 380px; }
+  .slide.historia .logo-chico.arriba { top: 270px; bottom: auto; }
+  /* lugar libre para el sticker de Instagram (encuesta, quiz, preguntas, cuenta regresiva, link):
+     no se dibuja nada, solo reserva el espacio. Ignacio pone el sticker encima al subirla. */
+  .zona-sticker { left: 140px; right: 140px; height: 360px; }
+  .flecha-sticker { width: 170px; }
+</style>
+</head>
+<body>
+<!-- HISTORIAS DE UN DÍA (mínimo 3). Copiá a salidas/AAAA-MM-DD-historias/piezas.html y exportá con
+     python render_piezas.py salidas/AAAA-MM-DD-historias/piezas.html  → slide-01.png, slide-02.png, slide-03.png
+     Mezcla diaria: 1 interactiva (encuesta / quiz / caja de preguntas / "¿cuál elegís?") · 1 que lleve al post o reel del día ·
+     1 de marca (Küme HQ, detrás de escena, la mascota de los ojitos, opinión corta o efeméride).
+     Todo el texto entre y = 270 y 1580. Dejá libre la .zona-sticker donde va el sticker. -->
+
+<!-- 1 · QUIZ (estilo claro) — sticker: Quiz -->
+<section class="slide historia claro crema">
+  <img class="ojitos" src="../../assets/logo-ojos.png" alt="" style="left:455px;top:330px">
+  <div class="etiqueta" style="top:500px">Pregunta del día</div>
+  <div class="titulo-verde" style="top:570px">¿Cuántos agentes de IA trabajan en Küme?</div>
+  <div class="zona-sticker" style="top:960px"></div>
+  <span class="garabato verde flecha-sticker" data-g="flechaCurva" style="left:110px;top:840px;transform:rotate(20deg)"></span>
+  <div class="texto-gris" style="top:1400px">La respuesta, <b>en el reel de hoy.</b></div>
+</section>
+
+<!-- 2 · ENCUESTA (estilo oscuro) — sticker: Encuesta -->
+<section class="slide historia oscuro">
+  <div class="pre" style="top:330px">Sin vueltas:</div>
+  <div class="titulo" style="top:410px">¿Le dejarías a una IA <em>responder tus DMs?</em></div>
+  <div class="zona-sticker" style="top:900px"></div>
+  <span class="garabato flecha-sticker" data-g="flecha" style="left:800px;top:780px;transform:rotate(110deg)"></span>
+  <div class="sub" style="top:1230px">Nosotros tenemos una regla: <b>nada sale sin aprobación.</b></div>
+  <img class="logo-chico" src="../../assets/logo-crema.png" alt="küme agencia creativa">
+</section>
+
+<!-- 3 · LLEVAR AL REEL DEL DÍA (estilo foto con recorte de la portada) — sticker: compartir el reel / mención -->
+<section class="slide historia foto" data-foto="../../assets/fotos/escritorio-planta.jpg">
+  <div class="pre" style="top:310px">Nuevo en el feed</div>
+  <div class="titulo" style="top:380px">14 empleados que <em>nunca duermen</em></div>
+  <div class="recorte" style="left:326px;top:660px;width:428px;height:760px;transform:rotate(-3deg)"><img src="../../salidas/2026-11-03-kume-hq-14-empleados-reel/portada.png" alt=""></div>
+  <span class="garabato" data-g="destellos" style="left:820px;top:660px;width:150px"></span>
+  <span class="garabato" data-g="flechaCurva" style="left:90px;top:1180px;width:200px;transform:scaleX(-1) rotate(-10deg)"></span>
+  <img class="logo-chico" src="../../assets/logo-crema.png" alt="küme agencia creativa">
+</section>
+</body>
+</html>
